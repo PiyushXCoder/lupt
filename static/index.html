@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="#">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+// Create WebSocket connection.
+const socket = new WebSocket('ws://localhost:8080/ws/');
+
+// Connection opened
+socket.addEventListener('open', function (event) {
+    socket.send('Hello Server!');
+});
+
+// Listen for messages
+socket.addEventListener('message', function (event) {
+    console.log('Message from server ', event.data);
+});
+
+function wsend(p) {
+    socket.send(p);
+}
+
+function join(r) {
+    socket.send(JSON.stringify({
+        cmd: "join",
+        name: r
+    }));
+}
+
+function send(t) {
+    socket.send(JSON.stringify({
+        cmd: "text",
+        text: t
+    }));
+}
+
+function name(t) {
+    socket.send(JSON.stringify({
+        cmd: "name",
+        name: t
+    }));
+}
+
+    </script>
+</body>
+</html>
