@@ -1,16 +1,15 @@
 //! Ws Sansad manage websocket of each client
-use actix::{Actor, Addr, Handler, Message, Running, StreamHandler};
-use actix_web::web;
+use actix::prelude::*;
+use actix_broker::{Broker, SystemBroker};
 use actix_web_actors::ws;
 use serde_json::{json, Value};
 
 use crate::chat_pinnd::ChatPinnd;
-use crate::chat_pinnd as pd;
+use crate::messages as ms;
 
 pub struct WsSansad {
     name: String,
     isthiti: Isthiti,
-    pinnd: web::Data<Addr<ChatPinnd>>,
     addr: Option<Addr<Self>>
 }
 
@@ -26,16 +25,12 @@ pub struct Grih {
     // name: String
 }
 
-// Handler Messages
-pub struct Text {
-    pub text: String,
-    pub sender: String
-}
-
-pub struct SelfAddr(pub Addr<WsSansad>);
-
 impl Actor for WsSansad {
     type Context = ws::WebsocketContext<Self>;
+    
+    fn started(&mut self, ctx: &mut Self::Context) {
+        self.addr = Some(ctx.address().clone());
+    }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
         futures::executor::block_on(self.end());
@@ -58,9 +53,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSansad {
     }
 }
 
-impl Handler<Text> for WsSansad {
+impl Handler<ms::WsMessage> for WsSansad {
     type Result = ();
-    fn handle(&mut self, msg: Text, ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: ms::WsMessage, ctx: &mut Self::Context) -> Self::Result {
         let json = json!({
             "cmd": "text",
             "text": msg.text,
@@ -70,19 +65,11 @@ impl Handler<Text> for WsSansad {
     }
 }
 
-impl Handler<SelfAddr> for WsSansad {
-    type Result = ();
-    fn handle(&mut self, msg: SelfAddr, _: &mut Self::Context) -> Self::Result {
-        self.addr = Some(msg.0);
-    }
-}
-
 impl WsSansad {
-    pub fn new(pinnd: web::Data<Addr<ChatPinnd>>) -> Self {
+    pub fn new() -> Self {
         WsSansad {
             name: "()".to_owned(),
             isthiti: Isthiti::None,
-            pinnd,
             addr: None
         }
     }
@@ -113,7 +100,7 @@ impl WsSansad {
             }
         };
 
-        self.pinnd.do_send(pd::Text {
+        Broker::<SystemBroker>::issue_async(ms::ReciveText {
             grih_kunjika,
             sender_name: self.name.clone(),
             text
@@ -127,8 +114,8 @@ impl WsSansad {
             None => None
         };
 
-        let kunjika = self.pinnd.send(pd::Join{
-            grih: pd::JoinType::Name(name.clone()),
+        let kunjika  = ChatPinnd::from_registry().send(ms::JoinUser{
+            grih: ms::JoinUserGrihType::Name(name.clone()),
             length,
             addr: self.addr.clone().unwrap()
         }).await.unwrap().unwrap();
@@ -141,13 +128,10 @@ impl WsSansad {
 
     async fn end(&mut self) {
         if let Isthiti::Grih(val) = &mut self.isthiti {
-            self.pinnd.do_send(pd::Delete {
+            Broker::<SystemBroker>::issue_async(ms::LeaveUser {
                 grih_kunjika: val.kunjika,
                 addr: self.addr.clone().unwrap()
             });
         }
     }
 }
-
-impl Message for Text { type Result = (); }
-impl Message for SelfAddr { type Result = (); }
