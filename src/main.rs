@@ -1,3 +1,14 @@
+//! Lupt chat
+//! Chat Website to have group chat and stranger's chat both
+//! 
+//! Structure of how program work flow
+//!
+//!           |--> ws_sansad1 <----\
+//! ws_index -|--> ws_sansad2 <---- \ chat_pind
+//!           |--> ws_sansad3 <---- /
+//!           |--> ws_sansad4 <----/
+//!
+
 use actix_web::{App, Error, HttpRequest, HttpResponse, HttpServer, web};
 use actix_files as fs;
 use actix_web_actors::ws;

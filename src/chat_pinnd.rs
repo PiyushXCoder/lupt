@@ -36,21 +36,24 @@ impl Actor for ChatPinnd {
     type Context = Context<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
+        // for actix broker 
         self.subscribe_system_async::<ms::SendText>(ctx);
         self.subscribe_system_async::<ms::LeaveUser>(ctx);
     }
 }
 
+// Set information of user
 impl Handler<ms::SetInfoVyakti> for ChatPinnd {
     type Result = Option<String>;
 
     fn handle(&mut self, msg: ms::SetInfoVyakti, _: &mut Self::Context) -> Self::Result {
+        // check if vayakti info is not modified and do key exist
         if !msg.modify {
             if self.vyakti.key_exist(&msg.kunjika) {
                 return Some("Kunjika Exists".to_owned());
             }
         }
-
+        // change value
         self.vyakti.insert(msg.kunjika, Vyakti {
             name: msg.name,
             tags: msg.tags
@@ -60,12 +63,14 @@ impl Handler<ms::SetInfoVyakti> for ChatPinnd {
     }
 }
 
+/// Join grih
 impl Handler<ms::JoinGrih> for ChatPinnd {
     type Result = Result<(), errors::GrihFullError>;
 
     fn handle(&mut self, msg: ms::JoinGrih, _: &mut Self::Context) -> Self::Result {
-        match self.grih.get_mut(&msg.grih_kunjika) {
-            Some(grih) =>{
+        match self.grih.get_mut(&msg.grih_kunjika) { // check if group exist
+            Some(grih) =>{ // exist
+                // check if group have no space left
                 if let Some(n) = grih.length {
                     if grih.loog.len() >= n {
                         return Err(errors::GrihFullError);
@@ -81,7 +86,8 @@ impl Handler<ms::JoinGrih> for ChatPinnd {
                         kunjika: kunjika.clone()
                     })
                 });
-            }, None => {
+            }, None => { // don't exist
+                // add group and notify
                 self.grih.insert(msg.grih_kunjika, Grih {
                     length: msg.length,
                     loog: vec![msg.addr.clone()]
@@ -97,9 +103,14 @@ impl Handler<ms::JoinGrih> for ChatPinnd {
     }
 }
 
+/// Join random vayakti 
+/// Works as:
+/// Check if watchlist is empty, if yes add the kunjika andaddr to watchlist
+/// if watchlist have people get 0th  person an connect it
 impl Handler<ms::JoinRandom> for ChatPinnd {
     type Result = Option<()>;
     fn handle(&mut self, msg: ms::JoinRandom, _: &mut Self::Context) -> Self::Result {
+        // Check if watch list is empty
         if self.vyaktigat_waitlist.len() == 0 {
             self.vyaktigat_waitlist.push(VyaktiWatchlist {
                 kunjika: msg.kunjika,
@@ -107,7 +118,8 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
             });
             return None;
         }
-
+        
+        // connect 0th person
         let vayakti_watchlist = self.vyaktigat_waitlist.remove(0);
         let vayakti1 =  self.vyakti.get(&msg.kunjika).unwrap();
         let vayakti2 = self.vyakti.get(&vayakti_watchlist.kunjika).unwrap();
@@ -117,6 +129,8 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
             loog: vec![msg.addr.clone(), vayakti_watchlist.addr.clone()]
         });
         
+        // notify about connection
+
         msg.addr.do_send(ms::WsConnectedRandom {
             ajnyat_name: vayakti2.name.clone(),
             grih_kunjika: group_kunjika.clone()
@@ -131,6 +145,7 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
     }
 }
 
+/// send text to exryone
 impl Handler<ms::SendText> for ChatPinnd {
     type Result = ();
 
@@ -146,6 +161,7 @@ impl Handler<ms::SendText> for ChatPinnd {
     }
 }
 
+/// Notifiy a user disconnected and trim grih
 impl Handler<ms::LeaveUser> for ChatPinnd {
     type Result = ();
 

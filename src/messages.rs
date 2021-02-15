@@ -4,8 +4,8 @@ use actix::prelude::*;
 use crate::ws_sansad::WsSansad;
 use crate::errors;
 
-
 //################################################## For ChatPinnd ##################################################
+/// Request to change information of vayakti to list of vayakti im ChatPind
 #[derive(Clone, Message)]
 #[rtype(result = "Option<String>")] // None if no error
 pub struct SetInfoVyakti {
@@ -15,6 +15,7 @@ pub struct SetInfoVyakti {
     pub modify: bool
 }
 
+/// Request to Grih with its kunjika
 #[derive(Clone, Message)]
 #[rtype(result = "Result<(), errors::GrihFullError>")]
 pub struct JoinGrih {
@@ -24,6 +25,7 @@ pub struct JoinGrih {
     pub kunjika: String
 }
 
+/// Request to connect Random vayakti
 #[derive(Clone, Message)]
 #[rtype(result = "Option<()>")]
 pub struct JoinRandom {
@@ -31,6 +33,7 @@ pub struct JoinRandom {
     pub kunjika: String
 }
 
+/// Request to send text t
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct SendText {
@@ -39,6 +42,7 @@ pub struct SendText {
     pub text: String
 }
 
+/// Request to leave grih
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct  LeaveUser {
@@ -48,6 +52,7 @@ pub struct  LeaveUser {
 }
 
 //################################################## For WsSansad ##################################################
+// Request to send transfer text
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsMessage {
@@ -55,6 +60,7 @@ pub struct WsMessage {
     pub sender: String
 }
 
+// Notify Someone connected
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsConnected {
@@ -62,12 +68,14 @@ pub struct WsConnected {
     pub kunjika: String
 }
 
+// Notify someone disconnected
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsDisconnected {
     pub kunjika: String
 }
 
+// Give response message
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsResponse {
@@ -75,7 +83,7 @@ pub struct WsResponse {
     pub message: String
 }
 
-
+// Got connected to random vayakti
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsConnectedRandom {

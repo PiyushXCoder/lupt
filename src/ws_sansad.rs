@@ -24,15 +24,16 @@ impl Actor for WsSansad {
     type Context = ws::WebsocketContext<Self>;
     
     fn started(&mut self, ctx: &mut Self::Context) {
-        self.addr = Some(ctx.address().clone());
+        self.addr = Some(ctx.address().clone()); // own addr
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        futures::executor::block_on(self.leave_grih());
+        futures::executor::block_on(self.leave_grih()); // notify leaving
         Running::Stop
     }
 }
 
+/// manage stream
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSansad {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         match msg {
@@ -48,6 +49,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSansad {
     }
 }
 
+/// send text message
 impl Handler<ms::WsMessage> for WsSansad {
     type Result = ();
     fn handle(&mut self, msg: ms::WsMessage, ctx: &mut Self::Context) -> Self::Result {
@@ -60,6 +62,7 @@ impl Handler<ms::WsMessage> for WsSansad {
     }
 }
 
+/// send response ok, error
 impl Handler<ms::WsResponse> for WsSansad {
     type Result = ();
     fn handle(&mut self, msg: ms::WsResponse, ctx: &mut Self::Context) -> Self::Result {
@@ -72,6 +75,7 @@ impl Handler<ms::WsResponse> for WsSansad {
     }
 }
 
+/// notify someone got connected
 impl Handler<ms::WsConnected> for WsSansad {
     type Result = ();
     fn handle(&mut self, msg: ms::WsConnected, ctx: &mut Self::Context) -> Self::Result {
@@ -84,6 +88,7 @@ impl Handler<ms::WsConnected> for WsSansad {
     }
 }
 
+/// notify someone got disconnected
 impl Handler<ms::WsDisconnected> for WsSansad {
     type Result = ();
     fn handle(&mut self, msg: ms::WsDisconnected, ctx: &mut Self::Context) -> Self::Result {
@@ -95,7 +100,7 @@ impl Handler<ms::WsDisconnected> for WsSansad {
     }
 }
 
-
+/// notify got connected to random person
 impl Handler<ms::WsConnectedRandom> for WsSansad {
     type Result = ();
     fn handle(&mut self, msg: ms::WsConnectedRandom, ctx: &mut Self::Context) -> Self::Result {
@@ -108,8 +113,6 @@ impl Handler<ms::WsConnectedRandom> for WsSansad {
     }
 }
 
-
-
 impl WsSansad {
     pub fn new() -> Self {
         WsSansad {
@@ -119,6 +122,7 @@ impl WsSansad {
         }
     }
 
+    /// parse the request text from client
     async fn parse_text_handle(&mut self, msg: String) {
         if let Ok(val) = serde_json::from_str::<Value>(&msg) {
             match val.get("cmd").unwrap().as_str().unwrap() {
@@ -132,6 +136,7 @@ impl WsSansad {
         }
     }
 
+    /// send ok response
     fn send_ok_response(&self) {
         self.addr.clone().unwrap().do_send(ms::WsResponse {
             result: "Ok".to_owned(),
@@ -139,6 +144,7 @@ impl WsSansad {
         });
     }
 
+    /// send error response
     fn send_err_response(&self, text: &str) {
         self.addr.clone().unwrap().do_send(ms::WsResponse {
             result: "Err".to_owned(),
@@ -146,7 +152,9 @@ impl WsSansad {
         });
     }
 
+    /// send info of user and modify if needed
     async fn set_info(&mut self, val: Value) {
+        // parse parameters
         let kunjika  = match val.get("kunjika") {
             Some(val ) => val.as_str().unwrap().to_owned(),
             None => {
@@ -175,8 +183,10 @@ impl WsSansad {
             }
         };
 
+        // check if eing modified
         let modify = self.kunjika == Some(kunjika.clone());
 
+        //request
         let result: Option<String> = ChatPinnd::from_registry().send(ms::SetInfoVyakti {
             kunjika: kunjika.clone(),
             name,
@@ -193,12 +203,15 @@ impl WsSansad {
         self.send_ok_response();
     }
 
+    /// Request for joining to random person
     async fn join_random(&mut self) {
+        // check if vayakti exist
         if let None = self.kunjika {
-            self.send_err_response("No user kunjika set");
+            self.send_err_response("No vayakti kunjika set");
             return;
         }
 
+        // is vayakti in watch list
         if let Isthiti::VraktigatWaitlist = self.isthiti {
             self.addr.clone().unwrap().do_send(ms::WsResponse {
                 result: "Ok".to_owned(),
@@ -207,6 +220,7 @@ impl WsSansad {
             return;
         }
 
+        // request
         let result: Option<()> = ChatPinnd::from_registry().send(ms::JoinRandom{
             addr: self.addr.clone().unwrap(),
             kunjika: self.kunjika.clone().unwrap()
@@ -221,12 +235,15 @@ impl WsSansad {
         }
     }
 
+    /// Request to join to grih
     async fn join_grih(&mut self, val: Value) {
+        //echeck user exist
         if let None = self.kunjika {
-            self.send_err_response("No user kunjika set");
+            self.send_err_response("No vayakti kunjika set");
             return;
         }
         
+        // parse parameter
         let grih_kunjika = match val.get("kunjika") {
             Some(val) => val,
             None => {
@@ -235,6 +252,7 @@ impl WsSansad {
             }
         }.as_str().unwrap().to_owned();
 
+        // restrict place for vaktigat chat
         if grih_kunjika.starts_with("gupt_") {
             self.send_err_response("Such grih kunjika is restricted");
             return;
@@ -245,6 +263,7 @@ impl WsSansad {
             None => None
         };
 
+        // requesy
         let result: Result<(), errors::GrihFullError> = ChatPinnd::from_registry().send(ms::JoinGrih {
             grih_kunjika: grih_kunjika.clone(),
             length,
@@ -261,17 +280,24 @@ impl WsSansad {
         }
     }
 
+    /// send text to vayakti in grih
     async fn send_text(&mut self, val: Value) {
+        // check if vayakti exist
         if let None = self.kunjika {
-            self.send_err_response("No user kunjika set");
+            self.send_err_response("No vayakti kunjika set");
             return;
         }
 
-        if let Isthiti::None = self.isthiti {
-            self.send_err_response("Grih not connected");
-            return;
+        // check if connected to any grih
+        match self.isthiti {
+            Isthiti::Grih(_) => (),
+            _ => {
+                self.send_err_response("Grih not connected");
+                return;
+            }
         }
 
+        // sent text
         let text = match val.get("text") {
             Some(val) => val,
             None => {
@@ -293,6 +319,7 @@ impl WsSansad {
         });
     }
 
+    // notify leaving
     async fn leave_grih(&mut self) {
         if let Isthiti::Grih(val) = &mut self.isthiti {
             Broker::<SystemBroker>::issue_async(ms::LeaveUser {
