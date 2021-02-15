@@ -25,10 +25,17 @@ function wsend(p) {
     socket.send(p);
 }
 
-function join(r) {
+function join(r, l) {
     socket.send(JSON.stringify({
         cmd: "join",
-        name: r
+        kunjika: r,
+        length: l
+    }));
+}
+
+function leave() {
+    socket.send(JSON.stringify({
+        cmd: "leave"
     }));
 }
 

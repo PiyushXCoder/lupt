@@ -2,27 +2,28 @@
 use actix::prelude::*;
 
 use crate::ws_sansad::WsSansad;
+use crate::errors;
 
 // For ChatPinnd 
 #[derive(Clone, Message)]
-#[rtype(result = "Option<i32>")]
-pub struct JoinUser {
-    pub grih: JoinUserGrihType,
-    pub length: Option<usize>,
-    pub addr: Addr<WsSansad>
+#[rtype(result = "Result<(), errors::AlreadyExistError>")]
+pub struct SetKunjikaUser {
+    pub kunjika: String
 }
 
-#[allow(dead_code)]
-#[derive(Clone)]
-pub enum JoinUserGrihType {
-    Name(String),
-    Kunjika(i32)
+#[derive(Clone, Message)]
+#[rtype(result = "Result<(), errors::GrihFullError>")]
+pub struct JoinUser {
+    pub grih_kunjika: String,
+    pub length: Option<usize>,
+    pub addr: Addr<WsSansad>,
+    pub name: String
 }
 
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
-pub struct ReciveText {
-    pub grih_kunjika: i32,
+pub struct SendText {
+    pub grih_kunjika: String,
     pub sender_name: String,
     pub text: String
 }
@@ -30,8 +31,15 @@ pub struct ReciveText {
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct  LeaveUser {
-    pub grih_kunjika: i32,
+    pub grih_kunjika: String,
     pub addr: Addr<WsSansad>
+}
+
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct  AddUserKunjika {
+    pub old_kunjika: Option<String>,
+    pub kunjika: String
 }
 
 // For WsSansad
@@ -40,4 +48,23 @@ pub struct  LeaveUser {
 pub struct WsMessage {
     pub text: String,
     pub sender: String
-} 
+}
+
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsConnected {
+    pub user: String
+}
+
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsDisconnected {
+    pub user: String
+}
+
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsResponse {
+    pub result: String,
+    pub message: String
+}

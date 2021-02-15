@@ -4,9 +4,11 @@ use actix_web_actors::ws;
 use ws_sansad::WsSansad;
 
 mod config;
+mod errors;
 mod messages;
 mod ws_sansad;
 mod chat_pinnd;
+mod vyakti_list;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

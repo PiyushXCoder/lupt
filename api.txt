@@ -1,0 +1,25 @@
+Set name:
+{
+    cmd: "name",
+    name: name
+}
+
+Join Grih: 
+{
+    cmd: "join",
+    kunjika: id,
+    length: number of members allowed (optional)
+}
+
+Leave:
+{
+    cmd: "leave"
+}
+
+Send Message:
+{
+    cmd: "text",
+    text: message
+}
+
+
