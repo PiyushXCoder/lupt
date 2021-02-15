@@ -46,10 +46,18 @@ function send(t) {
     }));
 }
 
-function name(t) {
+function info(k, n, t) {
     socket.send(JSON.stringify({
-        cmd: "name",
-        name: t
+        cmd: "seinfo",
+        kunjika: k,
+        name: n,
+        tags: t
+    }));
+}
+
+function joinrand() {
+    socket.send(JSON.stringify({
+        cmd: "rand"
     }));
 }
 

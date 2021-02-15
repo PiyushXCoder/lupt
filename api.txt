@@ -1,7 +1,9 @@
-Set name:
+Set Info:
 {
-    cmd: "name",
-    name: name
+    cmd: "seinfo",
+    name: name,
+    kunjika: kunjika,
+    tags: tags
 }
 
 Join Grih: 
@@ -20,6 +22,11 @@ Send Message:
 {
     cmd: "text",
     text: message
+}
+
+RandomUser:
+{
+    cmd: "rnd"
 }
 
 

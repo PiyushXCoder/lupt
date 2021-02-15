@@ -4,27 +4,38 @@ use actix::prelude::*;
 use crate::ws_sansad::WsSansad;
 use crate::errors;
 
-// For ChatPinnd 
+
+//################################################## For ChatPinnd ##################################################
 #[derive(Clone, Message)]
-#[rtype(result = "Result<(), errors::AlreadyExistError>")]
-pub struct SetKunjikaUser {
-    pub kunjika: String
+#[rtype(result = "Option<String>")] // None if no error
+pub struct SetInfoVyakti {
+    pub kunjika: String,
+    pub name: String,
+    pub tags: Vec<String>,
+    pub modify: bool
 }
 
 #[derive(Clone, Message)]
 #[rtype(result = "Result<(), errors::GrihFullError>")]
-pub struct JoinUser {
+pub struct JoinGrih {
     pub grih_kunjika: String,
     pub length: Option<usize>,
     pub addr: Addr<WsSansad>,
-    pub name: String
+    pub kunjika: String
+}
+
+#[derive(Clone, Message)]
+#[rtype(result = "Option<()>")]
+pub struct JoinRandom {
+    pub addr: Addr<WsSansad>,
+    pub kunjika: String
 }
 
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct SendText {
     pub grih_kunjika: String,
-    pub sender_name: String,
+    pub kunjika: String,
     pub text: String
 }
 
@@ -32,17 +43,11 @@ pub struct SendText {
 #[rtype(result = "()")]
 pub struct  LeaveUser {
     pub grih_kunjika: String,
+    pub kunjika: String,
     pub addr: Addr<WsSansad>
 }
 
-#[derive(Clone, Message)]
-#[rtype(result = "()")]
-pub struct  AddUserKunjika {
-    pub old_kunjika: Option<String>,
-    pub kunjika: String
-}
-
-// For WsSansad
+//################################################## For WsSansad ##################################################
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsMessage {
@@ -53,13 +58,14 @@ pub struct WsMessage {
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsConnected {
-    pub user: String
+    pub name: String,
+    pub kunjika: String
 }
 
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsDisconnected {
-    pub user: String
+    pub kunjika: String
 }
 
 #[derive(Clone, Message)]
@@ -68,3 +74,12 @@ pub struct WsResponse {
     pub result: String,
     pub message: String
 }
+
+
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsConnectedRandom {
+    pub ajnyat_name: String,
+    pub grih_kunjika: String
+}
+

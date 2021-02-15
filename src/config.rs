@@ -12,7 +12,7 @@ impl Config {
             .author(env!("CARGO_PKG_AUTHORS"))
             .about(env!("CARGO_PKG_DESCRIPTION"))
             .arg(Arg::with_name("static_path")
-                .short("b")
+                .short("s")
                 .long("static_path")
                 .value_name("DIR")
                 .help("Path of directory with index.html")
