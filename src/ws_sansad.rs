@@ -50,13 +50,28 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSansad {
 }
 
 /// send text message
-impl Handler<ms::WsMessage> for WsSansad {
+impl Handler<ms::WsText> for WsSansad {
     type Result = ();
-    fn handle(&mut self, msg: ms::WsMessage, ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: ms::WsText, ctx: &mut Self::Context) -> Self::Result {
         let json = json!({
             "cmd": "text",
             "text": msg.text,
-            "kunjika": msg.sender // Sender's kunjuka
+            "reply": msg.reply,
+            "kunjika": msg.sender_kunjika // Sender's kunjuka
+        });
+        ctx.text(json.to_string());
+    }
+}
+
+
+/// send text status
+impl Handler<ms::WsStatus> for WsSansad {
+    type Result = ();
+    fn handle(&mut self, msg: ms::WsStatus, ctx: &mut Self::Context) -> Self::Result {
+        let json = json!({
+            "cmd": "text",
+            "status": msg.status,
+            "kunjika": msg.sender_kunjika // Sender's kunjuka
         });
         ctx.text(json.to_string());
     }
@@ -130,6 +145,7 @@ impl WsSansad {
                 "join" => { self.join_grih(val).await },
                 "rand" => { self.join_random().await },
                 "text" => { self.send_text(val).await },
+                "status" => { self.send_status(val).await },
                 "leave" => { self.leave_grih().await },
                 _ => ()
             }
@@ -137,10 +153,10 @@ impl WsSansad {
     }
 
     /// send ok response
-    fn send_ok_response(&self) {
+    fn send_ok_response(&self, text: &str) {
         self.addr.clone().unwrap().do_send(ms::WsResponse {
             result: "Ok".to_owned(),
-            message: "".to_owned()
+            message: text.to_owned()
         });
     }
 
@@ -178,8 +194,7 @@ impl WsSansad {
                 v
             },
             None => {
-                self.send_err_response("Invalid request");
-                return;
+                Vec::new()
             }
         };
 
@@ -200,7 +215,7 @@ impl WsSansad {
         }
 
         self.kunjika = Some(kunjika);
-        self.send_ok_response();
+        self.send_ok_response("info changed");
     }
 
     /// Request for joining to random person
@@ -213,10 +228,7 @@ impl WsSansad {
 
         // is vayakti in watch list
         if let Isthiti::VraktigatWaitlist = self.isthiti {
-            self.addr.clone().unwrap().do_send(ms::WsResponse {
-                result: "Ok".to_owned(),
-                message: "watchlist".to_owned()
-            });
+            self.send_ok_response("watchlist");
             return;
         }
 
@@ -227,10 +239,7 @@ impl WsSansad {
         }).await.unwrap();
 
         if let None = result {
-            self.addr.clone().unwrap().do_send(ms::WsResponse {
-                result: "Ok".to_owned(),
-                message: "watchlist".to_owned()
-            });
+            self.send_ok_response("watchlist");
             self.isthiti = Isthiti::VraktigatWaitlist;
         }
     }
@@ -242,9 +251,16 @@ impl WsSansad {
             self.send_err_response("No vayakti kunjika set");
             return;
         }
+
+        match self.isthiti {
+            Isthiti::None => (),
+            _ => {
+                return;
+            }
+        }
         
         // parse parameter
-        let grih_kunjika = match val.get("kunjika") {
+        let grih_kunjika = match val.get("grih_kunjika") {
             Some(val) => val,
             None => {
                 self.send_err_response("Invalid request");
@@ -274,7 +290,7 @@ impl WsSansad {
         match result {
             Ok(_) => {
                 self.isthiti = Isthiti::Grih(grih_kunjika);
-                self.send_ok_response()
+                self.send_ok_response("joined")
             },
             Err(e) => self.send_err_response(&format!("{}", e))
         }
@@ -305,6 +321,12 @@ impl WsSansad {
                 return;
             }
         }.as_str().unwrap().to_owned();
+
+        let reply: Option<String> = match val.get("reply") {
+            Some(val) => Some(val.as_str().unwrap().to_owned()),
+            None => None
+        };
+
         let grih_kunjika = match &self.isthiti {
             Isthiti::Grih(g) => {
                 g.clone()
@@ -315,20 +337,66 @@ impl WsSansad {
         Broker::<SystemBroker>::issue_async(ms::SendText {
             grih_kunjika,
             kunjika: self.kunjika.clone().unwrap(),
-            text
+            text,
+            reply
+        });
+    }
+
+    /// send status to vayakti in grih
+    async fn send_status(&mut self, val: Value) {
+        // check if vayakti exist
+        if let None = self.kunjika {
+            self.send_err_response("No vayakti kunjika set");
+            return;
+        }
+
+        // check if connected to any grih
+        match self.isthiti {
+            Isthiti::Grih(_) => (),
+            _ => {
+                self.send_err_response("Grih not connected");
+                return;
+            }
+        }
+
+        // sent status
+        let status = match val.get("status") {
+            Some(val) => val,
+            None => {
+                self.send_err_response("Invalid request");
+                return;
+            }
+        }.as_str().unwrap().to_owned();
+        let grih_kunjika = match &self.isthiti {
+            Isthiti::Grih(g) => {
+                g.clone()
+            }, _ => {
+                return;
+            }
+        };
+        Broker::<SystemBroker>::issue_async(ms::SendStatus {
+            grih_kunjika,
+            kunjika: self.kunjika.clone().unwrap(),
+            status
         });
     }
 
     // notify leaving
     async fn leave_grih(&mut self) {
-        if let Isthiti::Grih(val) = &mut self.isthiti {
+        let grih_kunjika = match &self.isthiti {
+            Isthiti::Grih(val) => Some(val.to_owned()),
+            _ => None
+        };
+        
+        if let Some(ku) = &self.kunjika {
             Broker::<SystemBroker>::issue_async(ms::LeaveUser {
-                grih_kunjika: val.clone(),
-                kunjika: self.kunjika.clone().unwrap(),
+                grih_kunjika,
+                kunjika: 
+                ku.to_owned(),
                 addr: self.addr.clone().unwrap()
             });
-
-            self.send_ok_response();
         }
+
+        self.send_ok_response("left");
     }
 }

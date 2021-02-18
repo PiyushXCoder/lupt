@@ -39,14 +39,24 @@ pub struct JoinRandom {
 pub struct SendText {
     pub grih_kunjika: String,
     pub kunjika: String,
-    pub text: String
+    pub text: String,
+    pub reply: Option<String>,
+}
+
+// Request to send text t
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct SendStatus {
+    pub grih_kunjika: String,
+    pub kunjika: String,
+    pub status: String
 }
 
 /// Request to leave grih
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct  LeaveUser {
-    pub grih_kunjika: String,
+    pub grih_kunjika: Option<String>,
     pub kunjika: String,
     pub addr: Addr<WsSansad>
 }
@@ -55,10 +65,20 @@ pub struct  LeaveUser {
 // Request to send transfer text
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
-pub struct WsMessage {
+pub struct WsText {
     pub text: String,
-    pub sender: String
+    pub reply: Option<String>,
+    pub sender_kunjika: String
 }
+
+// Request to send transfer text
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsStatus {
+    pub status: String,
+    pub sender_kunjika: String
+}
+
 
 // Notify Someone connected
 #[derive(Clone, Message)]

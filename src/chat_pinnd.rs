@@ -21,12 +21,11 @@ pub struct Grih {
     loog: Vec<Addr<ws_sansad::WsSansad>>
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Vyakti {
     name: String,
     tags: Vec<String>
 }
-
 pub struct VyaktiWatchlist {
     kunjika: String,
     addr: Addr<ws_sansad::WsSansad>
@@ -145,16 +144,33 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
     }
 }
 
-/// send text to exryone
+/// send text to everyone
 impl Handler<ms::SendText> for ChatPinnd {
     type Result = ();
 
     fn handle(&mut self, msg: ms::SendText, _: &mut Self::Context) -> Self::Result {
         if let Some(grih) = self.grih.get(&msg.grih_kunjika) {
             grih.loog.iter().for_each(|c| {
-                c.do_send(ms::WsMessage {
-                    sender: msg.kunjika.clone(),
+                c.do_send(ms::WsText {
+                    sender_kunjika: msg.kunjika.clone(),
                     text: msg.text.clone(),
+                    reply: msg.reply.clone()
+                });
+            });
+        }
+    }
+}
+
+/// send status to everyone
+impl Handler<ms::SendStatus> for ChatPinnd {
+    type Result = ();
+
+    fn handle(&mut self, msg: ms::SendStatus, _: &mut Self::Context) -> Self::Result {
+        if let Some(grih) = self.grih.get(&msg.grih_kunjika) {
+            grih.loog.iter().for_each(|c| {
+                c.do_send(ms::WsStatus {
+                    sender_kunjika: msg.kunjika.clone(),
+                    status: msg.status.clone(),
                 });
             });
         }
@@ -166,20 +182,27 @@ impl Handler<ms::LeaveUser> for ChatPinnd {
     type Result = ();
 
     fn handle(&mut self, msg: ms::LeaveUser, _: &mut Self::Context) -> Self::Result {
-        if let Some(grih) = self.grih.get_mut(&msg.grih_kunjika) {
-            if let Some(i) = grih.loog.iter().position(|x| x == &msg.addr) {
-                grih.loog.remove(i);
+        if let Some(grih_kunjika) = &msg.grih_kunjika {
+            if let Some(grih) = self.grih.get_mut(grih_kunjika) {
+                if let Some(i) = grih.loog.iter().position(|x| x == &msg.addr) {
+                    grih.loog.remove(i);
+                }
+    
+                if grih.loog.len() == 0 {
+                    self.grih.remove(grih_kunjika);
+                } else {
+                    grih.loog.iter().for_each(|a| {
+                        a.do_send(ms::WsDisconnected {
+                            kunjika: msg.kunjika.clone()
+                        })
+                    });
+                }
             }
-
-            if grih.loog.len() == 0 {
-                self.grih.remove(&msg.grih_kunjika);
-            } else {
-                grih.loog.iter().for_each(|a| {
-                    a.do_send(ms::WsDisconnected {
-                        kunjika: msg.kunjika.clone()
-                    })
-                });
-            }
+        }
+        
+        self.vyakti.remove(&msg.kunjika).unwrap_or(());
+        if let Some(i) = self.vyaktigat_waitlist.iter().position(|a| a.kunjika == msg.kunjika) {
+            self.vyaktigat_waitlist.remove(i);
         }
     }
 }

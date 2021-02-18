@@ -90,6 +90,10 @@ impl<K: Clone + PartialEq,V: Clone> VecMap<K,V> {
             None => false
         }
     }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 }
 
 #[cfg(test)]
@@ -103,8 +107,7 @@ mod tests {
 
         a.insert(1, 5);
         a.insert(2, 10);
-        a.change_key(1, 2).unwrap();
-        a.insert(2, 15);
+        a.remove(&1);
 
         a.into_iter().enumerate().for_each(|(i,e)| {
             println!("{}\t-> {:?}", i,e);
