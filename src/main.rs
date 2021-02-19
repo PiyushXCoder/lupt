@@ -19,7 +19,7 @@ mod errors;
 mod messages;
 mod ws_sansad;
 mod chat_pinnd;
-
+mod validator;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let config = config::Config::new();

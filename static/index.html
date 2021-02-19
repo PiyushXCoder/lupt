@@ -14,7 +14,7 @@
     </div>
 
     <!-- Connect Screen -->
-    <div class="siimple-content siimple-content--extra-small">
+    <div id="connect_panel" class="siimple-content siimple-content--extra-small">
         <div class="siimple--px-5 siimple--py-5">
             <tabs>
                 <div class="siimple-jumbotron siimple--text-center siimple--py-4">
@@ -27,20 +27,28 @@
                 </div>
     
                 <form name="grih_sec" cmd="join" class="siimple-form">
-                    <div class="siimple-form-detail">Connect Grih(group) with kunjika.</div>
+                    <div name="error_area" class="siimple-content siimple--py-1 siimple--text-small siimple--color-primary siimple-content--fluid"></div>
+                    <div class="siimple-form-detail">Connect Grih(home) with kunjika.</div>
                     <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Grih kunjika</div>
+                        <div class="siimple-form-field-label">Grih kunjika(id)</div>
                         <input name="grih_kunjika" type="text" class="siimple-input siimple-input--fluid" placeholder="Grih kunjika">
+                        <div class="siimple-form-field-helper">New group is created if no such group exists</div>
                     </div>
                     <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Your kunjika</div>
+                        <div class="siimple-form-field-label">Your kunjika(id)</div>
                         <input name="kunjika" type="text" class="siimple-input siimple-input--fluid" placeholder="Your kunjika">
                     </div>
                     <div class="siimple-form-field">
                         <div class="siimple-form-field-label">Your name</div>
                         <input  name="name" type="text" class="siimple-input siimple-input--fluid" placeholder="Your name">
                     </div>
-                    <div class="siimple-form-field siimple--float-right">
+                    <div class="siimple-form-field">
+                        <div class="siimple-form-field-label">Size of Home</div>
+                        <input  name="length" type="number" class="siimple-input siimple-input--fluid" placeholder="Size">
+                        <div class="siimple-form-field-helper">Number of perople allowed in home. Leave empty for infinite</div>
+                    </div>
+                    <div class="siimple-form-field siimple--text-right" style="width: 100%;">
+                        <div><span name="error_msg" class="siimple-tag siimple-tag--error siimple--my-2 hidden"></span></div>
                         <div id="grih_connect" class="siimple-btn siimple-btn--success" onclick="connect($(this).parents('form').first())">Connect</div>
                     </div>
                 </form>
@@ -48,7 +56,7 @@
                 <form name="stranger_sec" cmd="rand" class="siimple-form hidden">
                     <div class="siimple-form-detail">Connect random stranger</div>
                     <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Your kunjika</div>
+                        <div class="siimple-form-field-label">Your kunjika(id)</div>
                         <input name="kunjika"  type="text" class="siimple-input siimple-input--fluid" placeholder="Your kunjika">
                     </div>
                     <div class="siimple-form-field">
@@ -60,7 +68,8 @@
                         <input name="tags" type="text" class="siimple-input siimple-input--fluid" placeholder="Tags">
                         <div class="siimple-form-field-helper">Seperated  by space</div>
                     </div>
-                    <div class="siimple-form-field siimple--float-right">
+                    <div class="siimple-form-field siimple--text-right" style="width: 100%;">
+                        <div><span name="error_msg" class="siimple-tag siimple-tag--error siimple--my-2 hidden"></span></div>
                         <div id="str_connect" class="siimple-btn siimple-btn--success" onclick="connect($(this).parents('form').first())">Connect</div>
                     </div>
                 </form>
@@ -79,31 +88,23 @@
                 <a class="siimple-navbar-item">Next &rightarrow;</a>
             </div>
         </div>
-        <div style="height: calc(100% - 2*44px - 2*5px); padding: 5px; overflow-y: scroll;" class="siimple--bg-light">
+        <div  id="message_area_scroll" style="height: calc(100% - 2*44px - 2*5px); padding: 5px; overflow-y: scroll;" class="siimple--bg-light">
             <div id="message_area" class="siimple--my-1">
-                <div class="message message-other">
-                    <div class="message-by">Ram_1_5</div>
-                    <pre>huh</pre>
-                </div>
-                <div class="message message-other">
-                    <div class="message-by">Ram_1_5</div>
-                    <pre>haha</pre>
-                </div>
-                <div class="message message-me">
-                    <div class="message-by">you</div>
-                    <pre>ya</pre>
-                </div>
+                
+            </div>
+            <div id="message_area" class="siimple--my-1">
+                
             </div>
         </div>
         <div class="siimple--bg-light chatpanel">
-            <div class="chatpanel-left siimple--mx-1 siimple--my-1">
+            <div class="chatpanel-left">
                 <div onclick="$('#action_clip').toggleClass('hidden')" class="siimple-btn siimple-btn--grey siimple--px-1"><img src="img/clip.svg" alt="send" width="24"></div>
             </div>
-            <div class="chatpanel-mid siimple--mx-1 siimple--my-1">
-                <textarea id="send_box" class="siimple-textarea siimple-textarea--fluid" style="height: calc(2em + 10px); overflow-y: hidden;"></textarea>             
+            <div class="chatpanel-mid">
+                <textarea id="send_box" class="siimple-textarea"></textarea>             
             </div>
-            <div class="chatpanel-right siimple--mx-1 siimple--my-1">
-                <div onclick="send()" class="siimple-btn siimple-btn--blue  siimple--px-2" style="height: 24px;"><img src="img/send.svg" alt="Send" width="24"></div>
+            <div class="chatpanel-right">
+                <div onclick="send()" class="siimple-btn siimple-btn--blue siimple-btn--rounded siimple--px-2" style="height: 24px;"><img src="img/send.svg" alt="Send" width="24"></div>
             </div>
         </div>
     </div>
@@ -132,7 +133,7 @@
             </div>
         </div>
         <div>
-            <a class="siimple-btn siimple-btn--blue">Clear</a>
+            <a onclick="cleanMessage()" class="siimple-btn siimple-btn--blue">Clear</a>
             <a class="siimple-btn siimple-btn--blue">List Users</a>
         </div>
     </div>

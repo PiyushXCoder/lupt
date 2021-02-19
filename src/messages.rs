@@ -52,6 +52,13 @@ pub struct SendStatus {
     pub status: String
 }
 
+// Request to send text t
+#[derive(Clone, Message)]
+#[rtype(result = "String")]
+pub struct List {
+    pub grih_kunjika: String
+}
+
 /// Request to leave grih
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
@@ -77,6 +84,13 @@ pub struct WsText {
 pub struct WsStatus {
     pub status: String,
     pub sender_kunjika: String
+}
+
+// Request to send transfer text
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsList {
+    pub json: String
 }
 
 

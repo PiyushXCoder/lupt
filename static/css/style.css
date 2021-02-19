@@ -1,5 +1,13 @@
 pre {
     font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.9em;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+textarea {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.9em;
     margin-top: 0;
     margin-bottom: 0;
 }
@@ -28,22 +36,45 @@ pre {
 }
 
 .chatpanel-left {
+    position: fixed;
     display: inline;
     width: 34px;
+    bottom: 0;
+    left: 0;
 }
 
 .chatpanel-mid {
+    position: fixed;
     display: inline;
     width: calc(100% - 54px - 34px);
+    bottom: 3px;
+    left: 34px;
 }
 
 .chatpanel-right {
+    position: fixed;
     display: inline;
     width: 44px;
+    bottom: 5px;
+    right: 5px;
+}
+
+#send_box {
+    width: 100%;
+    height: 40px; 
+    min-height: 40px;
+    word-wrap: break-word;
+    resize: none;
+}
+
+.status {
+    width: calc(100% - 6);
+    padding: 3px;
+    text-align: center;
 }
 
 .message {
-    padding: 0px 8px 5px 8px;
+    padding: 0px 8px 3px 8px;
     margin: 2px;
     word-wrap: break-word;;
 }
@@ -64,10 +95,10 @@ pre {
 }
 
 .message .message-by {
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     font-style: italic;
     text-decoration: underline;
-    padding-bottom: 2px;
+    padding-bottom: 1px;
 }
 
 .message-me.active {
