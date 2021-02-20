@@ -29,15 +29,7 @@ $(document).ready(() => {
 
     var send_typing = false;
     var timeout = null;
-    $('#send_box').keypress(function(e) {
-        if(e.originalEvent.charCode == 13 && !e.shiftKey) {
-            send();
-            e.preventDefault();
-            clearTimeout(timeout);
-            send_typing = false;
-            sendTypingEnd()
-            return
-        }
+    $('#send_box').keydown(function(e) {
         if (!send_typing) {
             sendTyping();
             send_typing = true;
@@ -48,6 +40,16 @@ $(document).ready(() => {
             send_typing = false;
             sendTypingEnd();
         },3000);
+    });
+    $('#send_box').keypress(function(e) {
+        if(e.originalEvent.charCode == 13 && !e.shiftKey) {
+            send();
+            e.preventDefault();
+            clearTimeout(timeout);
+            send_typing = false;
+            sendTypingEnd()
+            return
+        }
     });
 
     $('#send_box').bind('input propertychange keyup', function() {
@@ -110,6 +112,7 @@ socket.addEventListener('message', function (event) {
                     $('[name="error_msg"]').text(j.message);
                     $('[name="error_msg"]').removeClass('hidden');
                     $('#progressbar').addClass('hidden');
+                    joining = false;
                     callbacks = [];
                 } else {
                     pushStatus(j.message);
@@ -144,11 +147,11 @@ socket.addEventListener('message', function (event) {
             break;
         case 'connected':
             vayakti[j.kunjika] = j.name;
-            pushStatus('Vyakti '+j.name+' connected as '+j.kunjika);
+            pushStatus('Vyakti '+j.name+' connected as '+j.kunjika+' at '+currentTime());
             break;
         case 'disconnected':
             delete vayakti[j.kunjika];
-            pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika);
+            pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika+' at '+currentTime());
             break;
         case 'list':
             JSON.parse(j.vayakti).forEach(function(usr) {
@@ -184,6 +187,7 @@ function connect(frm) {
         myinfo.name = data.name;
         no_name_message = false;
         joining = false;
+        pushStatus('Connected at '+currentTime());
         socket.send(JSON.stringify({cmd: 'list'}));
     });
     socket.send(JSON.stringify(Object.assign({cmd: frm.attr('cmd')}, data)));
@@ -347,11 +351,16 @@ function cleanMessage() {
 function vayaktiList() {
     var v = $('#vayakti_list');
     v.empty();
-    Object.keys(vayaktiList).forEach((key) => {
+    Object.keys(vayakti).forEach((key) => {
         v.append($('<div>', {class: 'siimple-table-row'})
             .append($('<div>', {class: 'siimple-table-cell'}).append(key))
             .append($('<div>', {class: 'siimple-table-cell'}).append(vayakti[key])));
     });
     $('#vayakti_model').removeClass('hidden');
     $('#action_clip').addClass('hidden');
+}
+
+function currentTime() {
+    var today = new Date();
+    return today.getHours()+':'+today.getMinutes();
 }

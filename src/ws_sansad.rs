@@ -172,7 +172,6 @@ impl WsSansad {
             // check client heartbeats
             if Instant::now().duration_since(act.hb) > CLIENT_TIMEOUT {
                 // heartbeat timed out
-                println!("Websocket Client heartbeat failed, disconnecting!");
 
                 // stop actor
                 ctx.stop();
@@ -258,8 +257,7 @@ impl WsSansad {
         if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag], &kunjika, "Kunjika") {
             self.send_err_response(&val);
             return;
-        }
-        if let Some(val ) = validate(vec![vl::NonEmpty], &name, "Name") {
+        } else if let Some(val ) = validate(vec![vl::NonEmpty], &name, "Name") {
             self.send_err_response(&val);
             return;
         }
@@ -366,15 +364,13 @@ impl WsSansad {
 
 
         // Validate
-        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag], &kunjika, "Kunjika") {
-            self.send_err_response(&val);
-            return;
-        }
-        if let Some(val ) = validate(vec![vl::NonEmpty], &name, "Name") {
-            self.send_err_response(&val);
-            return;
-        }
         if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoGupt, vl::NoSpace], &grih_kunjika, "Grih Kunjika") {
+            self.send_err_response(&val);
+            return;
+        } else if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag], &kunjika, "Kunjika") {
+            self.send_err_response(&val);
+            return;
+        } else if let Some(val ) = validate(vec![vl::NonEmpty], &name, "Name") {
             self.send_err_response(&val);
             return;
         }

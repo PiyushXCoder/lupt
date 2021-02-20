@@ -56,12 +56,11 @@ impl Handler<ms::JoinGrih> for ChatPinnd {
     fn handle(&mut self, msg: ms::JoinGrih, _: &mut Self::Context) -> Self::Result {
         // check if user exist
         if let Some(_) = self.vyaktigat_waitlist.iter().position(|vk| vk.kunjika == msg.kunjika) {
-            println!("got in watchlist");
             return Resp::Err("Kunjika already exist".to_owned());
         }
 
         if let Some(_) = self.grih.iter().position(|(_,g)| {
-            match g.loog.iter().position(|a| {println!("Got in grih {:?} {:?}", a.kunjika, msg.kunjika);  a.kunjika == msg.kunjika}) {
+            match g.loog.iter().position(|a| a.kunjika == msg.kunjika) {
                 Some(_) => true,
                 None => false
             }
@@ -297,6 +296,9 @@ impl Handler<ms::SendStatus> for ChatPinnd {
     fn handle(&mut self, msg: ms::SendStatus, _: &mut Self::Context) -> Self::Result {
         if let Some(grih) = self.grih.get(&msg.grih_kunjika) {
             grih.loog.iter().for_each(|c| {
+                if c.kunjika == msg.kunjika {
+                    return;
+                }
                 c.addr.do_send(ms::WsStatus {
                     sender_kunjika: msg.kunjika.to_owned(),
                     status: msg.status.to_owned(),

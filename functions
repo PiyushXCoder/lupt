@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+lupt/target/release/lupt -s ./static -a $URL
