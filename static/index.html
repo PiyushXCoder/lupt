@@ -30,7 +30,7 @@
                     <div name="error_area" class="siimple-content siimple--py-1 siimple--text-small siimple--color-primary siimple-content--fluid"></div>
                     <div class="siimple-form-detail">Connect Grih(home) with kunjika.</div>
                     <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Grih kunjika(id)</div>
+                        <div class="siimple-form-field-label">Grih kunjika(home id)</div>
                         <input name="grih_kunjika" type="text" class="siimple-input siimple-input--fluid" placeholder="Grih kunjika">
                         <div class="siimple-form-field-helper">New group is created if no such group exists</div>
                     </div>
@@ -66,7 +66,7 @@
                     <div class="siimple-form-field">
                         <div class="siimple-form-field-label">Tags</div>
                         <input name="tags" type="text" class="siimple-input siimple-input--fluid" placeholder="Tags">
-                        <div class="siimple-form-field-helper">Seperated  by space</div>
+                        <div class="siimple-form-field-helper">Seperated  by space. Leave empty to connect anyone. Its recommended to try without tags if you don't get anyone</div>
                     </div>
                     <div class="siimple-form-field siimple--text-right" style="width: 100%;">
                         <div><span name="error_msg" class="siimple-tag siimple-tag--error siimple--my-2 hidden"></span></div>
@@ -85,14 +85,14 @@
             </div>
             <a class="siimple-navbar-title"><img src="img/label-l.svg" alt="Lupt Chat" height="34px"></a>
             <div class="siimple--float-right">
-                <a class="siimple-navbar-item">Next &rightarrow;</a>
+                <a id="next_btn" onclick="connect_next()" class="siimple-navbar-item">Next &rightarrow;</a>
             </div>
         </div>
         <div  id="message_area_scroll" style="height: calc(100% - 2*44px - 2*5px); padding: 5px; overflow-y: scroll;" class="siimple--bg-light">
             <div id="message_area" class="siimple--my-1">
                 
             </div>
-            <div id="message_area" class="siimple--my-1">
+            <div id="status_area" class="siimple--my-1">
                 
             </div>
         </div>
@@ -134,7 +134,36 @@
         </div>
         <div>
             <a onclick="cleanMessage()" class="siimple-btn siimple-btn--blue">Clear</a>
-            <a class="siimple-btn siimple-btn--blue">List Users</a>
+            <a onclick="vayaktiList()" class="siimple-btn siimple-btn--blue">List Vyakti(Users)</a>
+        </div>
+    </div>
+
+    <!-- Vyakti List -->
+    <div id="vayakti_model" class="siimple-modal siimple-modal--large hidden" style="z-index: 9999;" id="modal">
+        <div class="siimple-modal-content">
+            <div class="siimple-modal-header">
+                <div class="siimple-modal-header-title">List Vyakti(Users)</div>
+                <div onclick="$('#vayakti_model').addClass('hidden')" class="siimple-modal-header-close" id="modal-close"></div>
+            </div>
+            <div class="siimple-modal-body siimple--px-0">
+                <div class="siimple-table siimple--px-3">
+                    <div class="siimple-table-header">
+                        <div class="siimple-table-row">
+                            <div class="siimple-table-cell">Name</div>
+                            <div class="siimple-table-cell">Kunjika</div>
+                        </div>
+                    </div>
+                    <div id="vayakti_list" class="siimple-table-body">
+                        <div class="siimple-table-row">
+                            <div class="siimple-table-cell">a</div>
+                            <div class="siimple-table-cell">a</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="siimple-modal-footer  siimple--py-2">
+                <a onclick="$('#vayakti_model').addClass('hidden'); $('#vayakti_list').empty()" class="siimple-btn siimple-btn--blue">Close</a>
+            </div>
         </div>
     </div>
 

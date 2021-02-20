@@ -3,6 +3,7 @@ pre {
     font-size: 0.9em;
     margin-top: 0;
     margin-bottom: 0;
+    white-space: pre-wrap;
 }
 
 textarea {

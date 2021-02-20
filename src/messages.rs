@@ -1,35 +1,37 @@
 //! Messages to be sent between Actors
 use actix::prelude::*;
+use dev::{MessageResponse, ResponseChannel};
 
 use crate::ws_sansad::WsSansad;
-use crate::errors;
 
 //################################################## For ChatPinnd ##################################################
 /// Request to change information of vayakti to list of vayakti im ChatPind
-#[derive(Clone, Message)]
-#[rtype(result = "Option<String>")] // None if no error
-pub struct SetInfoVyakti {
-    pub kunjika: String,
-    pub name: String,
-    pub tags: Vec<String>,
-    pub modify: bool
-}
 
 /// Request to Grih with its kunjika
 #[derive(Clone, Message)]
-#[rtype(result = "Result<(), errors::GrihFullError>")]
+#[rtype(result = "Resp")]
 pub struct JoinGrih {
     pub grih_kunjika: String,
     pub length: Option<usize>,
     pub addr: Addr<WsSansad>,
-    pub kunjika: String
+    pub kunjika: String,
+    pub name: String,
 }
 
 /// Request to connect Random vayakti
 #[derive(Clone, Message)]
-#[rtype(result = "Option<()>")]
+#[rtype(result = "Resp")]
 pub struct JoinRandom {
     pub addr: Addr<WsSansad>,
+    pub kunjika: String,
+    pub name: String,
+    pub tags: Vec<String>,
+}
+/// Request to connect Random vayakti
+#[derive(Clone, Message)]
+#[rtype(result = "Resp")]
+pub struct JoinRandomNext {
+    pub grih_kunjika: String,
     pub kunjika: String
 }
 
@@ -93,7 +95,6 @@ pub struct WsList {
     pub json: String
 }
 
-
 // Notify Someone connected
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
@@ -106,7 +107,8 @@ pub struct WsConnected {
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsDisconnected {
-    pub kunjika: String
+    pub kunjika: String,
+    pub name: String
 }
 
 // Give response message
@@ -121,7 +123,25 @@ pub struct WsResponse {
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsConnectedRandom {
-    pub ajnyat_name: String,
+    pub name: String,
+    pub kunjika: String,
     pub grih_kunjika: String
 }
+//################################################## Helper ##################################################
+pub enum Resp {
+    Ok,
+    Err(String), 
+    None
+}
 
+impl<A, M> MessageResponse<A, M> for Resp
+where
+    A: Actor,
+    M: Message<Result = Resp>,
+{
+    fn handle<R: ResponseChannel<M>>(self, _: &mut A::Context, tx: Option<R>) {
+        if let Some(tx) = tx {
+            tx.send(self);
+        }
+    }
+}

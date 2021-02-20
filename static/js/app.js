@@ -20,18 +20,34 @@ $(document).ready(() => {
     });
 
     $('.message-me, .message-other').click(function() {
-        activateMessage(this);
+        selectMessage(this);
     });
 
     $('#selected_clip > .siimple-close').click(function() {
-        deactivateMessages();
+        unselectMessages();
     });
 
+    var send_typing = false;
+    var timeout = null;
     $('#send_box').keypress(function(e) {
         if(e.originalEvent.charCode == 13 && !e.shiftKey) {
             send();
             e.preventDefault();
+            clearTimeout(timeout);
+            send_typing = false;
+            sendTypingEnd()
+            return
         }
+        if (!send_typing) {
+            sendTyping();
+            send_typing = true;
+            return;
+        }
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            send_typing = false;
+            sendTypingEnd();
+        },3000);
     });
 
     $('#send_box').bind('input propertychange keyup', function() {
@@ -47,6 +63,20 @@ $(document).ready(() => {
     });
 });
 
+function sendTyping() {
+    socket.send(JSON.stringify({
+        cmd: 'status',
+        status: "typing"
+    }));
+}
+
+function sendTypingEnd() {
+    socket.send(JSON.stringify({
+        cmd: 'status',
+        status: "typing_end"
+    }));
+}
+
 function calcHeight(value) {
     let numberOfLineBreaks = (value.match(/\n/g) || []).length;
     // min-height + lines x line-height + padding + border
@@ -61,7 +91,9 @@ var myinfo = {
     kunjika: "",
     name: ""
 };
-var users = {};
+var vayaktiList = {};
+var typing = [];
+var no_name_message = false;
 
 // Connection opened
 socket.addEventListener('open', function (event) {
@@ -71,13 +103,13 @@ socket.addEventListener('open', function (event) {
 // Listen for messages
 socket.addEventListener('message', function (event) {
     var j = JSON.parse(event.data);
-    console.log(j);
     switch(j.cmd) {
         case 'resp':
             if(j.result == 'Err') {
                 if($('#chat_panel').hasClass('hidden')) {
                     $('[name="error_msg"]').text(j.message);
                     $('[name="error_msg"]').removeClass('hidden');
+                    $('#progressbar').addClass('hidden');
                     callbacks = [];
                 } else {
                     pushStatus(j.message);
@@ -89,24 +121,49 @@ socket.addEventListener('message', function (event) {
                 }
             }
             break;
+        case 'random':
+            callbacks[0]();
+            callbacks = [];
+            no_name_message = true;
+            $('#next_btn').removeClass('hidden');
+            pushStatus('Say hi to '+j.name);
+            vayaktiList[j.kunjika] = j.name;
+            break;
+        case 'status':
+            if(j.status == "typing") {
+                typing.push(j.kunjika);
+                pushTypingStatus();
+            } else if(j.status == "typing_end") {
+                const index = typing.indexOf(j.kunjika);
+                if (index > -1) typing.splice(index, 1);
+                pushTypingStatus();
+            }
+            break;
         case 'text':
             pushMessage(j.kunjika, j.text, j.reply);
             break;
         case 'connected':
-            users[j.kunjika] = j.name;
+            vayaktiList[j.kunjika] = j.name;
             pushStatus('Vyakti '+j.name+' connected as '+j.kunjika);
             break;
         case 'disconnected':
-            delete users[j.kunjika];
+            delete vayaktiList[j.kunjika];
             pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika);
             break;
-        
+        case 'list':
+            JSON.parse(j.vayakti).forEach(function(usr) {
+                vayaktiList[usr[0]] = usr[1];
+            });
+            break;
     }
 });
 
+var joining = false;
 function connect(frm) {
+    if(joining) return;
+    joining = true;
     var frm = $(frm);
-    $('#progressbar').addClass('hidden');
+    $('#progressbar').removeClass('hidden');
     var data = {};
     frm.serializeArray().forEach(el => {
         data[el.name] = el.value;
@@ -115,8 +172,27 @@ function connect(frm) {
         data['length'] = parseInt(data['length']);
     }
     callbacks.push(() => {
-        socket.send(JSON.stringify(Object.assign({cmd: frm.attr('cmd')}, data)));
+        cleanMessage();
+        $('#progressbar').addClass('hidden');
+        $('#send_box').text('');
+        $('#connect_panel').addClass('hidden');
+        $('[name="error_msg"]').addClass('hidden');
+        $('#chat_panel').removeClass('hidden');
+        $('#send_box').focus();
+        $('#next_btn').addClass('hidden');
+        myinfo.kunjika = data.kunjika;
+        myinfo.name = data.name;
+        no_name_message = false;
+        joining = false;
+        socket.send(JSON.stringify({cmd: 'list'}));
     });
+    socket.send(JSON.stringify(Object.assign({cmd: frm.attr('cmd')}, data)));
+}
+
+function connect_next() {
+    if(joining) return;
+    joining = true;
+    $('#progressbar').removeClass('hidden');
     callbacks.push(() => {
         cleanMessage();
         $('#progressbar').addClass('hidden');
@@ -125,10 +201,11 @@ function connect(frm) {
         $('[name="error_msg"]').addClass('hidden');
         $('#chat_panel').removeClass('hidden');
         $('#send_box').focus();
-        myinfo.kunjika = data.kunjika;
-        myinfo.name = data.name;
+        $('#next_btn').addClass('hidden');
+        joining = false;
+        socket.send(JSON.stringify({cmd: 'list'}));
     });
-    socket.send(JSON.stringify(Object.assign({cmd: 'seinfo'}, data)));
+    socket.send(JSON.stringify({ cmd: 'randnext' }));
 }
 
 function leave() {
@@ -138,19 +215,43 @@ function leave() {
         $('#selected_clip').addClass('hidden');
         $('#action_clip').addClass('hidden');
         $('#connect_panel').removeClass('hidden');
-        myinfo.kunjika = "";
-        myinfo.name = "";
+        myinfo.kunjika = '';
+        myinfo.name = '';
     });
     socket.send(JSON.stringify({
-        cmd: "leave"
+        cmd: 'leave'
     }));
+}
+
+function pushTypingStatus() {
+    var elm = $('#status_area > #typing');
+    if(elm.length > 0) elm.remove();
+    if(typing.length == 0) return;
+    var text = '';
+    typing.forEach((val)  => {
+        text += val + ','
+    })
+    text = text.substr(0, text.length-1);
+    text += ' is typing...'
+    $('#status_area').append($('<div>', { id: 'typing', 
+        class:'siimple-label siimple--mx-2 siimple--my-0' }).append(text));
+
+    var scroll = $("#message_area_scroll");
+    scroll.scrollTop(scroll[0].scrollHeight);
 }
 
 function pushMessage(sender, text, reply = null) {
     var isMe = myinfo.kunjika == sender;
     var area = $('#message_area');
     var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other')});
-    elm.append($('<div>', {class: 'message-by'}).append(users[sender]));
+    if(!no_name_message) {
+        if(sender == myinfo.kunjika)
+            elm.append($('<div>', {class: 'message-by'}).append('me'))
+        else
+            elm.append($('<div>', {class: 'message-by'}).append(vayaktiList[sender]+'('+sender+')'))
+    } else {
+        elm.addClass('siimple--py-1');
+    }
     if(reply != null && reply.length > 0) {
         elm.append(
             $('<div>', {class: 'message message-reply'})
@@ -159,35 +260,33 @@ function pushMessage(sender, text, reply = null) {
     }
     elm.append($('<pre>').append(text));
     elm.click(function() {
-        activateMessage(this);
+        selectMessage(this);
     });
     area.append(elm);
 
-    //to bottom
     var scroll = $("#message_area_scroll");
     scroll.scrollTop(scroll[0].scrollHeight);
 }
 
-
+// in message area 
 function pushStatus(text) {
     var area = $('#message_area');
     var elm = $('<div>', {class: 'status'});
     elm.append($('<span>', {class: 'siimple-tag siimple-tag--dark'}).append(text));
     area.append(elm);
 
-    //to bottom
     var scroll = $("#message_area_scroll");
     scroll.scrollTop(scroll[0].scrollHeight);
 }
 
-function deactivateMessages() {
+function unselectMessages() {
     $('.active').each(function() {
         $(this).removeClass('active');
     });
     $('#selected_clip').addClass('hidden');
 }
 
-function activateMessage(t) {
+function selectMessage(t) {
     var t = $(t);
     t.toggleClass('active');
 
@@ -214,7 +313,7 @@ function prepareReply() {
     el.removeClass('hidden');
     el.attr('msg', text);
     $('#reply_clip > span').text(text.substr(0, 15)+ '...');
-    deactivateMessages();
+    unselectMessages();
 }
 
 function send() {
@@ -237,49 +336,22 @@ function copyMessagesToClipboard() {
     $temp.val(selectedMessageToText()).select();
     document.execCommand("copy");
     $temp.remove();
-    deactivateMessages();
+    unselectMessages();
 }
 
 function cleanMessage() {
     $('#message_area').empty();
     $('#action_clip').addClass('hidden');
 }
-// function wsend(p) {
-//     socket.send(p);
-// }
 
-// function join(r, l) {
-//     socket.send(JSON.stringify({
-//         cmd: "join",
-//         grih_kunjika: r,
-//         length: l
-//     }));
-// }
-
-// function leave() {
-//     socket.send(JSON.stringify({
-//         cmd: "leave"
-//     }));
-// }
-
-// function send(t) {
-//     socket.send(JSON.stringify({
-//         cmd: "text",
-//         text: t
-//     }));
-// }
-
-// function info(k, n, t) {
-//     socket.send(JSON.stringify({
-//         cmd: "seinfo",
-//         kunjika: k,
-//         name: n,
-//         tags: t
-//     }));
-// }
-
-// function joinrand() {
-//     socket.send(JSON.stringify({
-//         cmd: "rand"
-//     }));
-// }
+function vayaktiList() {
+    var v = $('#vayakti_list');
+    v.empty();
+    Object.keys(vayaktiList).forEach((key) => {
+        v.append($('<div>', {class: 'siimple-table-row'})
+            .append($('<div>', {class: 'siimple-table-cell'}).append(key))
+            .append($('<div>', {class: 'siimple-table-cell'}).append(vayaktiList[key])));
+    });
+    $('#vayakti_model').removeClass('hidden');
+    $('#action_clip').addClass('hidden');
+}
