@@ -91,7 +91,7 @@ var myinfo = {
     kunjika: "",
     name: ""
 };
-var vayaktiList = {};
+var vayakti = {};
 var typing = [];
 var no_name_message = false;
 
@@ -127,7 +127,7 @@ socket.addEventListener('message', function (event) {
             no_name_message = true;
             $('#next_btn').removeClass('hidden');
             pushStatus('Say hi to '+j.name);
-            vayaktiList[j.kunjika] = j.name;
+            vayakti[j.kunjika] = j.name;
             break;
         case 'status':
             if(j.status == "typing") {
@@ -143,16 +143,16 @@ socket.addEventListener('message', function (event) {
             pushMessage(j.kunjika, j.text, j.reply);
             break;
         case 'connected':
-            vayaktiList[j.kunjika] = j.name;
+            vayakti[j.kunjika] = j.name;
             pushStatus('Vyakti '+j.name+' connected as '+j.kunjika);
             break;
         case 'disconnected':
-            delete vayaktiList[j.kunjika];
+            delete vayakti[j.kunjika];
             pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika);
             break;
         case 'list':
             JSON.parse(j.vayakti).forEach(function(usr) {
-                vayaktiList[usr[0]] = usr[1];
+                vayakti[usr[0]] = usr[1];
             });
             break;
     }
@@ -248,7 +248,7 @@ function pushMessage(sender, text, reply = null) {
         if(sender == myinfo.kunjika)
             elm.append($('<div>', {class: 'message-by'}).append('me'))
         else
-            elm.append($('<div>', {class: 'message-by'}).append(vayaktiList[sender]+'('+sender+')'))
+            elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender+')'))
     } else {
         elm.addClass('siimple--py-1');
     }
@@ -350,7 +350,7 @@ function vayaktiList() {
     Object.keys(vayaktiList).forEach((key) => {
         v.append($('<div>', {class: 'siimple-table-row'})
             .append($('<div>', {class: 'siimple-table-cell'}).append(key))
-            .append($('<div>', {class: 'siimple-table-cell'}).append(vayaktiList[key])));
+            .append($('<div>', {class: 'siimple-table-cell'}).append(vayakti[key])));
     });
     $('#vayakti_model').removeClass('hidden');
     $('#action_clip').addClass('hidden');
