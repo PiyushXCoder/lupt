@@ -7,6 +7,16 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Self {
+        let bind_address = std::env::var("URL");
+        let static_path = std::env::var("STATIC_PATH");
+
+        if bind_address.is_ok() && static_path.is_ok() {
+            return Config {
+                static_path: static_path.unwrap(),
+                bind_address: bind_address.unwrap()
+            };
+        }
+
         let matches = App::new("Lupt (लुप्त)")
             .version(env!("CARGO_PKG_VERSION"))
             .author(env!("CARGO_PKG_AUTHORS"))
