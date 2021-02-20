@@ -9,7 +9,7 @@
 //!           |--> ws_sansad4 <----/
 //!
 
-use actix_web::{App, Error, HttpRequest, HttpResponse, HttpServer, web};
+use actix_web::{App, Error, HttpRequest, HttpResponse, HttpServer, middleware::Logger, web};
 use actix_files as fs;
 use actix_web_actors::ws;
 use ws_sansad::WsSansad;
@@ -22,10 +22,14 @@ mod chat_pinnd;
 mod validator;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    std::env::set_var("RUST_LOG", "actix_web=info");
+    env_logger::init();
+
     let config = config::Config::new();
     let static_path = config.static_path;
     HttpServer::new(move || {
         App::new()
+        .wrap(Logger::new("%t [%a] %s %{User-Agent}i %r"))
         .service(web::resource("/ws/").route(web::get().to(ws_index)))
         .service(fs::Files::new("/", &static_path).index_file("index.html"))
     })
