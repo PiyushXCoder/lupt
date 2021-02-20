@@ -1,4 +1,0 @@
-[build]
-command = "make build"
-publish = "static"
-functions = "functions"
