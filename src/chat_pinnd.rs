@@ -137,24 +137,26 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
             return Resp::None;
         }
         
-        // connect person with tag or to zero
-        let pos = match self.vyaktigat_waitlist.iter().position(|vk| {
-            match vk.tags.iter().position(|t| msg.tags.contains(t)) {
-                Some(_) => true,
-                None => false
+        // connect person with tag 
+        let pos = if msg.tags.len() > 0 {
+            match self.vyaktigat_waitlist.iter().position(|vk| {
+                match vk.tags.iter().position(|t| msg.tags.contains(t)) {
+                    Some(_) => true,
+                    None => false
+                }
+            }) {
+                Some(i) => i,
+                None => {
+                    self.vyaktigat_waitlist.push(VyaktiWatchlist {
+                        kunjika: msg.kunjika,
+                        addr: msg.addr,
+                        name: msg.name,
+                        tags: msg.tags
+                    });
+                    return Resp::None;
+                }
             }
-        }) {
-            Some(i) => i,
-            None => {
-                self.vyaktigat_waitlist.push(VyaktiWatchlist {
-                    kunjika: msg.kunjika,
-                    addr: msg.addr,
-                    name: msg.name,
-                    tags: msg.tags
-                });
-                return Resp::None;
-            }
-        };
+        } else { 0 };
 
         let vayakti_watchlist = self.vyaktigat_waitlist.remove(pos);
         let group_kunjika = format!("gupt_{}>{}",msg.kunjika.to_owned(), vayakti_watchlist.kunjika);
