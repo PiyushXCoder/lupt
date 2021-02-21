@@ -15,7 +15,7 @@
 
     <!-- Connect Screen -->
     <div id="connect_panel" class="siimple-content siimple-content--extra-small">
-        <div class="siimple--px-5 siimple--py-5">
+        <div class="siimple--px-5 siimple--py-0">
             <tabs>
                 <div class="siimple-jumbotron siimple--text-center siimple--py-4">
                     <div class="siimple-jumbotron-title"><img src="img/label.svg" alt="Lupt Chat" style="width: 100%; height: auto;"></div>
@@ -74,9 +74,12 @@
                     </div>
                 </form>
             </tabs>
+            <div class="siimple-content siimple-content--fluid siimple--text-center siimple--py-1">
+                <div class="siimple-form-field-helper">By tapping "Connect" button I agree with <a class="siimple-link" href="/terms.html">Terms of Service</a> and <a class="siimple-link" href="policy.html">Privacy Policy</a></div>
+            </div>
         </div>
         <div class="siimple-footer" align="center">
-            Made with ❤️️ by <a href="http://github.com/PiyushXCoder" class="siimple-link">Piyush Mishra</a>
+            Made with ❤️️ by <a href="https://gitlab.com/PiyushXCoder" class="siimple-link">Piyush Mishra</a>
         </div>
                 
     </div>
@@ -85,11 +88,11 @@
     <div id="chat_panel" class="cover-screen siimple--bg-white hidden">
         <div class="siimple-navbar siimple--py-1 siimple-navbar--dark">
             <div class="siimple--float-left">
-                <a onclick="leave()" class="siimple-navbar-item">&leftarrow; Back</a>
+                <a onclick="leave()" class="siimple-navbar-item"><img src="img/back.svg" alt="" height="12px"> Back</a>
             </div>
             <a class="siimple-navbar-title"><img src="img/label-l.svg" alt="Lupt Chat" height="34px"></a>
             <div class="siimple--float-right">
-                <a id="next_btn" onclick="connect_next()" class="siimple-navbar-item">Next &rightarrow;</a>
+                <a id="next_btn" onclick="connect_next()" class="siimple-navbar-item">Next <img src="img/next.svg" alt="" height="12px"> </a>
             </div>
         </div>
         <div  id="message_area_scroll" style="height: calc(100% - 2*44px - 2*5px); padding: 5px; overflow-y: scroll;" class="siimple--bg-light">
@@ -130,7 +133,7 @@
 
     <!-- Action Clip -->
     <div id="action_clip" class="clip-win action-clip siimple--bg-white hidden">
-        <div class="siimple--my-1">
+        <div class="siimple--my-1 hidden">
             <div class="siimple-btn siimple-btn--light">
                 <img src="img/image.svg" alt="Image" width="50" class="siimple--py-2 siimple--px-2">
                 <div>send image</div>

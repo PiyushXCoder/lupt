@@ -39,7 +39,7 @@ $(document).ready(() => {
         timeout = setTimeout(function() {
             send_typing = false;
             sendTypingEnd();
-        },3000);
+        },2000);
     });
     $('#send_box').keypress(function(e) {
         if(e.originalEvent.charCode == 13 && !e.shiftKey) {
@@ -99,7 +99,7 @@ var no_name_message = false;
 
 // Connection opened
 socket.addEventListener('open', function (event) {
-    $('#progressbar').toggleClass('hidden');
+    $('#progressbar').addClass('hidden');
 });
 
 // Listen for messages
@@ -127,10 +127,9 @@ socket.addEventListener('message', function (event) {
         case 'random':
             callbacks[0]();
             callbacks = [];
-            no_name_message = true;
             $('#next_btn').removeClass('hidden');
+            no_name_message = true;
             pushStatus('Say hi to '+j.name);
-            vayakti[j.kunjika] = j.name;
             break;
         case 'status':
             if(j.status == "typing") {
@@ -152,6 +151,15 @@ socket.addEventListener('message', function (event) {
         case 'disconnected':
             delete vayakti[j.kunjika];
             pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika+' at '+currentTime());
+            break;
+        case 'left':
+            $('#chat_panel').addClass('hidden');
+            $('#reply_clip').addClass('hidden');
+            $('#selected_clip').addClass('hidden');
+            $('#action_clip').addClass('hidden');
+            $('#connect_panel').removeClass('hidden');
+            myinfo.kunjika = '';
+            myinfo.name = '';
             break;
         case 'list':
             JSON.parse(j.vayakti).forEach(function(usr) {
@@ -187,6 +195,7 @@ function connect(frm) {
         myinfo.name = data.name;
         no_name_message = false;
         joining = false;
+        vayakti = [];
         pushStatus('Connected at '+currentTime());
         socket.send(JSON.stringify({cmd: 'list'}));
     });
@@ -205,15 +214,18 @@ function connect_next() {
         $('[name="error_msg"]').addClass('hidden');
         $('#chat_panel').removeClass('hidden');
         $('#send_box').focus();
-        $('#next_btn').addClass('hidden');
         joining = false;
+        vayakti = [];
+        pushStatus('Connected at '+currentTime());
         socket.send(JSON.stringify({cmd: 'list'}));
     });
     socket.send(JSON.stringify({ cmd: 'randnext' }));
 }
 
-function leave() {
+function leave() {    
+    callbacks = [];
     callbacks.push(() => {
+        $('#progressbar').addClass('hidden');
         $('#chat_panel').addClass('hidden');
         $('#reply_clip').addClass('hidden');
         $('#selected_clip').addClass('hidden');
@@ -221,6 +233,7 @@ function leave() {
         $('#connect_panel').removeClass('hidden');
         myinfo.kunjika = '';
         myinfo.name = '';
+        joining = false;
     });
     socket.send(JSON.stringify({
         cmd: 'leave'

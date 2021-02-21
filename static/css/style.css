@@ -21,6 +21,7 @@ textarea {
     height: 10px !important;
     position: fixed;
     top: 0; left: 0; right: 0;
+    z-index: 99999;
 }
 
 .cover-screen {

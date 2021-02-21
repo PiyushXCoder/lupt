@@ -4,7 +4,6 @@ use std::{collections::HashMap, vec};
 
 use actix::prelude::*;
 use actix_broker::BrokerSubscribe;
-use ms::Resp;
 
 use crate::{ws_sansad, messages as ms};
 
@@ -51,12 +50,12 @@ impl Actor for ChatPinnd {
 
 /// Join grih
 impl Handler<ms::JoinGrih> for ChatPinnd {
-    type Result = Resp;
+    type Result = ms::Resp;
 
     fn handle(&mut self, msg: ms::JoinGrih, _: &mut Self::Context) -> Self::Result {
         // check if user exist
         if let Some(_) = self.vyaktigat_waitlist.iter().position(|vk| vk.kunjika == msg.kunjika) {
-            return Resp::Err("Kunjika already exist".to_owned());
+            return ms::Resp::Err("Kunjika already exist".to_owned());
         }
 
         if let Some(_) = self.grih.iter().position(|(_,g)| {
@@ -65,7 +64,7 @@ impl Handler<ms::JoinGrih> for ChatPinnd {
                 None => false
             }
         }) {
-            return Resp::Err("Kunjika already exist".to_owned());
+            return ms::Resp::Err("Kunjika already exist".to_owned());
         }
 
         // check if grih exist and add user
@@ -74,7 +73,7 @@ impl Handler<ms::JoinGrih> for ChatPinnd {
                 // check if grih have no space left
                 if let Some(n) = grih.length {
                     if grih.loog.len() >= n {
-                        return Resp::Err("Grih have no space".to_owned());
+                        return ms::Resp::Err("Grih have no space".to_owned());
                     } 
                 }
 
@@ -101,7 +100,7 @@ impl Handler<ms::JoinGrih> for ChatPinnd {
             }
         }
 
-        Resp::Ok
+        ms::Resp::Ok
     }
 }
 
@@ -110,11 +109,11 @@ impl Handler<ms::JoinGrih> for ChatPinnd {
 /// Check if watchlist is empty, if yes add the kunjika andaddr to watchlist
 /// if watchlist have people get 0th  person an connect it
 impl Handler<ms::JoinRandom> for ChatPinnd {
-    type Result = Resp;
+    type Result = ms::Resp;
     fn handle(&mut self, msg: ms::JoinRandom, _: &mut Self::Context) -> Self::Result {
         // check if user exist
         if let Some(_) = self.vyaktigat_waitlist.iter().position(|vk| vk.kunjika == msg.kunjika) {
-            return Resp::Err("Kunjika already exist".to_owned());
+            return ms::Resp::Err("Kunjika already exist".to_owned());
         }
 
         if let Some(_) = self.grih.iter().position(|(_,g)| {
@@ -123,7 +122,7 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
                 None => false
             }
         }) {
-            return Resp::Err("Kunjika already exist".to_owned());
+            return ms::Resp::Err("Kunjika already exist".to_owned());
         }
 
         // Check if watch list is empty
@@ -134,7 +133,7 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
                 name: msg.name,
                 tags: msg.tags
             });
-            return Resp::None;
+            return ms::Resp::None;
         }
         
         // connect person with tag 
@@ -153,7 +152,7 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
                         name: msg.name,
                         tags: msg.tags
                     });
-                    return Resp::None;
+                    return ms::Resp::None;
                 }
             }
         } else { 0 };
@@ -178,13 +177,13 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
             grih_kunjika: group_kunjika
         });
 
-        Resp::Ok
+        ms::Resp::Ok
     }
 }
 
 /// Next Random user
 impl Handler<ms::JoinRandomNext> for ChatPinnd {
-    type Result = Resp;
+    type Result = ms::Resp;
     fn handle(&mut self, msg: ms::JoinRandomNext, _: &mut Self::Context) -> Self::Result {
         let grih  = self.grih.get_mut(&msg.grih_kunjika).unwrap();
 
@@ -195,16 +194,25 @@ impl Handler<ms::JoinRandomNext> for ChatPinnd {
         let tags;
 
         {
-            let loog = grih.loog.get(0).unwrap();
+            let loog = grih.loog.get(loog_i).unwrap();
             
             if let None = loog.tags {
-                return Resp::Err("You are not a randome vyakti!".to_owned());
+                return ms::Resp::Err("You are not a randome vyakti!".to_owned());
             }
 
             addr = loog.addr.clone();
             name = loog.name.to_owned();
             tags = loog.tags.clone().unwrap();
         }        
+        
+        // remove from old grih
+        grih.loog.remove(loog_i);
+        grih.loog.iter().for_each(|a| {
+            a.addr.do_send(ms::WsDisconnected {
+                kunjika: msg.kunjika.to_owned(),
+                name: name.to_owned()
+            })
+        });
 
         // Check if watch list is empty
         if self.vyaktigat_waitlist.len() == 0 {
@@ -214,38 +222,31 @@ impl Handler<ms::JoinRandomNext> for ChatPinnd {
                 name,
                 tags
             });
-            return Resp::None;
+            return ms::Resp::None;
         }
-
         // connect person with tag or to zero
-        let tags = tags.clone();
-        let pos = match self.vyaktigat_waitlist.iter().position(|vk| {
-            match vk.tags.iter().position(|t| tags.contains(t)) {
-                Some(_) => true,
-                None => false
+        let pos = if tags.len() > 0 {
+            match self.vyaktigat_waitlist.iter().position(|vk| {
+                match vk.tags.iter().position(|t| tags.contains(t)) {
+                    Some(_) => true,
+                    None => false
+                }
+            }) {
+                Some(i) => i,
+                None => {
+                    self.vyaktigat_waitlist.push(VyaktiWatchlist {
+                        kunjika: msg.kunjika,
+                        addr,
+                        name,
+                        tags
+                    });
+                    return ms::Resp::None;
+                }
             }
-        }) {
-            Some(i) => i,
-            None => {
-                self.vyaktigat_waitlist.push(VyaktiWatchlist {
-                    kunjika: msg.kunjika,
-                    addr,
-                    name,
-                    tags
-                });
-                return Resp::None;
-            }
-        };
-
+        } else { 0 };
         let vayakti_watchlist = self.vyaktigat_waitlist.remove(pos);
         let group_kunjika = format!("gupt_{}>{}",msg.kunjika.to_owned(), vayakti_watchlist.kunjika);
-        grih.loog.remove(loog_i);
-        grih.loog.iter().for_each(|a| {
-            a.addr.do_send(ms::WsDisconnected {
-                kunjika: msg.kunjika.to_owned(),
-                name: name.to_owned()
-            })
-        });
+        
         let log_count = grih.loog.len();
         drop(grih);
         if log_count == 0 {
@@ -256,7 +257,6 @@ impl Handler<ms::JoinRandomNext> for ChatPinnd {
             loog: vec![Loog::new(addr.clone(), msg.kunjika.to_owned(), name.to_owned(), Some(tags.clone())),
                 Loog::new(vayakti_watchlist.addr.clone(), vayakti_watchlist.kunjika.to_owned(), vayakti_watchlist.name.to_owned(), Some(vayakti_watchlist.tags.clone()))]
         });
-
         // notify about connection
         addr.do_send(ms::WsConnectedRandom {
             name: vayakti_watchlist.name,
@@ -270,7 +270,7 @@ impl Handler<ms::JoinRandomNext> for ChatPinnd {
             grih_kunjika: group_kunjika
         });
 
-        Resp::Ok
+        ms::Resp::Ok
     }
 }
 

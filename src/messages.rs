@@ -128,6 +128,7 @@ pub struct WsConnectedRandom {
     pub grih_kunjika: String
 }
 //################################################## Helper ##################################################
+#[derive(Debug)]
 pub enum Resp {
     Ok,
     Err(String), 
