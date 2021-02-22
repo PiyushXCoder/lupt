@@ -182,8 +182,8 @@ impl WsSansad {
                 // heartbeat timed out
 
                 // stop actor
-                ctx.stop();
-
+                futures::executor::block_on(act.leave_grih()); // notify leaving
+                ctx.stop();                
                 // don't try to send a ping
                 return;
             }
@@ -202,6 +202,7 @@ impl WsSansad {
                 // heartbeat timed out
 
                 // stop actor
+                futures::executor::block_on(act.leave_grih()); // notify leaving
                 ctx.stop();
 
                 // don't try to send a ping

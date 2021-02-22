@@ -177,7 +177,10 @@ function connect(frm) {
     $('#progressbar').removeClass('hidden');
     var data = {};
     frm.serializeArray().forEach(el => {
-        data[el.name] = el.value;
+        if(typeof el.value == 'string')
+            data[el.name] = el.value.trim();
+        else
+            data[el.name] = el.value;
     });
     if(data['length'] !== undefined) {
         data['length'] = parseInt(data['length']);
@@ -222,7 +225,10 @@ function connect_next() {
     socket.send(JSON.stringify({ cmd: 'randnext' }));
 }
 
+var leaving = false;
 function leave() {    
+    if(leaving) return;
+    leaving = true;
     callbacks = [];
     callbacks.push(() => {
         $('#progressbar').addClass('hidden');
@@ -234,6 +240,7 @@ function leave() {
         myinfo.kunjika = '';
         myinfo.name = '';
         joining = false;
+        leaving = false;
     });
     socket.send(JSON.stringify({
         cmd: 'leave'
