@@ -11,11 +11,11 @@ use crate::{chat_pinnd::ChatPinnd, messages as ms, validator::{Validation as vl,
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 /// How long before lack of client response causes a timeout
-const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
+const CLIENT_TIMEOUT: Duration = Duration::from_secs(15);
 
 // for phones if browser kept websocket on 
 const SPECIAL_HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5*60);
-const SPECIAL_CLIENT_TIMEOUT: Duration = Duration::from_secs(6*60);
+const SPECIAL_CLIENT_TIMEOUT: Duration = Duration::from_secs(10*60);
 
 pub struct WsSansad {
     kunjika: String,

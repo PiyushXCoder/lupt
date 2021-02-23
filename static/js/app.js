@@ -63,6 +63,10 @@ $(document).ready(() => {
             $('#selected_clip').css('bottom',  (this.scrollHeight + 10) + 'px');
         }
     });
+
+    $('[name=connect]').click(function () {
+        connect($(this).parents('form').first());
+    });
 });
 
 function sendTyping() {
