@@ -29,7 +29,7 @@ async fn main() -> std::io::Result<()> {
     let static_path = config.static_path;
     HttpServer::new(move || {
         App::new()
-        .wrap(Logger::new("%t [%a] %s %{User-Agent}i %r"))
+        .wrap(Logger::new("%t [%{x-forwarded-for}i] %s %{User-Agent}i %r"))
         .service(web::resource("/ws/").route(web::get().to(ws_index)))
         .service(fs::Files::new("/", &static_path).index_file("index.html"))
     })
