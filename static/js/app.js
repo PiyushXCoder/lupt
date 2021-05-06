@@ -80,8 +80,10 @@ let Messages = class {
         if(elm.length > 0) elm.remove();
         if(typing.length == 0) return;
         var text = '';
-        typing.forEach((val)  => {
-            text += val + ','
+        typing.forEach((val) => {
+            var name = vayakti[val];
+            if(name == undefined) name = "";
+            text += name+'('+val.substr(0,8)+')'+ ','
         })
         text = text.substr(0, text.length-1);
         text += ' is typing...'
@@ -310,10 +312,10 @@ socket.addEventListener('message', function (event) {
             break;
         case 'status':
             if(j.status == "typing") {
-                typing.push(vayakti[j.kunjika]+"("+j.kunjika.substr(0,8)+")");
+                typing.push(j.kunjika);
                 Messages.pushTypingStatus();
             } else if(j.status == "typing_end") {
-                const index = typing.indexOf(vayakti[j.kunjika]+"("+j.kunjika.substr(0,8)+")");
+                const index = typing.indexOf(j.kunjika);
                 if (index > -1) typing.splice(index, 1);
                 Messages.pushTypingStatus();
             }
