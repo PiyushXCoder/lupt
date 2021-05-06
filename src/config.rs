@@ -35,13 +35,6 @@ impl Config {
                 .help("Address to bind for server")
                 .required(true)
                 .takes_value(true))
-            .arg(Arg::with_name("salt")
-                .short("s")
-                .long("salt")
-                .value_name("SALT")
-                .help("Salt for hashing")
-                .required(false)
-                .takes_value(true))
             .get_matches();
 
         Config {
