@@ -3,176 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/siimple.min.css">
     <link rel="stylesheet" href="css/style.css">
     <title>Lupt Chat</title>
 </head>
 <body>
-    <div id="progressbar" class="siimple-progress siimple-progress--primary siimple-progress--striped progress-bar">
-        <span style="width:100%;"></span>
+    <div id="progress" class="bg-white" style="z-index: 9999; position: fixed; top: 0; bottom: 0;width: 100%; height: 100%;">
+        <div style="top: 50%;
+        left: 50%;
+        width:10em;
+        height:10em;
+        margin-top: -5em; /*set to a negative number 1/2 of your height*/
+        margin-left: -5em; /*set to a negative number 1/2 of your width*/
+        position:fixed;
+        text-align: center;
+        ">
+            <img src="img/loading.svg" style="height: 100%;">
+            <button class="button" onclick="leave()">Close</button>
+        </div>
     </div>
-
     <!-- Connect Screen -->
-    <div id="connect_panel" class="siimple-content siimple-content--extra-small">
-        <div class="siimple--px-5 siimple--py-0">
-            <tabs>
-                <div class="siimple-jumbotron siimple--text-center siimple--py-4">
-                    <div class="siimple-jumbotron-title"><img src="img/label.svg" alt="Lupt Chat" style="width: 100%; height: auto;"></div>
-                    <div class="siimple-jumbotron-detail">Chat in group or to strangers</div>
-                </div>
-                <div class="siimple-tabs">
-                    <div for="grih_sec" class="siimple-tabs-item siimple-tabs-tab--selected">Grih</div>
-                    <div for="stranger_sec" class="siimple-tabs-item">Stranger</div>
-                </div>
-    
-                <form name="grih_sec" cmd="join" class="siimple-form">
-                    <div name="error_area" class="siimple-content siimple--py-1 siimple--text-small siimple--color-primary siimple-content--fluid"></div>
-                    <div class="siimple-form-detail">Connect Grih(home) with kunjika(id).</div>
-                    <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Grih kunjika(home id)</div>
-                        <input name="grih_kunjika" type="text" class="siimple-input siimple-input--fluid" placeholder="Grih kunjika">
-                        <div class="siimple-form-field-helper">New grih is created if no such grih exists</div>
-                    </div>
-                    <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Your kunjika(id)</div>
-                        <input name="kunjika" type="text" class="siimple-input siimple-input--fluid" placeholder="Your kunjika">
-                    </div>
-                    <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Your name</div>
-                        <input  name="name" type="text" class="siimple-input siimple-input--fluid" placeholder="Your name">
-                    </div>
-                    <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Size of Grih</div>
-                        <input  name="length" type="number" class="siimple-input siimple-input--fluid" placeholder="Size">
-                        <div class="siimple-form-field-helper">Number of perople allowed in grih. Leave empty for infinite</div>
-                    </div>
-                    <div class="siimple-form-field siimple--text-right" style="width: 100%;">
-                        <div><span name="error_msg" class="siimple-tag siimple-tag--error siimple--my-2 hidden"></span></div>
-                        <div name="connect" class="siimple-btn siimple-btn--success">Connect</div>
-                    </div>
-                </form>
-    
-                <form name="stranger_sec" cmd="rand" class="siimple-form hidden">
-                    <div class="siimple-form-detail">Connect random stranger</div>
-                    <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Your kunjika(id)</div>
-                        <input name="kunjika"  type="text" class="siimple-input siimple-input--fluid" placeholder="Your kunjika">
-                    </div>
-                    <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Your name</div>
-                        <input name="name" type="text" class="siimple-input siimple-input--fluid" placeholder="Your name">
-                    </div>
-                    <div class="siimple-form-field">
-                        <div class="siimple-form-field-label">Tags</div>
-                        <input name="tags" type="text" class="siimple-input siimple-input--fluid" placeholder="Tags">
-                        <div class="siimple-form-field-helper">Seperated  by space. Leave empty to connect anyone. Its recommended to try without tags if you don't get anyone</div>
-                    </div>
-                    <div class="siimple-form-field siimple--text-right" style="width: 100%;">
-                        <div><span name="error_msg" class="siimple-tag siimple-tag--error siimple--my-2 hidden"></span></div>
-                        <div name="connect" class="siimple-btn siimple-btn--success">Connect</div>
-                    </div>
-                </form>
-            </tabs>
-            <div class="siimple-content siimple-content--fluid siimple--text-center siimple--py-1">
-                <div class="siimple-form-field-helper">By tapping "Connect" button I agree with <a class="siimple-link" href="/terms.html">Terms of Service</a> and <a class="siimple-link" href="policy.html">Privacy Policy</a></div>
+    <div id="connect_panel" class="container">
+        <div class="logo is-center" style="padding-top: 20px;">
+            <img src="img/label.png" alt="Lupt Chat" width="400">
+        </div>
+        <tabs>
+            <div class="tabs is-center">
+                <a name="kaksh_sec" class="active">Kaksh(Room)</a>
+                <a name="stranger_sec">Stranger</a>
             </div>
+
+            <form name="kaksh_sec" cmd="join">
+                <div class="is-center">
+                    Connect Kaksh(room) with kunjika(id)
+                </div>
+                <div>
+                    <label>Kaksh kunjika(room id)</label>
+                    <input name="kaksh_kunjika" type="text" placeholder="Kaksh kunjika">
+                    <small class="text-grey">Pick a random id to create new kaksh</small>
+                </div>
+                <div>
+                    <label>Your kunjika(your id)</label>
+                    <input name="kunjika" type="text" placeholder="Your kunjika">
+                    <small class="text-grey">Pick a random kunjika(id)</small>
+                </div>
+                <div>
+                    <label>Your name</label>
+                    <input  name="name" type="text" placeholder="Your name">
+                </div>
+                <div>
+                    <label>Size of kaksh(<i>Optional</i>)</label>
+                    <input  name="length" type="number" placeholder="Size">
+                    <small  class="text-grey">Number of perople allowed in kaksh.</small>
+                </div>
+                <div class="row">
+                    <div class="col is-vertical-align text-right"><div name="error_msg" class="text-error is-hidden"></div></div>
+                    <div class="col is-right">
+                        <a name="connect" class="button outline primary">Connect</a>
+                    </div>
+                </div>
+            </form>
+
+            <form name="stranger_sec" cmd="rand" class="is-hidden">
+                <div class="is-center">
+                    Connect random stranger
+                </div>
+                <div>
+                    <label>Your kunjika(your id)</label>
+                    <input name="kunjika"  type="text" placeholder="Your kunjika">
+                    <small class="text-grey">Pick a random kunjika(id)</small>
+                </div>
+                <div>
+                    <label>Your name</label>
+                    <input name="name" type="text" placeholder="Your name">
+                </div>
+                <div>
+                    <label>Tags</label>
+                    <input name="tags" type="text" placeholder="Tags">
+                    <small class="text-grey text-center">
+                        Seperated  by space. Leave empty to connect anyone.
+                        Its recommended to try without tags if you don't get anyone.
+                    </small>
+                </div>
+                <div class="row">
+                    <div class="col is-vertical-align text-right"><div name="error_msg" class="text-error is-hidden"></div></div>
+                    <div class="col is-right">
+                        <a name="connect" class="button outline primary">Connect</a>
+                    </div>
+                </div>
+            </form>
+        </tabs>
+        <div class="is-center text-center">
+            <small>
+                By tapping "Connect" button I agree with 
+                <a href="/terms.html">Terms of Service</a> and 
+                <a href="policy.html">Privacy Policy</a>
+            </small>
         </div>
-        <div class="siimple-footer" align="center">
-            Made with ❤️️ by <a href="https://gitlab.com/PiyushXCoder" class="siimple-link">Piyush Mishra</a>
-        </div>
+
+        <footer class="is-center" style="padding: 60px;">
+            <small>Made with ❤️️ by  <a href="https://gitlab.com/PiyushXCoder" >Piyush Mishra</a></small>
+        </footer>
                 
     </div>
     
     <!-- Chat Screen -->
-    <div id="chat_panel" class="cover-screen siimple--bg-white hidden">
-        <div class="siimple-navbar siimple--py-1 siimple-navbar--dark">
-            <div class="siimple--float-left">
-                <a onclick="leave()" class="siimple-navbar-item"><img src="img/back.svg" alt="" height="12px"> Back</a>
-            </div>
-            <a class="siimple-navbar-title"><img src="img/label-l.svg" alt="Lupt Chat" height="34px"></a>
-            <div class="siimple--float-right">
-                <a id="next_btn" onclick="connect_next()" class="siimple-navbar-item">Next <img src="img/next.svg" alt="" height="12px"> </a>
-            </div>
+    <div id="chat_panel" class="cover-screen chatpanel is-hidden">
+        <div class="chatpanel-top bg-light">
+            <button onclick="leave()"  class="button chatpanel-top-l">
+                <img src="img/back.svg" alt="" height="12px"> Back
+            </button>
+            <img src="img/label.png" alt="Lupt Chat" height="40px" class="chatpanel-top-m">
+            <button id="next_btn" onclick="connect_next()" class="button chatpanel-top-r is-hidden">
+                Next <img src="img/next.svg" alt="" height="12px"> 
+            </button> 
         </div>
-        <div  id="message_area_scroll" style="height: calc(100% - 2*44px - 2*5px); padding: 5px; overflow-y: scroll;" class="siimple--bg-light">
-            <div id="message_area" class="siimple--my-1">
+        <div  id="message_area_scroll" class="chatpanel-mid">
+            <div id="message_area">
                 
             </div>
-            <div id="status_area" class="siimple--my-1">
+            <div id="status_area">
                 
             </div>
         </div>
-        <div class="siimple--bg-light chatpanel">
-            <div class="chatpanel-left">
-                <div onclick="$('#action_clip').toggleClass('hidden')" class="siimple-btn siimple-btn--grey siimple--px-1"><img src="img/clip.svg" alt="send" width="24"></div>
+        <div class="chatpanel-bot bg-light">
+            <button onclick="$('#action_clip').toggleClass('is-hidden')" class="button chatpanel-bot-l">
+                <img src="img/clip.svg" alt="send" width="24">
+            </button>
+            <div class="chatpanel-bot-m">
+                <textarea id="send_box" rows="1"></textarea>     
             </div>
-            <div class="chatpanel-mid">
-                <textarea id="send_box" class="siimple-textarea"></textarea>             
-            </div>
-            <div class="chatpanel-right">
-                <div onclick="send()" class="siimple-btn siimple-btn--blue siimple-btn--rounded siimple--px-2" style="height: 24px;"><img src="img/send.svg" alt="Send" width="24"></div>
-            </div>
+            <button onclick="send()" class="button chatpanel-bot-r">
+                <img src="img/send.svg" alt="Send" width="50">
+            </button> 
         </div>
     </div>
 
     <!-- Reply Clip -->
-    <div  id="reply_clip" class="clip-win reply-clip siimple--bg-white hidden">
-        <span></span>
-        <div onclick="$('#reply_clip > span').text(''); $('#reply_clip').addClass('hidden');" class="siimple-close siimple--float-right"></div>
+    <div  id="reply_clip" class="clip-win reply-clip bg-white is-hidden">
+        <span>sss</span>
+        <a onclick="$('#reply_clip > span').text(''); $('#reply_clip').addClass('hidden');" style="float: right; padding: 3px 6px;">
+            <img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;">
+        </a>
     </div>
 
     <!-- Selected Clip -->
-    <div id="selected_clip" class="clip-win selected-clip siimple--bg-white hidden">
-        <div class="siimple-btn-group">
-            <div onclick="copyMessagesToClipboard()" class="siimple-btn siimple-btn--blue  siimple--px-2" style="height: 24px;">Copy</div>
-            <div onclick="prepareReply()" class="siimple-btn siimple-btn--blue  siimple--px-2" style="height: 24px;">Reply</div>
+    <div id="selected_clip" class="clip-win selected-clip bg-white is-hidden">
+        <div style="padding: 4px;">
+            <div onclick="copyMessagesToClipboard()" class="button outline primary">Copy</div>
+            <div onclick="prepareReply()" class="button outline primary">Reply</div>
+            <a onclick="Messages.unselectAll()" style="float: right; padding: 6px 2px 6px 8px;">
+                <img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;">
+            </a>
         </div>
-        <div class="siimple-close siimple--float-right siimple--my-1 siimple--ml-2"></div>
     </div>
 
     <!-- Action Clip -->
-    <div id="action_clip" class="clip-win action-clip siimple--bg-white hidden">
-        <div class="siimple--my-1 hidden">
-            <div class="siimple-btn siimple-btn--light">
+    <div id="action_clip" class="clip-win action-clip is-hidden bg-white">
+        <div class="is-hidden">
+            <button class="button">
                 <img src="img/image.svg" alt="Image" width="50" class="siimple--py-2 siimple--px-2">
                 <div>send image</div>
-            </div>
+            </button>
         </div>
         <div>
-            <a onclick="cleanMessage()" class="siimple-btn siimple-btn--blue">Clear</a>
-            <a onclick="vayaktiList()" class="siimple-btn siimple-btn--blue">List Vyakti(Users)</a>
+            <button onclick="Messages.cleanMessage()" class="button">Clear</button>
+            <button onclick="vayaktiList()" class="button">List Vyakti(Users)</button>
         </div>
     </div>
 
-    <!-- Vyakti List -->
-    <div id="vayakti_model" class="siimple-modal siimple-modal--large hidden" style="z-index: 9999;" id="modal">
-        <div class="siimple-modal-content">
-            <div class="siimple-modal-header">
-                <div class="siimple-modal-header-title">List Vyakti(Users)</div>
-                <div onclick="$('#vayakti_model').addClass('hidden')" class="siimple-modal-header-close" id="modal-close"></div>
-            </div>
-            <div class="siimple-modal-body siimple--px-0">
-                <div class="siimple-table siimple--px-3">
-                    <div class="siimple-table-header">
-                        <div class="siimple-table-row">
-                            <div class="siimple-table-cell">Name</div>
-                            <div class="siimple-table-cell">Kunjika</div>
-                        </div>
-                    </div>
-                    <div id="vayakti_list" class="siimple-table-body">
-                        <div class="siimple-table-row">
-                            <div class="siimple-table-cell">a</div>
-                            <div class="siimple-table-cell">a</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="siimple-modal-footer  siimple--py-2">
-                <a onclick="$('#vayakti_model').addClass('hidden'); $('#vayakti_list').empty()" class="siimple-btn siimple-btn--blue">Close</a>
-            </div>
+    <!-- vayakti -->
+    <div id="vayakti_model" class="card is-hidden" style="position: fixed; top: 50px; bottom: 50px; right: 0; z-index: 9999; width: 100%; max-width: 500px;">
+        <header>
+            <h4>
+                List Vyakti(Users)
+                <button onclick="$('#vayakti_model').addClass('is-hidden'); $('#vayakti_list').empty()" class="button bg-red" style="float: right;"><img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;"></button>
+            </h4>
+        </header>
+        <div style="overflow-y: scroll; max-height: calc(100% - 40px);">
+            <table>
+                <thead>
+                    <th>Name</th>
+                    <th>Kunjika</th>
+                </thead>
+                <tbody id="vayakti_list">
+                    <tr>
+                        <td>1</td>
+                        <td>2</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
-
+    </div>      
     <script src="js/jquery-3.5.1.min.js"></script>
     <script src="js/app.js"></script>
 </body>

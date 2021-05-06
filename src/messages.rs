@@ -7,11 +7,11 @@ use crate::ws_sansad::WsSansad;
 //################################################## For ChatPinnd ##################################################
 /// Request to change information of vayakti to list of vayakti im ChatPind
 
-/// Request to Grih with its kunjika
+/// Request to Kaksh with its kunjika
 #[derive(Clone, Message)]
 #[rtype(result = "Resp")]
-pub struct JoinGrih {
-    pub grih_kunjika: String,
+pub struct JoinKaksh {
+    pub kaksh_kunjika: String,
     pub length: Option<usize>,
     pub addr: Addr<WsSansad>,
     pub kunjika: String,
@@ -31,7 +31,7 @@ pub struct JoinRandom {
 #[derive(Clone, Message)]
 #[rtype(result = "Resp")]
 pub struct JoinRandomNext {
-    pub grih_kunjika: String,
+    pub kaksh_kunjika: String,
     pub kunjika: String
 }
 
@@ -39,7 +39,7 @@ pub struct JoinRandomNext {
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct SendText {
-    pub grih_kunjika: String,
+    pub kaksh_kunjika: String,
     pub kunjika: String,
     pub text: String,
     pub reply: Option<String>,
@@ -49,7 +49,7 @@ pub struct SendText {
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct SendStatus {
-    pub grih_kunjika: String,
+    pub kaksh_kunjika: String,
     pub kunjika: String,
     pub status: String
 }
@@ -58,14 +58,14 @@ pub struct SendStatus {
 #[derive(Clone, Message)]
 #[rtype(result = "String")]
 pub struct List {
-    pub grih_kunjika: String
+    pub kaksh_kunjika: String
 }
 
-/// Request to leave grih
+/// Request to leave kaksh
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct  LeaveUser {
-    pub grih_kunjika: Option<String>,
+    pub kaksh_kunjika: Option<String>,
     pub kunjika: String,
     pub addr: Addr<WsSansad>
 }
@@ -125,7 +125,7 @@ pub struct WsResponse {
 pub struct WsConnectedRandom {
     pub name: String,
     pub kunjika: String,
-    pub grih_kunjika: String
+    pub kaksh_kunjika: String
 }
 //################################################## Helper ##################################################
 #[derive(Debug)]

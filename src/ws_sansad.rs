@@ -28,7 +28,7 @@ pub struct WsSansad {
 #[derive(Debug)]
 enum Isthiti {
     None,
-    Grih(String),
+    Kaksh(String),
     VraktigatWaitlist
 }
 
@@ -42,7 +42,7 @@ impl Actor for WsSansad {
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        futures::executor::block_on(self.leave_grih()); // notify leaving
+        futures::executor::block_on(self.leave_kaksh()); // notify leaving
         Running::Stop
     }
 }
@@ -151,7 +151,7 @@ impl Handler<ms::WsDisconnected> for WsSansad {
 impl Handler<ms::WsConnectedRandom> for WsSansad {
     type Result = ();
     fn handle(&mut self, msg: ms::WsConnectedRandom, ctx: &mut Self::Context) -> Self::Result {
-        self.isthiti = Isthiti::Grih(msg.grih_kunjika);
+        self.isthiti = Isthiti::Kaksh(msg.kaksh_kunjika);
         let json = json!({
             "cmd": "random",
             "name": msg.name,
@@ -182,7 +182,7 @@ impl WsSansad {
                 // heartbeat timed out
 
                 // stop actor
-                futures::executor::block_on(act.leave_grih()); // notify leaving
+                futures::executor::block_on(act.leave_kaksh()); // notify leaving
                 ctx.stop();                
                 // don't try to send a ping
                 return;
@@ -202,7 +202,7 @@ impl WsSansad {
                 // heartbeat timed out
 
                 // stop actor
-                futures::executor::block_on(act.leave_grih()); // notify leaving
+                futures::executor::block_on(act.leave_kaksh()); // notify leaving
                 ctx.stop();
 
                 // don't try to send a ping
@@ -214,14 +214,23 @@ impl WsSansad {
     /// parse the request text from client
     async fn parse_text_handle(&mut self, msg: String) {
         if let Ok(val) = serde_json::from_str::<Value>(&msg) {
+            // let cmd  = match val.get("cmd") {
+            //     Some(v) => v,
+            //     None => return
+            // };
+            // let cmd  = match cmd.as_str() {
+            //     Some(v) => v,
+            //     None => return
+            // };
+
             match val.get("cmd").unwrap().as_str().unwrap() {
-                "join" => { self.join_grih(val).await },
+                "join" => { self.join_kaksh(val).await },
                 "rand" => { self.join_random(val).await },
                 "randnext" => { self.join_random_next().await },
                 "text" => { self.send_text(val).await },
                 "status" => { self.send_status(val).await },
                 "list" => { self.list().await },
-                "leave" => { self.leave_grih().await },
+                "leave" => { self.leave_kaksh().await },
                 _ => ()
             }
         }
@@ -250,7 +259,7 @@ impl WsSansad {
             Isthiti::VraktigatWaitlist => {
                 self.send_ok_response("watchlist");
                 return;
-            }, Isthiti::Grih(_) => return
+            }, Isthiti::Kaksh(_) => return
         }
 
         let kunjika  = match val.get("kunjika") {
@@ -314,12 +323,12 @@ impl WsSansad {
     /// Request for joining to random person
     async fn join_random_next(&mut self) {
         // Check is already joined
-        let grih_kunjika = match &self.isthiti {
+        let kaksh_kunjika = match &self.isthiti {
             Isthiti::VraktigatWaitlist => {
                 self.send_ok_response("watchlist");
                 return;
             },
-            Isthiti::Grih(grih_kunjika) => grih_kunjika,
+            Isthiti::Kaksh(kaksh_kunjika) => kaksh_kunjika,
             Isthiti::None => {
                 self.send_ok_response("Not allowed");
                 return;
@@ -329,7 +338,7 @@ impl WsSansad {
         // request
         let result: Resp = ChatPinnd::from_registry().send(ms::JoinRandomNext {
             kunjika: self.kunjika.to_owned(),
-            grih_kunjika: grih_kunjika.to_owned(),
+            kaksh_kunjika: kaksh_kunjika.to_owned(),
         }).await.unwrap();
 
         match result {
@@ -346,8 +355,8 @@ impl WsSansad {
         }
     }
 
-    /// Request to join to grih
-    async fn join_grih(&mut self, val: Value) {
+    /// Request to join to kaksh
+    async fn join_kaksh(&mut self, val: Value) {
         // Check is already joined
         match self.isthiti {
             Isthiti::None => (),
@@ -374,7 +383,7 @@ impl WsSansad {
                 return;
             }
         };
-        let grih_kunjika = match val.get("grih_kunjika") {
+        let kaksh_kunjika = match val.get("kaksh_kunjika") {
             Some(val ) => val.as_str().unwrap().to_owned(),
             None => {
                 self.send_err_response("Invalid request");
@@ -391,7 +400,7 @@ impl WsSansad {
 
 
         // Validate
-        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoGupt, vl::NoSpace], &grih_kunjika, "Grih Kunjika") {
+        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoGupt, vl::NoSpace], &kaksh_kunjika, "Kaksh Kunjika") {
             self.send_err_response(&val);
             return;
         } else if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag], &kunjika, "Kunjika") {
@@ -403,8 +412,8 @@ impl WsSansad {
         }
         
         // request
-        let result: Resp = ChatPinnd::from_registry().send(ms::JoinGrih {
-            grih_kunjika: grih_kunjika.to_owned(),
+        let result: Resp = ChatPinnd::from_registry().send(ms::JoinKaksh {
+            kaksh_kunjika: kaksh_kunjika.to_owned(),
             length,
             addr: self.addr.clone().unwrap(),
             kunjika: kunjika.to_owned(),
@@ -415,7 +424,7 @@ impl WsSansad {
         match result {
             Resp::Err(err) => self.send_err_response(&err), 
             Resp::Ok => {
-                self.isthiti = Isthiti::Grih(grih_kunjika);
+                self.isthiti = Isthiti::Kaksh(kaksh_kunjika);
                 self.kunjika = kunjika;
                 self.send_ok_response("joined")
             }
@@ -423,19 +432,19 @@ impl WsSansad {
         }
     }
 
-    /// Request to join to grih
+    /// Request to join to kaksh
     async fn list(&mut self) {
         // check if vayakti exist
         if let Isthiti::None = self.isthiti {
-            self.send_err_response("Not in any Grih");
+            self.send_err_response("Not in any Kaksh");
             return;
         }
 
-        // check if connected to any grih
+        // check if connected to any kaksh
         match &self.isthiti {
-            Isthiti::Grih(kunjika) => {
+            Isthiti::Kaksh(kunjika) => {
                 let json: String = ChatPinnd::from_registry().send(ms::List {
-                    grih_kunjika: kunjika.to_owned()
+                    kaksh_kunjika: kunjika.to_owned()
                 }).await.unwrap();
 
                 self.addr.clone().unwrap().do_send(ms::WsList {
@@ -443,25 +452,25 @@ impl WsSansad {
                 })
             },
             _ => {
-                self.send_err_response("Grih not connected");
+                self.send_err_response("Kaksh not connected");
                 return;
             }
         }
     }
 
-    /// send text to vayakti in grih
+    /// send text to vayakti in kaksh
     async fn send_text(&mut self, val: Value) {
         // check if vayakti exist
         if let Isthiti::None = self.isthiti {
-            self.send_err_response("Not in any Grih");
+            self.send_err_response("Not in any Kaksh");
             return;
         }
 
-        // check if connected to any grih
+        // check if connected to any kaksh
         match self.isthiti {
-            Isthiti::Grih(_) => (),
+            Isthiti::Kaksh(_) => (),
             _ => {
-                self.send_err_response("Grih not connected");
+                self.send_err_response("Kaksh not connected");
                 return;
             }
         }
@@ -480,34 +489,34 @@ impl WsSansad {
             None => None
         };
 
-        let grih_kunjika = match &self.isthiti {
-            Isthiti::Grih(grih_kunjika) => {
-                grih_kunjika.to_owned()
+        let kaksh_kunjika = match &self.isthiti {
+            Isthiti::Kaksh(kaksh_kunjika) => {
+                kaksh_kunjika.to_owned()
             }, _ => {
                 return;
             }
         };
         Broker::<SystemBroker>::issue_async(ms::SendText {
-            grih_kunjika,
+            kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
             text,
             reply
         });
     }
 
-    /// send status to vayakti in grih
+    /// send status to vayakti in kaksh
     async fn send_status(&mut self, val: Value) {
         // check if vayakti exist
         if let Isthiti::None = self.isthiti {
-            self.send_err_response("Not in any Grih");
+            self.send_err_response("Not in any Kaksh");
             return;
         }
 
-        // check if connected to any grih
+        // check if connected to any kaksh
         match self.isthiti {
-            Isthiti::Grih(_) => (),
+            Isthiti::Kaksh(_) => (),
             _ => {
-                self.send_err_response("Grih not connected");
+                self.send_err_response("Kaksh not connected");
                 return;
             }
         }
@@ -520,34 +529,33 @@ impl WsSansad {
                 return;
             }
         }.as_str().unwrap().to_owned();
-        let grih_kunjika = match &self.isthiti {
-            Isthiti::Grih(grih_kunjika) => {
-                grih_kunjika.to_owned()
+        let kaksh_kunjika = match &self.isthiti {
+            Isthiti::Kaksh(kaksh_kunjika) => {
+                kaksh_kunjika.to_owned()
             }, _ => {
                 return;
             }
         };
         Broker::<SystemBroker>::issue_async(ms::SendStatus {
-            grih_kunjika,
+            kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
             status
         });
     }
 
     /// notify leaving
-    async fn leave_grih(&mut self) {
-        let grih_kunjika = match &self.isthiti {
-            Isthiti::Grih(val) => Some(val.to_owned()),
+    async fn leave_kaksh(&mut self) {
+        let kaksh_kunjika = match &self.isthiti {
+            Isthiti::Kaksh(val) => Some(val.to_owned()),
             _ => None
         };
         
         Broker::<SystemBroker>::issue_async(ms::LeaveUser {
-            grih_kunjika,
+            kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
             addr: self.addr.clone().unwrap()
         });
     
-
         self.isthiti = Isthiti::None;        
         self.send_ok_response("left");
     }

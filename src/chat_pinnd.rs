@@ -9,11 +9,11 @@ use crate::{ws_sansad, messages as ms};
 
 #[allow(dead_code)]
 pub struct ChatPinnd {
-    grih: HashMap<String, Grih>, // kunjika, Grih
+    kaksh: HashMap<String, Kaksh>, // kunjika, Kaksh
     vyaktigat_waitlist: Vec<VyaktiWatchlist>,
 }
 
-pub struct Grih {
+pub struct Kaksh {
     length: Option<usize>,
     loog: Vec<Loog>
 }
@@ -48,17 +48,17 @@ impl Actor for ChatPinnd {
     }
 }
 
-/// Join grih
-impl Handler<ms::JoinGrih> for ChatPinnd {
+/// Join kaksh
+impl Handler<ms::JoinKaksh> for ChatPinnd {
     type Result = ms::Resp;
 
-    fn handle(&mut self, msg: ms::JoinGrih, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: ms::JoinKaksh, _: &mut Self::Context) -> Self::Result {
         // check if user exist
         if let Some(_) = self.vyaktigat_waitlist.iter().position(|vk| vk.kunjika == msg.kunjika) {
             return ms::Resp::Err("Kunjika already exist".to_owned());
         }
 
-        if let Some(_) = self.grih.iter().position(|(_,g)| {
+        if let Some(_) = self.kaksh.iter().position(|(_,g)| {
             match g.loog.iter().position(|a| a.kunjika == msg.kunjika) {
                 Some(_) => true,
                 None => false
@@ -67,33 +67,33 @@ impl Handler<ms::JoinGrih> for ChatPinnd {
             return ms::Resp::Err("Kunjika already exist".to_owned());
         }
 
-        // check if grih exist and add user
-        match self.grih.get_mut(&msg.grih_kunjika) { 
-            Some(grih) =>{ // exist
-                // check if grih have no space left
-                if let Some(n) = grih.length {
-                    if grih.loog.len() >= n {
-                        return ms::Resp::Err("Grih have no space".to_owned());
+        // check if kaksh exist and add user
+        match self.kaksh.get_mut(&msg.kaksh_kunjika) { 
+            Some(kaksh) =>{ // exist
+                // check if kaksh have no space left
+                if let Some(n) = kaksh.length {
+                    if kaksh.loog.len() >= n {
+                        return ms::Resp::Err("Kaksh have no space".to_owned());
                     } 
                 }
 
-                grih.loog.iter().for_each(|a: &Loog| {
+                kaksh.loog.iter().for_each(|a: &Loog| {
                     a.addr.do_send(ms::WsConnected {
                         name: msg.name.to_owned(),
                         kunjika: msg.kunjika.to_owned()
                     })
                 });
 
-                grih.loog.push(Loog::new(msg.addr, msg.kunjika,msg.name, None));
+                kaksh.loog.push(Loog::new(msg.addr, msg.kunjika,msg.name, None));
 
                 
             }, None => { // don't exist
-                // add grih and notify
+                // add kaksh and notify
                 msg.addr.do_send(ms::WsConnected {
                     name: msg.name.to_owned(),
                     kunjika: msg.kunjika.to_owned()
                 });
-                self.grih.insert(msg.grih_kunjika, Grih {
+                self.kaksh.insert(msg.kaksh_kunjika, Kaksh {
                     length: msg.length,
                     loog: vec![Loog::new(msg.addr,msg.kunjika,msg.name, None)]
                 });
@@ -116,7 +116,7 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
             return ms::Resp::Err("Kunjika already exist".to_owned());
         }
 
-        if let Some(_) = self.grih.iter().position(|(_,g)| {
+        if let Some(_) = self.kaksh.iter().position(|(_,g)| {
             match g.loog.iter().position(|a| a.kunjika == msg.kunjika) {
                 Some(_) => true,
                 None => false
@@ -159,7 +159,7 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
 
         let vayakti_watchlist = self.vyaktigat_waitlist.remove(pos);
         let group_kunjika = format!("gupt_{}>{}",msg.kunjika.to_owned(), vayakti_watchlist.kunjika);
-        self.grih.insert(group_kunjika.to_owned(), Grih {
+        self.kaksh.insert(group_kunjika.to_owned(), Kaksh {
             length: Some(2),
             loog: vec![Loog::new(msg.addr.clone(), msg.kunjika.to_owned(), msg.name.to_owned(), Some(msg.tags.clone())),
                 Loog::new(vayakti_watchlist.addr.clone(), vayakti_watchlist.kunjika.to_owned(), vayakti_watchlist.name.to_owned(), Some(vayakti_watchlist.tags.clone()))]
@@ -169,12 +169,12 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
         msg.addr.do_send(ms::WsConnectedRandom {
             name: vayakti_watchlist.name,
             kunjika: vayakti_watchlist.kunjika,
-            grih_kunjika: group_kunjika.to_owned()
+            kaksh_kunjika: group_kunjika.to_owned()
         });
         vayakti_watchlist.addr.do_send(ms::WsConnectedRandom {
             name: msg.name,
             kunjika: msg.kunjika.to_owned(),
-            grih_kunjika: group_kunjika
+            kaksh_kunjika: group_kunjika
         });
 
         ms::Resp::Ok
@@ -185,16 +185,25 @@ impl Handler<ms::JoinRandom> for ChatPinnd {
 impl Handler<ms::JoinRandomNext> for ChatPinnd {
     type Result = ms::Resp;
     fn handle(&mut self, msg: ms::JoinRandomNext, _: &mut Self::Context) -> Self::Result {
-        let grih  = self.grih.get_mut(&msg.grih_kunjika).unwrap();
+        let kaksh  = match self.kaksh.get_mut(&msg.kaksh_kunjika) {
+            Some(v) => v,
+            None => return ms::Resp::Err("Failed to join, check entries!".to_owned())
+        };
 
-        let loog_i = grih.loog.iter().position(|a| a.kunjika == msg.kunjika).unwrap();
+        let loog_i = match kaksh.loog.iter().position(|a| a.kunjika == msg.kunjika) {
+            Some(v) => v,
+            None => return ms::Resp::Err("Failed to join, check entries!".to_owned())
+        };
         
         let addr;
         let name;
         let tags;
 
         {
-            let loog = grih.loog.get(loog_i).unwrap();
+            let loog = match kaksh.loog.get(loog_i) {
+                Some(v) => v,
+                None => return ms::Resp::Err("Failed to join, check entries!".to_owned())
+            };
             
             if let None = loog.tags {
                 return ms::Resp::Err("You are not a randome vyakti!".to_owned());
@@ -202,12 +211,15 @@ impl Handler<ms::JoinRandomNext> for ChatPinnd {
 
             addr = loog.addr.clone();
             name = loog.name.to_owned();
-            tags = loog.tags.clone().unwrap();
+            tags = match loog.tags.clone() {
+                Some(v) => v,
+                None => return ms::Resp::Err("Failed to join, check entries!".to_owned())
+            };
         }        
         
-        // remove from old grih
-        grih.loog.remove(loog_i);
-        grih.loog.iter().for_each(|a| {
+        // remove from old kaksh
+        kaksh.loog.remove(loog_i);
+        kaksh.loog.iter().for_each(|a| {
             a.addr.do_send(ms::WsDisconnected {
                 kunjika: msg.kunjika.to_owned(),
                 name: name.to_owned()
@@ -247,12 +259,12 @@ impl Handler<ms::JoinRandomNext> for ChatPinnd {
         let vayakti_watchlist = self.vyaktigat_waitlist.remove(pos);
         let group_kunjika = format!("gupt_{}>{}",msg.kunjika.to_owned(), vayakti_watchlist.kunjika);
         
-        let log_count = grih.loog.len();
-        drop(grih);
+        let log_count = kaksh.loog.len();
+        drop(kaksh);
         if log_count == 0 {
-            self.grih.remove(&msg.grih_kunjika);
+            self.kaksh.remove(&msg.kaksh_kunjika);
         }
-        self.grih.insert(group_kunjika.to_owned(), Grih {
+        self.kaksh.insert(group_kunjika.to_owned(), Kaksh {
             length: Some(2),
             loog: vec![Loog::new(addr.clone(), msg.kunjika.to_owned(), name.to_owned(), Some(tags.clone())),
                 Loog::new(vayakti_watchlist.addr.clone(), vayakti_watchlist.kunjika.to_owned(), vayakti_watchlist.name.to_owned(), Some(vayakti_watchlist.tags.clone()))]
@@ -261,13 +273,13 @@ impl Handler<ms::JoinRandomNext> for ChatPinnd {
         addr.do_send(ms::WsConnectedRandom {
             name: vayakti_watchlist.name,
             kunjika: vayakti_watchlist.kunjika,
-            grih_kunjika: group_kunjika.to_owned()
+            kaksh_kunjika: group_kunjika.to_owned()
         });
 
         vayakti_watchlist.addr.do_send(ms::WsConnectedRandom {
             name,
             kunjika: msg.kunjika.to_owned(),
-            grih_kunjika: group_kunjika
+            kaksh_kunjika: group_kunjika
         });
 
         ms::Resp::Ok
@@ -279,8 +291,8 @@ impl Handler<ms::SendText> for ChatPinnd {
     type Result = ();
 
     fn handle(&mut self, msg: ms::SendText, _: &mut Self::Context) -> Self::Result {
-        if let Some(grih) = self.grih.get(&msg.grih_kunjika) {
-            grih.loog.iter().for_each(|c| {
+        if let Some(kaksh) = self.kaksh.get(&msg.kaksh_kunjika) {
+            kaksh.loog.iter().for_each(|c| {
                 c.addr.do_send(ms::WsText {
                     sender_kunjika: msg.kunjika.to_owned(),
                     text: msg.text.to_owned(),
@@ -296,8 +308,8 @@ impl Handler<ms::SendStatus> for ChatPinnd {
     type Result = ();
 
     fn handle(&mut self, msg: ms::SendStatus, _: &mut Self::Context) -> Self::Result {
-        if let Some(grih) = self.grih.get(&msg.grih_kunjika) {
-            grih.loog.iter().for_each(|c| {
+        if let Some(kaksh) = self.kaksh.get(&msg.kaksh_kunjika) {
+            kaksh.loog.iter().for_each(|c| {
                 if c.kunjika == msg.kunjika {
                     return;
                 }
@@ -315,9 +327,9 @@ impl Handler<ms::List> for ChatPinnd {
     type Result = String;
 
     fn handle(&mut self, msg: ms::List, _: &mut Self::Context) -> Self::Result {
-        if let Some(grih) = self.grih.get(&msg.grih_kunjika) {
+        if let Some(kaksh) = self.kaksh.get(&msg.kaksh_kunjika) {
             let mut list = Vec::new();
-            for x in grih.loog.iter() {
+            for x in kaksh.loog.iter() {
                 list.push((x.kunjika.to_owned(),x.name.to_owned()));
             }
             serde_json::json!(list).to_string()
@@ -327,21 +339,21 @@ impl Handler<ms::List> for ChatPinnd {
     }
 }
 
-/// Notifiy a user disconnected and trim grih
+/// Notifiy a user disconnected and trim kaksh
 impl Handler<ms::LeaveUser> for ChatPinnd {
     type Result = ();
 
     fn handle(&mut self, msg: ms::LeaveUser, _: &mut Self::Context) -> Self::Result {
-        if let Some(grih_kunjika) = &msg.grih_kunjika {
-            if let Some(grih) = self.grih.get_mut(grih_kunjika) {
-                let name = if let Some(i) = grih.loog.iter().position(|x| x.addr == msg.addr) {
-                    grih.loog.remove(i).name
+        if let Some(kaksh_kunjika) = &msg.kaksh_kunjika {
+            if let Some(kaksh) = self.kaksh.get_mut(kaksh_kunjika) {
+                let name = if let Some(i) = kaksh.loog.iter().position(|x| x.addr == msg.addr) {
+                    kaksh.loog.remove(i).name
                 } else { "".to_owned() };
     
-                if grih.loog.len() == 0 {
-                    self.grih.remove(grih_kunjika);
+                if kaksh.loog.len() == 0 {
+                    self.kaksh.remove(kaksh_kunjika);
                 } else {
-                    grih.loog.iter().for_each(|a| {
+                    kaksh.loog.iter().for_each(|a| {
                         a.addr.do_send(ms::WsDisconnected {
                             kunjika: msg.kunjika.to_owned(),
                             name: name.to_owned()
@@ -360,7 +372,7 @@ impl Handler<ms::LeaveUser> for ChatPinnd {
 impl Default for ChatPinnd {
     fn default() -> Self {
         ChatPinnd {
-            grih: HashMap::new(),
+            kaksh: HashMap::new(),
             vyaktigat_waitlist: Vec::new()
         }
     }

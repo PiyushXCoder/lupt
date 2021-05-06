@@ -1,9 +1,44 @@
+
+@import url(chota.min.css);
+
+@font-face {
+    font-family: "Itim";
+    src: url("../img/Itim-Regular.ttf");
+}
+
+:root {
+    --bg-color: #ffffff;
+    --bg-secondary-color: #f3f3f6;
+    --color-primary: #14854F;
+    --color-lightGrey: #d2d6dd;
+    --color-grey: #747681;
+    --color-darkGrey: #3f4144;
+    --color-error: #d43939;
+    --color-success: #28bd14;
+    --grid-maxWidth: 120rem;
+    --grid-gutter: 2rem;
+    --font-size: 1.8rem;
+    --font-color: #333333;
+    --font-family-sans: "Itim";
+    --font-family-mono: monaco, "Consolas", "Lucida Console", monospace;
+}
+
+body > .container {
+    max-width: 720px;
+}
+
+form > div {
+    padding: 5px;
+}
+
 pre {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Itim;
     font-size: 0.9em;
     margin-top: 0;
     margin-bottom: 0;
     white-space: pre-wrap;
+    background: none;
+    padding: 0.1rem;
 }
 
 textarea {
@@ -13,15 +48,8 @@ textarea {
     margin-bottom: 0;
 }
 
-.hidden {
-    display: none;
-}
-
-.siimple-progress.progress-bar {
-    height: 10px !important;
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 99999;
+.bg-white {
+    background-color: white;
 }
 
 .cover-screen {
@@ -31,34 +59,68 @@ textarea {
 }
 
 .chatpanel {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    height: 44px;
+    background-image: url(../img/pattern.svg); 
+    background-size: 30px;
 }
 
-.chatpanel-left {
-    position: fixed;
-    display: inline;
-    width: 34px;
-    bottom: 0;
-    left: 0;
+.chatpanel-top {
+    width: 100%; 
+    height: 50px; 
+    text-align: center;
 }
 
 .chatpanel-mid {
-    position: fixed;
-    display: inline;
-    width: calc(100% - 54px - 34px);
-    bottom: 3px;
-    left: 34px;
+    height: calc(100% - 2*50px); 
+    padding: 5px; 
+    overflow-y: scroll;
 }
 
-.chatpanel-right {
+.chatpanel-bot {
+    width: 100%; 
+    height: 50px; 
+    text-align: center;
+}
+
+.chatpanel-top-l {
+    height: 50px; 
     position: fixed;
-    display: inline;
-    width: 44px;
-    bottom: 5px;
-    right: 5px;
+    left: 0;
+    top: 0;
+}
+
+.chatpanel-top-m {
+    margin-top: 5px;
+}
+
+.chatpanel-top-r {
+    height: 50px; 
+    float: right;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
+.chatpanel-bot-l {
+    height: 50px;
+    width: 50px; 
+    float: left; 
+    padding: 1rem; 
+    margin: 0px;
+}
+
+.chatpanel-bot-m {
+    width: calc(100% - 100px); 
+    position: fixed; 
+    bottom: 5px; 
+    left: 50px;
+}
+
+.chatpanel-bot-r {
+    height: 50px; 
+    width: 50px; 
+    float: right; 
+    padding: 0.2rem; 
+    margin: 0px;
 }
 
 #send_box {
@@ -97,7 +159,7 @@ textarea {
 }
 
 .message .message-by {
-    font-size: 0.7rem;
+    font-size: 1.3rem;
     font-style: italic;
     text-decoration: underline;
     padding-bottom: 1px;
@@ -116,23 +178,25 @@ textarea {
 .clip-win {
     position: fixed;
     z-index: 9999;
-    padding: 8px;
+    padding: 6px;
     margin: 5px;
-    bottom: 44px;
+    bottom: 50px;
     border: 1px dashed #1E86D7;
 }
 
 .clip-win.reply-clip {
     width: calc(100% - 2*8px - 3*5px);
     max-width: 720px;
-    height: 1.5em;
+    height: 2em;
+    padding: 2px;
     border-left: 5px solid #1E86D7;
     border-radius:  0px 30px 30px 0px;
 }
 
 .clip-win.selected-clip {
     width: fit-content;
-    height: 34px;
+    min-width: 250px;
+    height: fit-content;
     left: 50%; 
     transform: translateX(-50%);
     border-radius:  15px;
@@ -142,4 +206,10 @@ textarea {
     border-radius: 10px;
     width: calc(100% - 2*8px - 3*5px);
     max-width: 720px;
+}
+
+@media screen and (max-width: 600px)  {
+    div[name="error_msg"] {
+        width: 100%;
+    }
 }
