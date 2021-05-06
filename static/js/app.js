@@ -247,7 +247,11 @@ $(document).ready(() => {
 });
 
 // Create WebSocket connection.
-const socket = new WebSocket('ws://'+window.location.host+'/ws/');
+var wsProtocol = 'ws://';
+if (window.location.protocol === 'https:') {
+    wsProtocol = 'wss://';
+}
+const socket = new WebSocket(wsProtocol+window.location.host+'/ws/');
 var myinfo = {
     kunjika: "",
     name: ""
@@ -258,6 +262,8 @@ var no_name_message = false;
 
 // Connection opened
 socket.addEventListener('open', function (event) {
+    $('#progress_button').removeClass('is-hidden');
+
     var params = window.location.search;
     params = params.substr(1,params.length).split('&');
     
