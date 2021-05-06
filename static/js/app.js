@@ -85,8 +85,7 @@ let Messages = class {
         })
         text = text.substr(0, text.length-1);
         text += ' is typing...'
-        $('#status_area').append($('<div>', { id: 'typing', 
-            class:'siimple-label siimple--mx-2 siimple--my-0' }).append(text));
+        $('#status_area').append($('<div>', { id: 'typing' }).append(text));
 
         var scroll = $("#message_area_scroll");
         scroll.scrollTop(scroll[0].scrollHeight);
@@ -100,14 +99,12 @@ let Messages = class {
             if(sender == myinfo.kunjika)
                 elm.append($('<div>', {class: 'message-by'}).append('me'))
             else
-                elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender+')'))
-        } else {
-            elm.addClass('siimple--py-1');
-        }
+                elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
+        } 
         if(reply != null && reply.length > 0) {
             elm.append(
                 $('<div>', {class: 'message message-reply'})
-                .append($('<pre>', {class: 'siimple--my-0 siimple--pt-1'}).append(reply))
+                .append($('<pre>').append(reply))
             );
         }
         elm.append($('<pre>').append(text));
@@ -295,6 +292,9 @@ socket.addEventListener('message', function (event) {
                 actions.execute();
             }
             break;
+        case 'kunjika':
+            myinfo.kunjika = j.kunjika;
+            break;
         case 'random':
             actions.execute();
             actions.clear_key('join');
@@ -318,12 +318,12 @@ socket.addEventListener('message', function (event) {
         case 'connected':
             vayakti[j.kunjika] = j.name;
             if(!$('#vayakti_model').hasClass('.is-hidden')) refreshVayaktiList();
-            Messages.pushStatus('Vyakti '+j.name+' connected as '+j.kunjika+' at '+Messages.currentTime());
+            Messages.pushStatus('Vyakti '+j.name+' connected as '+j.kunjika.substr(0,8)+' at '+Messages.currentTime());
             break;
         case 'disconnected':
             delete vayakti[j.kunjika];
             if(!$('#vayakti_model').hasClass('.is-hidden')) refreshVayaktiList();
-            Messages.pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika+' at '+Messages.currentTime());
+            Messages.pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika.substr(0,8)+' at '+Messages.currentTime());
             break;
         case 'left':
             myinfo.kunjika = '';
@@ -355,7 +355,6 @@ function connect(frm) {
 
     actions.add('join', function() {
         Messages.cleanMessage();
-        myinfo.kunjika = data.kunjika;
         myinfo.name = data.name;
         no_name_message = false;
         joining = false;
@@ -363,7 +362,7 @@ function connect(frm) {
         typing = [];
         State.chat();
         State.hideProgress();
-        Messages.pushStatus('Connected at '+Messages.currentTime());
+        Messages.pushStatus('Connected as '+data.name+' at '+Messages.currentTime());
         socket.send(JSON.stringify({cmd: 'list'}));
     })
 
@@ -380,7 +379,7 @@ function connect_next() {
         vayakti = [];
         typing = [];
         State.hideProgress();
-        Messages.pushStatus('Connected at '+Messages.currentTime());
+        Messages.pushStatus('Connectedas '+data.name+' at '+Messages.currentTime());
         socket.send(JSON.stringify({cmd: 'list'}));
     });
     socket.send(JSON.stringify({ cmd: 'randnext' }));
@@ -437,7 +436,7 @@ function refreshVayaktiList() {
     v.empty();
     Object.keys(vayakti).forEach((key) => {
         v.append($('<tr>')
-            .append($('<td>').append(key))
-            .append($('<td>').append(vayakti[key])));
+            .append($('<td>').append(vayakti[key]))
+            .append($('<td>').append(key)));
     });
 }

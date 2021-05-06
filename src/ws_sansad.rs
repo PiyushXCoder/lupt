@@ -108,6 +108,18 @@ impl Handler<ms::WsList> for WsSansad {
     }
 }
 
+/// Own Kunjika hash
+impl Handler<ms::WsKunjikaHash> for WsSansad {
+    type Result = ();
+    fn handle(&mut self, msg: ms::WsKunjikaHash, ctx: &mut Self::Context) -> Self::Result {
+        let json = json!({
+            "cmd": "kunjika",
+            "kunjika": msg.kunjika
+        });
+        ctx.text(json.to_string());
+    }
+}
+
 /// send response ok, error
 impl Handler<ms::WsResponse> for WsSansad {
     type Result = ();
@@ -269,6 +281,12 @@ impl WsSansad {
                 return;
             }
         };
+        // kunjika to hash
+        let mut m = sha1::Sha1::new();
+        m.update(format!("{}{}",kunjika,
+            std::env::var("SALT").unwrap_or("".to_owned())).as_bytes());
+        let kunjika = m.digest().to_string();
+
         let name  = match val.get("name") {
             Some(val ) => val.as_str().unwrap().to_owned(),
             None => {
@@ -308,13 +326,17 @@ impl WsSansad {
 
         match result {
             Resp::Err(err) => self.send_err_response(&err), 
-            Resp::Ok =>  self.kunjika = kunjika,
+            Resp::Ok =>  {
+                self.addr.clone().unwrap().do_send(ms::WsKunjikaHash{ kunjika: kunjika.clone() });
+                self.kunjika = kunjika;
+            },
             Resp::None => {
                 self.addr.clone().unwrap().do_send(ms::WsResponse{
                     result: "watch".to_owned() ,
                     message: "Watchlist".to_owned()
                  });
                 self.isthiti = Isthiti::VraktigatWaitlist;
+                self.addr.clone().unwrap().do_send(ms::WsKunjikaHash{ kunjika: kunjika.clone() });
                 self.kunjika = kunjika
             }
         }
@@ -376,6 +398,12 @@ impl WsSansad {
                 return;
             }
         };
+        // kunjika to hash
+        let mut m = sha1::Sha1::new();
+        m.update(format!("{}{}",kunjika,
+            std::env::var("SALT").unwrap_or("".to_owned())).as_bytes());
+        let kunjika = m.digest().to_string();
+
         let name  = match val.get("name") {
             Some(val ) => val.as_str().unwrap().to_owned(),
             None => {
@@ -425,6 +453,7 @@ impl WsSansad {
             Resp::Err(err) => self.send_err_response(&err), 
             Resp::Ok => {
                 self.isthiti = Isthiti::Kaksh(kaksh_kunjika);
+                self.addr.clone().unwrap().do_send(ms::WsKunjikaHash{ kunjika: kunjika.clone() });
                 self.kunjika = kunjika;
                 self.send_ok_response("joined")
             }

@@ -71,6 +71,12 @@ pub struct  LeaveUser {
 }
 
 //################################################## For WsSansad ##################################################
+// Request to send own kunjika hash
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsKunjikaHash {
+    pub kunjika: String
+}
 // Request to send transfer text
 #[derive(Clone, Message)]
 #[rtype(result = "()")]

@@ -2,7 +2,7 @@ use clap::{App, Arg};
 
 pub struct Config {
     pub static_path: String,
-    pub bind_address: String,
+    pub bind_address: String
 }
 
 impl Config {
@@ -22,7 +22,7 @@ impl Config {
             .author(env!("CARGO_PKG_AUTHORS"))
             .about(env!("CARGO_PKG_DESCRIPTION"))
             .arg(Arg::with_name("static_path")
-                .short("s")
+                .short("p")
                 .long("static_path")
                 .value_name("DIR")
                 .help("Path of directory with index.html")
@@ -34,6 +34,13 @@ impl Config {
                 .value_name("ADDRESS")
                 .help("Address to bind for server")
                 .required(true)
+                .takes_value(true))
+            .arg(Arg::with_name("salt")
+                .short("s")
+                .long("salt")
+                .value_name("SALT")
+                .help("Salt for hashing")
+                .required(false)
                 .takes_value(true))
             .get_matches();
 
