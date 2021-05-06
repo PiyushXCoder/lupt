@@ -141,7 +141,7 @@
     <!-- Reply Clip -->
     <div  id="reply_clip" class="clip-win reply-clip bg-white is-hidden">
         <span>sss</span>
-        <a onclick="$('#reply_clip > span').text(''); $('#reply_clip').addClass('hidden');" style="float: right; padding: 3px 6px;">
+        <a onclick="$('#reply_clip > span').text(''); $('#reply_clip').addClass('is-hidden');" style="float: right; padding: 3px 6px;">
             <img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;">
         </a>
     </div>
@@ -149,8 +149,8 @@
     <!-- Selected Clip -->
     <div id="selected_clip" class="clip-win selected-clip bg-white is-hidden">
         <div style="padding: 4px;">
-            <div onclick="copyMessagesToClipboard()" class="button outline primary">Copy</div>
-            <div onclick="prepareReply()" class="button outline primary">Reply</div>
+            <div onclick="Messages.copyMessagesToClipboard()" class="button outline primary">Copy</div>
+            <div onclick="Messages.prepareReply()" class="button outline primary">Reply</div>
             <a onclick="Messages.unselectAll()" style="float: right; padding: 6px 2px 6px 8px;">
                 <img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;">
             </a>

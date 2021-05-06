@@ -109,7 +109,7 @@ let Messages = class {
         }
         elm.append($('<pre>').append(text));
         elm.click(function() {
-            selectMessage(this);
+            Messages.pick(this);
         });
         area.append(elm);
 
@@ -145,7 +145,7 @@ let Messages = class {
         el.removeClass('is-hidden');
         el.attr('msg', text);
         $('#reply_clip > span').text(text.substr(0, 15)+ '...');
-        unselectMessages();
+        Messages.unselectAll();
     }
     
     static copyMessagesToClipboard() {
@@ -154,7 +154,7 @@ let Messages = class {
         $temp.val(this.selectedMessageToText()).select();
         document.execCommand("copy");
         $temp.remove();
-        unselectMessages();
+        Messages.unselectAll();
     }
     
     static cleanMessage() {
@@ -310,10 +310,10 @@ socket.addEventListener('message', function (event) {
             break;
         case 'status':
             if(j.status == "typing") {
-                typing.push(j.kunjika);
+                typing.push(vayakti[j.kunjika]+"("+j.kunjika.substr(0,8)+")");
                 Messages.pushTypingStatus();
             } else if(j.status == "typing_end") {
-                const index = typing.indexOf(j.kunjika);
+                const index = typing.indexOf(vayakti[j.kunjika]+"("+j.kunjika.substr(0,8)+")");
                 if (index > -1) typing.splice(index, 1);
                 Messages.pushTypingStatus();
             }
