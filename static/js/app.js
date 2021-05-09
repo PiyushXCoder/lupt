@@ -1,252 +1,5 @@
 
-let State = class {
-    static login() {
-        $('#connect_panel').removeClass('is-hidden');
-        $('#chat_panel').addClass('is-hidden');
-        $('#reply_clip').addClass('is-hidden');
-        $('#selected_clip').addClass('is-hidden');
-        $('#action_clip').addClass('is-hidden');
-        $('#vayakti_model').addClass('is-hidden');
-        $('[name="error_msg"]').addClass('is-hidden');
-    }
-
-    static chat() {
-        $('#chat_panel').removeClass('is-hidden');
-        $('#connect_panel').addClass('is-hidden');
-        $('#reply_clip').addClass('is-hidden');
-        $('#selected_clip').addClass('is-hidden');
-        $('#action_clip').addClass('is-hidden');
-        $('#vayakti_model').addClass('is-hidden');
-        $('#next_btn').addClass('is-hidden');
-        $('#send_box').focus();
-    }
-
-    static showProgress() {
-        $('#progress').removeClass('is-hidden');
-    }
-    
-    static hideProgress() {
-        $('#progress').addClass('is-hidden');
-    }
-};
-
-let Messages = class {
-    static pick(elm) {
-        var elm = $(elm);
-        elm.toggleClass('active');
-
-        if($('.active').length == 0)
-            $('#selected_clip').addClass('is-hidden');
-        else
-            $('#selected_clip').removeClass('is-hidden');
-    }
-
-    static unselectAll(msg) {
-        $('.active').each(function() {
-            $(this).removeClass('active');
-        });
-        $('#selected_clip').addClass('is-hidden');
-    }
-
-    static setupTyping() {
-        var send_typing = false;
-        var timeout = null;
-        $('#send_box').keydown(function(e) {
-            if (!send_typing) {
-                sendTyping();
-                send_typing = true;
-                return;
-            }
-            clearTimeout(timeout);
-            timeout = setTimeout(function() {
-                send_typing = false;
-                sendTypingEnd();
-            },2000);
-        });
-        $('#send_box').keypress(function(e) {
-            if(e.originalEvent.charCode == 13 && !e.shiftKey) {
-                send();
-                e.preventDefault();
-                clearTimeout(timeout);
-                send_typing = false;
-                sendTypingEnd()
-                return
-            }
-        });
-    }
-
-    static pushTypingStatus() {
-        var elm = $('#status_area > #typing');
-        if(elm.length > 0) elm.remove();
-        if(typing.length == 0) return;
-        var text = '';
-        typing.forEach((val) => {
-            var name = vayakti[val];
-            if(name == undefined) name = "";
-            text += name+'('+val.substr(0,8)+')'+ ','
-        })
-        text = text.substr(0, text.length-1);
-        text += ' is typing...'
-        $('#status_area').append($('<div>', { id: 'typing' }).append(text));
-
-        var scroll = $("#message_area_scroll");
-        scroll.scrollTop(scroll[0].scrollHeight);
-    }
-
-    static pushMessage(sender, text, reply = null) {
-        var isMe = myinfo.kunjika == sender;
-        var area = $('#message_area');
-        var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other')});
-        if(!no_name_message) {
-            if(sender == myinfo.kunjika)
-                elm.append($('<div>', {class: 'message-by'}).append('me'))
-            else
-                elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
-        } 
-        if(reply != null && reply.length > 0) {
-            elm.append(
-                $('<div>', {class: 'message message-reply'})
-                .append($('<pre>').append(reply))
-            );
-        }
-        elm.append($('<pre>').append(text));
-        elm.click(function() {
-            Messages.pick(this);
-        });
-        area.append(elm);
-
-        var scroll = $("#message_area_scroll");
-        scroll.scrollTop(scroll[0].scrollHeight);
-    }
-
-    // in message area 
-    static pushStatus(text) {
-        var area = $('#message_area');
-        var elm = $('<div>', {class: 'status'});
-        elm.append($('<small>', {class: 'tag bg-light'}).append(text));
-        area.append(elm);
-
-        var scroll = $("#message_area_scroll");
-        scroll.scrollTop(scroll[0].scrollHeight);
-    }
-
-    static selectedMessageToText() {
-        var text = "";
-        $('.active').each(function() {
-            $(this).find('pre').each(function() {
-                text += $(this).text() + '\n' 
-            });
-        });
-    
-        return text.trim();
-    }
-    
-    static prepareReply() {
-        var text = this.selectedMessageToText();
-        var el = $('#reply_clip');
-        el.removeClass('is-hidden');
-        el.attr('msg', text);
-        $('#reply_clip > span').text(text.substr(0, 15)+ '...');
-        Messages.unselectAll();
-    }
-    
-    static copyMessagesToClipboard() {
-        var $temp = $("<textarea>");
-        $("body").append($temp);
-        $temp.val(this.selectedMessageToText()).select();
-        document.execCommand("copy");
-        $temp.remove();
-        Messages.unselectAll();
-    }
-    
-    static cleanMessage() {
-        $('#message_area').empty();
-        $('#status_area').empty();
-        $('#action_clip').addClass('is-hidden');
-    }
-
-    static currentTime() {
-        var today = new Date();
-        return today.getHours()+':'+today.getMinutes();
-    }
-}
-
-class Actions {
-    actions = []; // [[id, func]]
-
-    execute() {
-        if(this.actions.length <= 0) return;
-
-        var act = this.actions[0];
-        this.actions.shift();
-
-        act[1]();
-    }
-
-    clear() {
-        this.actions = [];
-    }
-
-    clear_key(ac) {
-        this.actions = this.actions.filter(function (arr) {
-            return arr[0] != ac
-        });
-    }
-
-    has_key(ac) {
-        var out = this.actions.find(function (arr) {
-            return arr[0] == ac
-        });
-        return out != undefined;
-    }
-
-    add(id, func) {
-        this.actions.push([id, func]);
-    }
-}
-
 var actions = new Actions();
-
-$(document).ready(() => {
-    $(".tabs > a").click(function() {
-        var t = $(this);
-        $(t.parents('tabs').first()).find('form').each(function(i,elm) {
-            var elm = $(elm);
-            if(elm.attr('name') == t.attr('name')) 
-                elm.removeClass('is-hidden');
-            else elm.addClass('is-hidden');
-        });
-        $(".tabs > a").each(function(i,elm) {
-            var elm = $(elm);
-            if(elm.attr('name') != t.attr('name')) 
-                elm.removeClass('active');
-            else elm.addClass('active');
-        });
-    });
-
-    $('.message-me, .message-other').click(function() {
-        Messages.select();
-    });
-
-    Messages.setupTyping();
-
-    $('[name=connect]').click(function () {
-        State.showProgress();
-        connect($(this).parents('form').first());
-    });
-
-    var textarea = $('#send_box')[0];
-
-    textarea.addEventListener('keydown', autosize);
-                
-    function autosize(){
-        var el = this;
-        setTimeout(function(){
-            el.style.cssText = 'height:auto; padding:0';
-            el.style.cssText = 'height:' + el.scrollHeight + 'px';
-        },0);
-    }
-});
 
 // Create WebSocket connection.
 var wsProtocol = 'ws://';
@@ -321,7 +74,7 @@ socket.addEventListener('message', function (event) {
             }
             break;
         case 'text':
-            Messages.pushMessage(j.kunjika, j.text, j.reply);
+            Messages.pushMessage(j.kunjika, j.text, j.reply, j.msg_id);
             break;
         case 'connected':
             vayakti[j.kunjika] = j.name;
@@ -431,11 +184,17 @@ function send() {
     $('#reply_clip').attr('msg', '');
     $('#reply_clip').addClass('is-hidden');
     $('#reply_clip > span').text('');
+    autosize($('#send_box')[0]);
 }
 
 function vayaktiList() {
     refreshVayaktiList();
     $('#vayakti_model').removeClass('is-hidden');
+    $('#action_clip').addClass('is-hidden');
+}
+
+function changeColor() {
+    $('body').toggleClass('dark')
     $('#action_clip').addClass('is-hidden');
 }
 
@@ -447,4 +206,40 @@ function refreshVayaktiList() {
             .append($('<td>').append(vayakti[key]))
             .append($('<td>').append(key)));
     });
+}
+           
+function autosize(el){
+    setTimeout(function(){
+        el.style.cssText = 'height:auto; padding:0';
+        el.style.cssText = 'height:' + el.scrollHeight + 'px';
+        $('#reply_clip').css('bottom',  (el.scrollHeight + 10) + 'px');
+        $('#selected_clip').css('bottom',  (el.scrollHeight + 10) + 'px');
+    },0);    
+}
+
+// Camera
+var video = $('#videoElement')[0];
+if (navigator.mediaDevices.getUserMedia) {
+navigator.mediaDevices.getUserMedia({ video: true, width: {max: 100} })
+    .then(function (stream) {
+    video.srcObject = stream;
+    })
+    .catch(function (error) {
+    console.log('Something went wrong!');
+    });
+}
+
+var resultb64='';
+function capture() {        
+    var canvas = $('<canvas>')[0];     
+    var video = $('#videoElement')[0];
+    canvas.width = 200;
+    canvas.height = 200;
+    canvas.getContext('2d').drawImage(video, 0, 0, 120,120);  
+    resultb64=canvas.toDataURL();
+    socket.send(JSON.stringify({
+        cmd: 'text',
+        text: resultb64,
+        reply: ''
+    }));
 }

@@ -76,7 +76,8 @@ impl Handler<ms::WsText> for WsSansad {
             "cmd": "text",
             "text": msg.text,
             "reply": msg.reply,
-            "kunjika": msg.sender_kunjika // Sender's kunjuka
+            "kunjika": msg.sender_kunjika, // Sender's kunjuka
+            "msg_id": msg.msg_id.to_string()
         });
         ctx.text(json.to_string());
     }

@@ -7,7 +7,7 @@
     <title>Lupt Chat</title>
 </head>
 <body>
-    <div id="progress" class="bg-white" style="z-index: 9999; position: fixed; top: 0; bottom: 0;width: 100%; height: 100%;">
+    <div id="progress" class="bg-sec" style="z-index: 9999; position: fixed; top: 0; bottom: 0;width: 100%; height: 100%;">
         <div style="top: 50%;
         left: 50%;
         width:10em;
@@ -30,6 +30,7 @@
             <div class="tabs is-center">
                 <a name="kaksh_sec" class="active">Kaksh(Room)</a>
                 <a name="stranger_sec">Stranger</a>
+                <a onclick="changeColor()"><img src="img/color.svg" alt="C" height="16"></a>
             </div>
 
             <form name="kaksh_sec" cmd="join">
@@ -108,7 +109,7 @@
     
     <!-- Chat Screen -->
     <div id="chat_panel" class="cover-screen chatpanel is-hidden">
-        <div class="chatpanel-top bg-light">
+        <div class="chatpanel-top bg-ter">
             <button onclick="leave()"  class="button chatpanel-top-l">
                 <img src="img/back.svg" alt="" height="12px"> Back
             </button>
@@ -125,29 +126,30 @@
                 
             </div>
         </div>
-        <div class="chatpanel-bot bg-light">
+        <div class="chatpanel-bot bg-ter">
             <button onclick="$('#action_clip').toggleClass('is-hidden')" class="button chatpanel-bot-l">
                 <img src="img/clip.svg" alt="send" width="24">
             </button>
             <div class="chatpanel-bot-m">
                 <textarea id="send_box" rows="1"></textarea>     
             </div>
-            <button onclick="send()" class="button chatpanel-bot-r">
+            <button id="send_button" class="button chatpanel-bot-r">
                 <img src="img/send.svg" alt="Send" width="50">
             </button> 
         </div>
     </div>
 
     <!-- Reply Clip -->
-    <div  id="reply_clip" class="clip-win reply-clip bg-white is-hidden">
-        <span>sss</span>
-        <a onclick="$('#reply_clip > span').text(''); $('#reply_clip').addClass('is-hidden');" style="float: right; padding: 3px 6px;">
+    <div  id="reply_clip" class="clip-win reply-clip is-hidden">
+        <span></span>
+        <a onclick="$('#reply_clip > span').text(''); $('#reply_clip').attr('msg', '');
+            $('#reply_clip').addClass('is-hidden');" style="float: right; padding: 3px 6px;">
             <img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;">
         </a>
     </div>
 
     <!-- Selected Clip -->
-    <div id="selected_clip" class="clip-win selected-clip bg-white is-hidden">
+    <div id="selected_clip" class="clip-win selected-clip is-hidden">
         <div style="padding: 4px;">
             <div onclick="Messages.copyMessagesToClipboard()" class="button outline primary">Copy</div>
             <div onclick="Messages.prepareReply()" class="button outline primary">Reply</div>
@@ -158,17 +160,25 @@
     </div>
 
     <!-- Action Clip -->
-    <div id="action_clip" class="clip-win action-clip is-hidden bg-white">
-        <div class="is-hidden">
+    <div id="action_clip" class="clip-win action-clip is-hidden">
+        <div style="padding-bottom: 10px;">
             <button class="button">
                 <img src="img/image.svg" alt="Image" width="50" class="siimple--py-2 siimple--px-2">
                 <div>send image</div>
             </button>
         </div>
         <div>
+            <button onclick="changeColor()" class="button"><img src="img/color.svg" alt="C" height="16"></button>
             <button onclick="Messages.cleanMessage()" class="button">Clear</button>
             <button onclick="vayaktiList()" class="button">List Vyakti(Users)</button>
         </div>
+    </div>
+
+    <!-- Camera Clip -->
+    <div id="camera_clip" class="clip-win camera-clip is-hidden">
+        <video autoplay="true" id="videoElement" width="300"></video>
+        <button class="button is-full-width">Send</button>
+        
     </div>
 
     <!-- vayakti -->
@@ -176,7 +186,7 @@
         <header>
             <h4>
                 List Vyakti(Users)
-                <button onclick="$('#vayakti_model').addClass('is-hidden'); $('#vayakti_list').empty()" class="button bg-red" style="float: right;"><img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;"></button>
+                <button onclick="$('#vayakti_model').addClass('is-hidden'); $('#vayakti_list').empty()" class="button bg-red pull-right"><img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;"></button>
             </h4>
         </header>
         <div style="overflow-y: scroll; height: calc(100% - 40px);">
@@ -195,6 +205,10 @@
         </div>
     </div>      
     <script src="js/jquery-3.5.1.min.js"></script>
+    <script src="js/actions.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/message.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/onload.js"></script>
 </body>
 </html>

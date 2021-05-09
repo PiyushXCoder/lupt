@@ -16,7 +16,7 @@ use ws_sansad::WsSansad;
 
 mod config;
 mod errors;
-mod messages;
+mod broker_messages;
 mod ws_sansad;
 mod chat_pinnd;
 mod validator;

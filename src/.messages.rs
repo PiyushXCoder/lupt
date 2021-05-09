@@ -35,7 +35,7 @@ pub struct JoinRandomNext {
     pub kunjika: String
 }
 
-/// Request to send text t
+/// Request to send text 
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct SendText {
@@ -43,6 +43,15 @@ pub struct SendText {
     pub kunjika: String,
     pub text: String,
     pub reply: Option<String>,
+}
+/// Request to send image t
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct SendImage {
+    pub kaksh_kunjika: String,
+    pub kunjika: String,
+    pub part: String,
+    pub image_id: i32
 }
 
 // Request to send text t
@@ -81,6 +90,15 @@ pub struct WsKunjikaHash {
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsText {
+    pub text: String,
+    pub reply: Option<String>,
+    pub sender_kunjika: String,
+    pub msg_id: u128
+}
+// Request to send transfer text
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsImage {
     pub text: String,
     pub reply: Option<String>,
     pub sender_kunjika: String

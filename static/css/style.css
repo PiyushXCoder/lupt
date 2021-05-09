@@ -9,8 +9,10 @@
 :root {
     --bg-color: #ffffff;
     --bg-secondary-color: #f3f3f6;
+    --bg-tertiary-color: #cacad8;
     --color-primary: #14854F;
     --color-lightGrey: #d2d6dd;
+    --color-border: #d2d6dd;
     --color-grey: #747681;
     --color-darkGrey: #3f4144;
     --color-error: #d43939;
@@ -21,6 +23,39 @@
     --font-color: #333333;
     --font-family-sans: "Itim";
     --font-family-mono: monaco, "Consolas", "Lucida Console", monospace;
+
+    --msg-other-bg-color : rgb(75, 147, 196);
+    --msg-me-bg-color : rgb(101, 187, 130);
+    --msg-reply-bg-color : rgb(198, 203, 207);
+    --msg-other-border-color : #fff;
+    --msg-me-border-color : #fff;
+    --msg-reply-border-color : #fff;
+    --msg-other-border-sel-color : #fff;
+    --msg-me-border-sel-color : #fff;
+}
+
+* {
+    scrollbar-width: auto;
+}
+
+body.dark {
+    --bg-color: rgb(25, 25, 27);
+    --bg-secondary-color: #1f1f20;
+    --bg-tertiary-color: #28282b;
+    --font-color: #e5e7eb;
+    --color-grey: #ccc;
+    --color-lightGrey: #959ba5;
+    --color-darkGrey: rgb(140, 142, 146);
+    --color-border: rgb(140, 142, 146);
+
+    --msg-other-bg-color : #2C5AA0;
+    --msg-me-bg-color : #005544;
+    --msg-reply-bg-color : rgb(45, 46, 53);
+    --msg-other-border-color : #3771C8;
+    --msg-me-border-color : #008066;
+    --msg-reply-border-color : #717479;
+    --msg-other-border-sel-color : #ACDBFF;
+    --msg-me-border-sel-color : #8CE7A9;
 }
 
 body > .container {
@@ -46,10 +81,30 @@ textarea {
     font-size: 0.9em;
     margin-top: 0;
     margin-bottom: 0;
+    scrollbar-width: none;
+    background-color: var(--bg-secondary-color);
+    color: var(--font-color);
+}
+
+input {
+    background-color: var(--bg-secondary-color);
+    color: var(--font-color);
+}
+
+.bg-sec {
+    background-color: var(--bg-secondary-color) !important;
+}
+
+.bg-ter {
+    background-color: var(--bg-tertiary-color) !important;
 }
 
 .bg-white {
-    background-color: white;
+    background-color: white !important;
+}
+
+.button {
+    background-color: var(--bg-tertiary-color);
 }
 
 .cover-screen {
@@ -137,6 +192,10 @@ textarea {
     text-align: center;
 }
 
+.status .tag {
+    background-color: var(--bg-tertiary-color);
+}
+
 .message {
     padding: 0px 8px 3px 8px;
     margin: 2px;
@@ -144,18 +203,18 @@ textarea {
 }
 
 .message-other {
-    border-left: 5px solid #1E86D7;
-    background-color: #95C1E2;
+    border-left: 5px solid var(--msg-other-border-color);
+    background-color: var(--msg-other-bg-color);
 }
 
 .message-me {
-    border-left: 5px solid #2F848D;
-    background-color: #99C5C9;
+    border-left: 5px solid var(--msg-me-border-color);
+    background-color: var(--msg-me-bg-color);
 }
 
 .message-reply {
-    border-left: 5px solid #383C4A;
-    background-color: #DEDEDE;
+    border-left: 5px solid var(--msg-reply-border-color);
+    background-color: var(--msg-reply-bg-color);
 }
 
 .message .message-by {
@@ -166,13 +225,13 @@ textarea {
 }
 
 .message-me.active {
-    border: 2px dashed #11603F;
-    border-left: 5px solid #11603F;
+    border: 3px dashed var(--msg-me-border-sel-color);
+    border-left: 5px solid var(--msg-me-border-sel-color);
 }
 
 .message-other.active {
-    border: 2px dashed #104975;
-    border-left: 5px solid #104975;
+    border: 3px dashed var(--msg-other-border-sel-color);
+    border-left: 5px solid var(--msg-other-border-sel-color);
 }
 
 .clip-win {
@@ -182,6 +241,7 @@ textarea {
     margin: 5px;
     bottom: 50px;
     border: 1px dashed #1E86D7;
+    background-color: var(--bg-secondary-color);
 }
 
 .clip-win.reply-clip {
@@ -207,6 +267,17 @@ textarea {
     width: calc(100% - 2*8px - 3*5px);
     max-width: 720px;
 }
+
+.clip-win.action-clip button {
+    padding: 1rem 1rem;
+    margin-left: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.clip-win.camera-clip {
+    width: 314px;
+}
+
 
 @media screen and (max-width: 600px)  {
     div[name="error_msg"] {
