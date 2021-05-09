@@ -24,14 +24,16 @@
     --font-family-sans: "Itim";
     --font-family-mono: monaco, "Consolas", "Lucida Console", monospace;
 
-    --msg-other-bg-color : rgb(75, 147, 196);
-    --msg-me-bg-color : rgb(101, 187, 130);
-    --msg-reply-bg-color : rgb(198, 203, 207);
-    --msg-other-border-color : #fff;
-    --msg-me-border-color : #fff;
-    --msg-reply-border-color : #fff;
-    --msg-other-border-sel-color : #fff;
-    --msg-me-border-sel-color : #fff;
+    --msg-other-bg-color : rgb(97, 182, 238);
+    --msg-me-bg-color : rgb(92, 175, 148);
+    --msg-reply-bg-color : rgb(209, 215, 219);
+    --msg-other-border-color : rgb(62, 127, 212);
+    --msg-me-border-color : rgb(64, 148, 116);
+    --msg-reply-border-color : rgb(94, 100, 105);
+    --msg-other-border-sel-color : rgb(58, 90, 139);
+    --msg-me-border-sel-color : rgb(48, 105, 86);
+
+    --svg-filter: none;
 }
 
 * {
@@ -53,9 +55,11 @@ body.dark {
     --msg-reply-bg-color : rgb(45, 46, 53);
     --msg-other-border-color : #3771C8;
     --msg-me-border-color : #008066;
-    --msg-reply-border-color : #717479;
+    --msg-reply-border-color : #5b5f64;
     --msg-other-border-sel-color : #ACDBFF;
     --msg-me-border-sel-color : #8CE7A9;
+
+    --svg-filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
 }
 
 body > .container {
@@ -105,6 +109,10 @@ input {
 
 .button {
     background-color: var(--bg-tertiary-color);
+}
+
+.svg-filter {
+    filter: var(--svg-filter);
 }
 
 .cover-screen {

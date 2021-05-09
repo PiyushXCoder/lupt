@@ -28,13 +28,13 @@
    guidetolerance="10"
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
-   inkscape:window-width="903"
-   inkscape:window-height="453"
+   inkscape:window-width="1278"
+   inkscape:window-height="868"
    id="namedview37"
    showgrid="false"
-   inkscape:zoom="1.243281"
-   inkscape:cx="246.24387"
-   inkscape:cy="236.82063"
+   inkscape:zoom="0.31082025"
+   inkscape:cx="-66.060137"
+   inkscape:cy="234.88598"
    inkscape:window-x="0"
    inkscape:window-y="54"
    inkscape:window-maximized="0"
@@ -42,11 +42,11 @@
    inkscape:document-rotation="0" />
 <g
    id="g4"
-   style="fill:#1a1a1a">
+   style="fill:#1a1a1a;fill-opacity:0.93514794">
 	<path
-   d="M145.188,238.575l215.5-215.5c5.3-5.3,5.3-13.8,0-19.1s-13.8-5.3-19.1,0l-225.1,225.1c-5.3,5.3-5.3,13.8,0,19.1l225.1,225   c2.6,2.6,6.1,4,9.5,4s6.9-1.3,9.5-4c5.3-5.3,5.3-13.8,0-19.1L145.188,238.575z"
+   d="m 145.188,238.575 215.5,-215.5 c 5.3,-5.3 5.3,-13.8 0,-19.1 -5.3,-5.3 -13.8,-5.3 -19.1,0 l -225.1,225.1 c -5.3,5.3 -5.3,13.8 0,19.1 l 225.1,225 c 2.6,2.6 6.1,4 9.5,4 3.4,0 6.9,-1.3 9.5,-4 5.3,-5.3 5.3,-13.8 0,-19.1 z"
    id="path2"
-   style="fill:#1a1a1a" />
+   style="fill:#1a1a1a;fill-opacity:0.93514794" />
 </g>
 <g
    id="g6">

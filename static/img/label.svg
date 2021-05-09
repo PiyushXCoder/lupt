@@ -16,7 +16,7 @@
    sodipodi:docname="label.svg">
   <defs
      id="defs2" />
-   <sodipodi:namedview
+  <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -54,7 +54,7 @@
      id="layer1">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:96px;line-height:1.25;font-family:sans-serif;fill:#216778;fill-opacity:1;stroke:none;"
+       style="font-style:normal;font-weight:normal;font-size:96px;line-height:1.25;font-family:sans-serif;fill:#2c89a0;fill-opacity:1;stroke:none;"
        x="152.76921"
        y="232.96042"
        id="text52"><tspan
@@ -62,10 +62,10 @@
          id="tspan50"
          x="152.76921"
          y="232.96042"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;font-family:Itim;-inkscape-font-specification:Itim;fill:#216778;">Lupt Chat </tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;font-family:Itim;-inkscape-font-specification:Itim;fill:#2c89a0;">Lupt Chat </tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:133.333px;line-height:1.25;font-family:Teko;-inkscape-font-specification:Teko;fill:#374548;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:133.333px;line-height:1.25;font-family:Teko;-inkscape-font-specification:Teko;fill:#6f8a91;fill-opacity:1;stroke:none;"
        x="268.19843"
        y="130.02667"
        id="text56"><tspan
@@ -73,33 +73,33 @@
          id="tspan54"
          x="268.19843"
          y="130.02667"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:133.333px;font-family:Rajdhani;-inkscape-font-specification:'Rajdhani Medium';fill:#374548">लुप्त चैट</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:133.333px;font-family:Rajdhani;-inkscape-font-specification:'Rajdhani Medium';fill:#6f8a91;">लुप्त चैट</tspan></text>
     <g
-       style="fill:#d45500;stroke:#005544;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:#d45500;stroke:#2ca089;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none"
        id="g49"
        transform="matrix(-10.249207,0,0,10.492348,280.41862,-26.401894)">
       <path
          d="M 8,9.50004 C 7.30964,9.50004 6.75,10.0597 6.75,10.75 6.75,11.4404 7.30964,12 8,12 8.69036,12 9.25,11.4404 9.25,10.75 9.25,10.0597 8.69036,9.50004 8,9.50004 Z"
          fill="#000000"
          id="path29"
-         style="fill:none;stroke:#005544;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none" />
+         style="fill:none;stroke:#2ca089;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none" />
       <path
          d="m 12,9.50004 c -0.6904,0 -1.25,0.55966 -1.25,1.24996 0,0.6904 0.5596,1.25 1.25,1.25 0.6904,0 1.25,-0.5596 1.25,-1.25 0,-0.6903 -0.5596,-1.24996 -1.25,-1.24996 z"
          fill="#000000"
          id="path31"
-         style="fill:none;stroke:#005544;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none" />
+         style="fill:none;stroke:#2ca089;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none" />
       <path
          d="m 14.75,10.75 c 0,-0.6903 0.5596,-1.24996 1.25,-1.24996 0.6904,0 1.25,0.55966 1.25,1.24996 0,0.6904 -0.5596,1.25 -1.25,1.25 -0.6904,0 -1.25,-0.5596 -1.25,-1.25 z"
          fill="#000000"
          id="path33"
-         style="fill:none;stroke:#005544;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none" />
+         style="fill:none;stroke:#2ca089;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none" />
       <path
          fill-rule="evenodd"
          clip-rule="evenodd"
          d="M 16.1007,4.59283 C 13.4065,4.36307 10.6983,4.34974 8.00194,4.55296 L 7.80871,4.56752 C 5.23741,4.76132 3.25,6.90415 3.25,9.48275 V 18 c 0,0.2639 0.13867,0.5084 0.36515,0.6438 0.22648,0.1354 0.50746,0.1418 0.73989,0.0169 L 8.26583,16.559 C 8.44774,16.4612 8.65104,16.41 8.85756,16.41 H 17.834 c 1.1321,0 2.1022,-0.8094 2.3052,-1.9231 0.4113,-2.2572 0.4437,-4.5672 0.0961,-6.83511 L 20.1329,6.98346 C 19.9464,5.76671 18.951,4.8359 17.7245,4.7313 Z"
          fill="#000000"
          id="path35"
-         style="fill:none;stroke:#005544;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none"
+         style="fill:none;stroke:#2ca089;stroke-width:0.385726;stroke-miterlimit:4;stroke-dasharray:none"
          sodipodi:nodetypes="cccsssccssccccc" />
     </g>
   </g>
