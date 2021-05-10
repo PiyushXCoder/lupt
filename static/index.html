@@ -186,9 +186,17 @@
     <!-- Selected Clip -->
     <div id="selected_clip" class="clip-win selected-clip is-hidden">
         <div style="padding: 4px;">
-            <div onclick="Messages.copyMessagesToClipboard()" class="button outline primary">Copy</div>
-            <div onclick="Messages.prepareReply()" class="button outline primary">Reply</div>
-            <a onclick="Messages.unselectAll()" style="float: right; padding: 6px 2px 6px 8px;">
+            <button onclick="Messages.copyMessagesToClipboard()" class="button outline primary" style="padding: 1rem 1rem;">
+                <img src="img/delete.svg" style="height: 1.6rem;">
+            </button>
+            <button onclick="Messages.copyMessagesToClipboard()" class="button outline primary" style="padding: 1rem 1rem;">
+                <img src="img/edit.svg" class="svg-filter" style="height: 1.6rem;">
+            </button>
+            <button onclick="Messages.copyMessagesToClipboard()" class="button outline primary" style="padding: 1rem 1rem;">
+                <img src="img/copy.svg" class="svg-filter" style="height: 1.6rem;">
+            </button>
+            <button onclick="Messages.prepareReply()" class="button outline primary">Reply</button>
+            <a onclick="Messages.unselectAll()" style="float: right; padding: 7px 2px 7px 15px;">
                 <img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;">
             </a>
         </div>

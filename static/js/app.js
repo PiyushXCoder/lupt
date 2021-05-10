@@ -224,7 +224,7 @@ function autosize(el){
     setTimeout(function(){
         el.style.cssText = 'height:auto; padding:0';
         el.style.cssText = 'height:' + el.scrollHeight + 'px';
-        $('#reply_clip').css('bottom',  (el.scrollHeight + 10) + 'px');
-        $('#selected_clip').css('bottom',  (el.scrollHeight + 25) + 'px');
+        $('#reply_clip').css('bottom',  (el.scrollHeight + 20) + 'px');
+        $('#selected_clip').css('bottom',  (el.scrollHeight + 30) + 'px');
     },0);    
 }

@@ -121,10 +121,9 @@ let Messages = class {
 
     static selectedMessageToText() {
         var text = "";
-        $('.active').each(function() {
-            $(this).find('pre').each(function() {
-                text += $(this).text() + '\n' 
-            });
+        $('.message.active').each(function() {
+            text += $(this).find('.message-by').text()+' : ';
+            text += $(this).find('pre').last().text() + '\n';
         });
     
         return text.trim();

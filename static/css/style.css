@@ -215,9 +215,9 @@ input {
 .clip-win {
     position: fixed;
     z-index: 9999;
-    padding: 6px;
-    margin: 5px;
-    bottom: 50px;
+    padding: 6px;    
+    bottom: 55px;
+    left: 5px;
     border: 1px dashed #1E86D7;
     background-color: var(--bg-secondary-color);
 }
@@ -232,7 +232,7 @@ input {
 }
 
 .clip-win.selected-clip {
-    min-width: 250px;
+    min-width: 320px;
     left: 50%; 
     transform: translateX(-50%);
     border-radius:  15px;
