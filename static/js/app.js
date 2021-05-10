@@ -76,6 +76,9 @@ socket.addEventListener('message', function (event) {
         case 'text':
             Messages.pushMessage(j.kunjika, j.text, j.reply, j.msg_id);
             break;
+        case 'img':
+            Messages.pushImage(j.kunjika, j.src,  j.msg_id);
+            break;
         case 'connected':
             vayakti[j.kunjika] = j.name;
             if(!$('#vayakti_model').hasClass('.is-hidden')) refreshVayaktiList();
@@ -215,31 +218,4 @@ function autosize(el){
         $('#reply_clip').css('bottom',  (el.scrollHeight + 10) + 'px');
         $('#selected_clip').css('bottom',  (el.scrollHeight + 10) + 'px');
     },0);    
-}
-
-// Camera
-var video = $('#videoElement')[0];
-if (navigator.mediaDevices.getUserMedia) {
-navigator.mediaDevices.getUserMedia({ video: true, width: {max: 100} })
-    .then(function (stream) {
-    video.srcObject = stream;
-    })
-    .catch(function (error) {
-    console.log('Something went wrong!');
-    });
-}
-
-var resultb64='';
-function capture() {        
-    var canvas = $('<canvas>')[0];     
-    var video = $('#videoElement')[0];
-    canvas.width = 200;
-    canvas.height = 200;
-    canvas.getContext('2d').drawImage(video, 0, 0, 120,120);  
-    resultb64=canvas.toDataURL();
-    socket.send(JSON.stringify({
-        cmd: 'text',
-        text: resultb64,
-        reply: ''
-    }));
 }

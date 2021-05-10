@@ -47,6 +47,7 @@ impl Actor for ChatPinnd {
     fn started(&mut self, ctx: &mut Self::Context) {
         // for actix broker 
         self.subscribe_system_async::<ms::pind::SendText>(ctx);
+        self.subscribe_system_async::<ms::pind::SendImage>(ctx);
         self.subscribe_system_async::<ms::pind::SendStatus>(ctx);
         self.subscribe_system_async::<ms::pind::LeaveUser>(ctx);
     }

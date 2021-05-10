@@ -101,20 +101,12 @@ impl WsSansad {
     /// parse the request text from client
     async fn parse_text_handle(&mut self, msg: String) {
         if let Ok(val) = serde_json::from_str::<Value>(&msg) {
-            // let cmd  = match val.get("cmd") {
-            //     Some(v) => v,
-            //     None => return
-            // };
-            // let cmd  = match cmd.as_str() {
-            //     Some(v) => v,
-            //     None => return
-            // };
-
             match val.get("cmd").unwrap().as_str().unwrap() {
                 "join" => { self.join_kaksh(val).await },
                 "rand" => { self.join_random(val).await },
                 "randnext" => { self.join_random_next().await },
                 "text" => { self.send_text(val).await },
+                "img" => { self.send_image(val).await },
                 "status" => { self.send_status(val).await },
                 "list" => { self.list().await },
                 "leave" => { self.leave_kaksh().await },

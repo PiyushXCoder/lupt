@@ -18,13 +18,14 @@ pub struct WsText {
     pub sender_kunjika: String,
     pub msg_id: u128
 }
+
 // Request to send transfer text
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsImage {
-    pub text: String,
-    pub reply: Option<String>,
-    pub sender_kunjika: String
+    pub src: String,
+    pub sender_kunjika: String,
+    pub msg_id: u128
 }
 
 // Request to send transfer text

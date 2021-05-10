@@ -42,14 +42,14 @@ pub struct SendText {
     pub text: String,
     pub reply: Option<String>,
 }
-/// Request to send image t
+
+/// Request to send image 
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct SendImage {
     pub kaksh_kunjika: String,
     pub kunjika: String,
-    pub part: String,
-    pub image_id: i32
+    pub src: String
 }
 
 // Request to send text t

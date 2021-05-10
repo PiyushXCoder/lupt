@@ -44,4 +44,6 @@ $(document).ready(() => {
         evt.preventDefault();
         send();
     });
+
+    Camera.setupCamera();
 });

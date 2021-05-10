@@ -88,6 +88,26 @@ let Messages = class {
         scroll.scrollTop(scroll[0].scrollHeight);
     }
 
+    static pushImage(sender, src, msg_id) {
+        var isMe = myinfo.kunjika == sender;
+        var area = $('#message_area');
+        var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
+        if(!no_name_message) {
+            if(sender == myinfo.kunjika)
+                elm.append($('<div>', {class: 'message-by'}).append('me'))
+            else
+                elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
+        } 
+        elm.append($('<img>', {src: src}));
+        elm.click(function() {
+            Messages.pick(this);
+        });
+        area.append(elm);
+
+        var scroll = $("#message_area_scroll");
+        scroll.scrollTop(scroll[0].scrollHeight);
+    }
+
     // in message area 
     static pushStatus(text) {
         var area = $('#message_area');

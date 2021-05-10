@@ -16,6 +16,20 @@ impl Handler<ms::sansad::WsText> for WsSansad {
     }
 }
 
+/// send text message
+impl Handler<ms::sansad::WsImage> for WsSansad {
+    type Result = ();
+    fn handle(&mut self, msg: ms::sansad::WsImage, ctx: &mut Self::Context) -> Self::Result {
+        let json = json!({
+            "cmd": "img",
+            "src": msg.src,
+            "kunjika": msg.sender_kunjika, // Sender's kunjuka
+            "msg_id": msg.msg_id.to_string()
+        });
+        ctx.text(json.to_string());
+    }
+}
+
 
 /// send text status
 impl Handler<ms::sansad::WsStatus> for WsSansad {
