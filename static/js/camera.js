@@ -1,11 +1,11 @@
-var Camera = class {
+let Camera = class {
     static setupCamera() {
         $('#file-input')[0].addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) {
                 return;
             }
-            this.compressImage(file, 0.1, 'image/webp');
+            Camera.compressImage(file, 0.1, 'image/webp');
         });
     }    
 
