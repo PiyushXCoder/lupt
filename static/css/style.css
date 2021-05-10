@@ -118,7 +118,7 @@ input {
 .cover-screen {
     position: fixed;
     top: 0; bottom: 0; left: 0; right: 0;
-    z-index: 999;
+    z-index: 100;
 }
 
 .chatpanel {
@@ -244,7 +244,7 @@ input {
 
 .clip-win {
     position: fixed;
-    z-index: 9999;
+    z-index: 999;
     padding: 6px;    
     bottom: 55px;
     left: 5px;
@@ -284,6 +284,14 @@ input {
     width: 314px;
 }
 
+#dialog {
+    z-index: 999;
+    position: fixed;
+    top: 80px;
+    width: 300px;
+    margin-left: -150px;
+    left: 50%;
+}
 
 @media screen and (max-width: 600px)  {
     div[name="error_msg"] {

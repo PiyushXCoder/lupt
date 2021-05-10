@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="progress"
-        style="z-index: 9999; position: fixed; top: 0; bottom: 0;
+        style="z-index: 1000; position: fixed; top: 0; bottom: 0;
             width: 100%; height: 100%; background-color: var(--bg-secondary-color);">
         <div style="top: 50%;
         left: 50%;
@@ -155,7 +155,7 @@
     <!-- Selected Clip -->
     <div id="selected_clip" class="clip-win selected-clip is-hidden">
         <div style="padding: 4px;">
-            <button onclick="Messages.copyMessagesToClipboard()" class="button outline primary" style="padding: 1rem 1rem;">
+            <button onclick="Messages.deleteMessages()" class="button outline primary" style="padding: 1rem 1rem;">
                 <img src="img/delete.svg" style="height: 1.6rem;">
             </button>
             <button onclick="Messages.copyMessagesToClipboard()" class="button outline primary" style="padding: 1rem 1rem;">
@@ -195,7 +195,7 @@
     </div>
 
     <!-- vayakti -->
-    <div id="vayakti_model" class="card is-hidden" style="position: fixed; top: 50px; bottom: 50px; right: 0; z-index: 9999; width: 100%; max-width: 500px;">
+    <div id="vayakti_model" class="card is-hidden" style="position: fixed; top: 50px; bottom: 50px; right: 0; z-index: 999; width: 100%; max-width: 500px;">
         <header>
             <h4>
                 List Vyakti(Users)
@@ -216,7 +216,23 @@
                 </tbody>
             </table>
         </div>
-    </div>      
+    </div>    
+    
+    <div id="dialog" class="card is-hidden">
+        <header>
+            <h4 id="dialog_title"></h4>
+        </header>
+        <p id="dialog_text"></p>
+        <div id="dialog_checkbox">
+            <input type="checkbox" id="dialog_check" value="hello">
+            <label for="dialog_check" id="dialog_check_label"></label>
+        </div>
+        <footer class="is-right">
+            <a id="dialog_ok" class="button primary">OK</a>
+            <a id="dialog_cancel" class="button">Cancel</a>
+        </footer>
+    </div>
+  
     <script src="js/jquery-3.5.1.min.js"></script>
     <script src="js/compressor.min.js"></script>
     <script src="js/actions.js"></script>

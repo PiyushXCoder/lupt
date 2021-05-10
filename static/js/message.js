@@ -67,10 +67,7 @@ let Messages = class {
         var area = $('#message_area');
         var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
         if(!no_name_message) {
-            if(sender == myinfo.kunjika)
-                elm.append($('<div>', {class: 'message-by'}).append('me'))
-            else
-                elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
+            elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
         } 
         if(reply != null && reply.length > 0) {
             elm.append(
@@ -93,10 +90,7 @@ let Messages = class {
         var area = $('#message_area');
         var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
         if(!no_name_message) {
-            if(sender == myinfo.kunjika)
-                elm.append($('<div>', {class: 'message-by'}).append('me'))
-            else
-                elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
+            elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
         } 
         elm.append($('<img>', {src: src, width: 300}));
         elm.click(function() {
@@ -122,7 +116,7 @@ let Messages = class {
     static selectedMessageToText() {
         var text = "";
         $('.message.active').each(function() {
-            text += $(this).find('.message-by').text()+' : ';
+            text += $(this).find('.message-by').text() + ' : ';
             text += $(this).find('pre').last().text() + '\n';
         });
     
@@ -153,8 +147,47 @@ let Messages = class {
         $('#action_clip').addClass('is-hidden');
     }
 
+    static deleteMessages() {
+        var prop = {
+            title: 'Delete Messages',
+            text: 'Do you really want to delete?',
+            checkLabel: 'Delete both side',
+            check: true
+        }
+
+        dialog(prop, function() {
+            if($('#dialog_check').prop('checked')) {
+
+            } else $('.message.active').remove();
+        });
+
+        $('#selected_clip').addClass('is-hidden');
+    }
+
     static currentTime() {
         var today = new Date();
         return today.getHours()+':'+('0' + today.getMinutes()).slice(-2);
     }
 }
+
+var callback;
+function dialog(prop, call) {
+    callback = call;
+    $('#dialog_title').text(prop.title);
+    $('#dialog_text').text(prop.text);
+    $('#dialog_check_label').text(prop.checkLabel);
+    
+    if(prop.check) $('#dialog_checkbox').removeClass('is-hidden');
+    else $('#dialog_checkbox').addClass('is-hidden');
+
+    $('#dialog').removeClass('is-hidden');
+}
+
+$('#dialog_cancel').click(function() {
+    $('#dialog').addClass('is-hidden');
+});
+
+$('#dialog_ok').click(function() {
+    $('#dialog').addClass('is-hidden');
+    callback();
+});
