@@ -4,7 +4,7 @@ let Messages = class {
         var elm = $(elm);
         elm.toggleClass('active');
 
-        if($('.active').length == 0)
+        if($('.message.active').length == 0)
             $('#selected_clip').addClass('is-hidden');
         else
             $('#selected_clip').removeClass('is-hidden');
@@ -49,7 +49,7 @@ let Messages = class {
         if(elm.length > 0) elm.remove();
         if(typing.length == 0) return;
         var text = '';
-        typing.forEach((val) => {
+        typing.forEach(function(val) {
             var name = vayakti[val];
             if(name == undefined) name = "";
             text += name+'('+val.substr(0,8)+')'+ ','
@@ -98,7 +98,7 @@ let Messages = class {
             else
                 elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
         } 
-        elm.append($('<img>', {src: src}));
+        elm.append($('<img>', {src: src, width: 300}));
         elm.click(function() {
             Messages.pick(this);
         });

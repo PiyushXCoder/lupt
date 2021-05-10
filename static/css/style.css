@@ -6,36 +6,6 @@
     src: url("../img/Itim-Regular.ttf");
 }
 
-:root {
-    --bg-color: #ffffff;
-    --bg-secondary-color: #f3f3f6;
-    --bg-tertiary-color: #cacad8;
-    --color-primary: #14854F;
-    --color-lightGrey: #d2d6dd;
-    --color-border: #d2d6dd;
-    --color-grey: #747681;
-    --color-darkGrey: #3f4144;
-    --color-error: #d43939;
-    --color-success: #28bd14;
-    --grid-maxWidth: 120rem;
-    --grid-gutter: 2rem;
-    --font-size: 1.8rem;
-    --font-color: #333333;
-    --font-family-sans: "Itim";
-    --font-family-mono: monaco, "Consolas", "Lucida Console", monospace;
-
-    --msg-other-bg-color : rgb(97, 182, 238);
-    --msg-me-bg-color : rgb(92, 175, 148);
-    --msg-reply-bg-color : rgb(209, 215, 219);
-    --msg-other-border-color : rgb(62, 127, 212);
-    --msg-me-border-color : rgb(64, 148, 116);
-    --msg-reply-border-color : rgb(94, 100, 105);
-    --msg-other-border-sel-color : rgb(58, 90, 139);
-    --msg-me-border-sel-color : rgb(48, 105, 86);
-
-    --svg-filter: none;
-}
-
 * {
     scrollbar-width: auto;
 }
@@ -262,9 +232,7 @@ input {
 }
 
 .clip-win.selected-clip {
-    width: fit-content;
     min-width: 250px;
-    height: fit-content;
     left: 50%; 
     transform: translateX(-50%);
     border-radius:  15px;

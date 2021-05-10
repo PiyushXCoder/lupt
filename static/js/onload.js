@@ -2,7 +2,7 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
     $('body').toggleClass('dark');
 }
 
-$(document).ready(() => {
+$(document).ready(function() {
     
     $(".tabs > a").click(function() {
         var t = $(this);

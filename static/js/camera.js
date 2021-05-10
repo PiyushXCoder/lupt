@@ -1,6 +1,6 @@
 var Camera = class {
     static setupCamera() {
-        $('#file-input')[0].addEventListener('change', (e) => {
+        $('#file-input')[0].addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) {
                 return;
@@ -19,10 +19,13 @@ var Camera = class {
                 reader.readAsDataURL(result); 
                 reader.onloadend = function() {
                     var base64data = reader.result;
-                    if(base64data.length > 63000 && mime != 'image/jpeg') {
+                    if(base64data.length > 63488 && mime != 'image/jpeg') {
                         base64data = null;
                         result = null;
                         Camera.compressImage(file, 0.7, 'image/jpeg');
+                        return;
+                    } else if(base64data.length > 63488 && mime == 'image/jpeg') {
+                        window.alert('file is too large!');
                         return;
                     }
                     

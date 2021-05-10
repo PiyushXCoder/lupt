@@ -15,10 +15,13 @@ var vayakti = {};
 var typing = [];
 var no_name_message = false;
 
-// Connection opened
-socket.addEventListener('open', function (event) {
-    $('#progress_button').removeClass('is-hidden');
+// check if support ws
+if(!('WebSocket' in window || 'MozWebSocket' in window)) {
+    $('initerror').text('Warning: Web Browser dosen\'t support websocket! Upgrade');
+}
 
+// Connection opened
+socket.onopen = function(event) {
     var params = window.location.search;
     params = params.substr(1,params.length).split('&');
     
@@ -31,12 +34,18 @@ socket.addEventListener('open', function (event) {
     frm.find('[name=kaksh_kunjika]').val(params[0]);
     frm.find('[name=kunjika]').val(params[1]);
     frm.find('[name=name]').val(params[2]);
-    
+    $('#progress_button').css('display', '');
     connect(frm);
-});
+}
+
+// Connection fail
+socket.onerror = function(event) {
+    $('initerror').text('Warning: Failed to connect websocket! Refresh the '+
+        'page and if still don\'t work upgrade Web Browser');
+}
 
 // Listen for messages
-socket.addEventListener('message', function (event) {
+socket.onmessage = function(event) {
     var j = JSON.parse(event.data);
     switch(j.cmd) {
         case 'resp':
@@ -100,13 +109,13 @@ socket.addEventListener('message', function (event) {
             });
             break;
     }
-});
+}
 
 function connect(frm) {
     if(actions.has_key('join') || actions.has_key('leave')) return;
     var frm = $(frm);
     var data = {};
-    frm.serializeArray().forEach(el => {
+    frm.serializeArray().forEach(function(el) {
         if(typeof el.value == 'string')
             data[el.name] = el.value.trim();
         else
@@ -204,7 +213,7 @@ function changeColor() {
 function refreshVayaktiList() {
     var v = $('#vayakti_list');
     v.empty();
-    Object.keys(vayakti).forEach((key) => {
+    Object.keys(vayakti).forEach(function(key) {
         v.append($('<tr>')
             .append($('<td>').append(vayakti[key]))
             .append($('<td>').append(key)));
@@ -216,6 +225,6 @@ function autosize(el){
         el.style.cssText = 'height:auto; padding:0';
         el.style.cssText = 'height:' + el.scrollHeight + 'px';
         $('#reply_clip').css('bottom',  (el.scrollHeight + 10) + 'px');
-        $('#selected_clip').css('bottom',  (el.scrollHeight + 10) + 'px');
+        $('#selected_clip').css('bottom',  (el.scrollHeight + 25) + 'px');
     },0);    
 }
