@@ -67,7 +67,7 @@ pub struct SendStatus {
 pub struct DeleteMsg {
     pub kaksh_kunjika: String,
     pub kunjika: String,
-    pub msg_id: Vec<u128>
+    pub msg_id: Vec<String>
 }
 
 // Request to send list of users

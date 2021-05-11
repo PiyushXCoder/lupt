@@ -47,6 +47,7 @@ socket.onerror = function(event) {
 // Listen for messages
 socket.onmessage = function(event) {
     var j = JSON.parse(event.data);
+    console.log(j);
     switch(j.cmd) {
         case 'resp':
             if(j.result == 'Err') {
@@ -87,6 +88,9 @@ socket.onmessage = function(event) {
             break;
         case 'img':
             Messages.pushImage(j.kunjika, j.src,  j.msg_id);
+            break;
+        case 'del':
+            Messages.deleteMessages(j.msg_id);
             break;
         case 'connected':
             vayakti[j.kunjika] = j.name;
@@ -199,6 +203,30 @@ function send() {
     autosize($('#send_box')[0]);
 }
 
+function deleteMessages() {
+    var prop = {
+        title: 'Delete Messages',
+        text: 'Do you really want to delete?',
+        checkLabel: 'Delete both side',
+        check: true
+    }
+
+    dialog(prop, function() {
+        if($('#dialog_check').prop('checked')) {
+            var msg_id = [];
+            $('.message.active').each(function() {
+                msg_id.push($(this).attr('msgid'));
+            });
+            socket.send(JSON.stringify({
+                cmd: "del",
+                msg_id: msg_id
+            }));
+        } else $('.message.active').remove();
+    });
+
+    $('#selected_clip').addClass('is-hidden');
+}
+
 function vayaktiList() {
     refreshVayaktiList();
     $('#vayakti_model').removeClass('is-hidden');
@@ -228,3 +256,26 @@ function autosize(el){
         $('#selected_clip').css('bottom',  (el.scrollHeight + 30) + 'px');
     },0);    
 }
+
+
+var dialogCallback;
+function dialog(prop, call) {
+    dialogCallback = call;
+    $('#dialog_title').text(prop.title);
+    $('#dialog_text').text(prop.text);
+    $('#dialog_check_label').text(prop.checkLabel);
+    
+    if(prop.check) $('#dialog_checkbox').removeClass('is-hidden');
+    else $('#dialog_checkbox').addClass('is-hidden');
+
+    $('#dialog').removeClass('is-hidden');
+}
+
+$('#dialog_cancel').click(function() {
+    $('#dialog').addClass('is-hidden');
+});
+
+$('#dialog_ok').click(function() {
+    $('#dialog').addClass('is-hidden');
+    dialogCallback();
+});

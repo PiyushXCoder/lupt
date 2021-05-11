@@ -156,7 +156,7 @@ impl WsSansad {
         }.as_array().unwrap();
         
         for id in ids {
-            msg_id.push(id.as_str().unwrap().parse::<u128>().unwrap());
+            msg_id.push(id.as_str().unwrap().to_owned());
         }
         drop(ids);
 
@@ -167,6 +167,7 @@ impl WsSansad {
                 return;
             }
         };
+
         Broker::<SystemBroker>::issue_async(ms::pind::DeleteMsg {
             kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),

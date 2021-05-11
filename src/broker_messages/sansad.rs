@@ -40,7 +40,7 @@ pub struct WsStatus {
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsDeleteMsg {
-    pub msg_id: Vec<u128>,
+    pub msg_id: Vec<String>,
     pub sender_kunjika: String
 }
 

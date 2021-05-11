@@ -147,25 +147,10 @@ let Messages = class {
         $('#action_clip').addClass('is-hidden');
     }
 
-    static deleteMessages() {
-        var prop = {
-            title: 'Delete Messages',
-            text: 'Do you really want to delete?',
-            checkLabel: 'Delete both side',
-            check: true
-        }
-
-        dialog(prop, function() {
-            if($('#dialog_check').prop('checked')) {
-                var msg_id = [];
-                $('.message.active').each(function() {
-                    msg_id.push($(this).attr('msgid'));
-                });
-                console.log(msg_id)
-            } else $('.message.active').remove();
+    static deleteMessages(msgid) {
+        msgid.forEach(function(id) {
+            $('[msgid='+id+']').remove();
         });
-
-        $('#selected_clip').addClass('is-hidden');
     }
 
     static currentTime() {
@@ -173,25 +158,3 @@ let Messages = class {
         return today.getHours()+':'+('0' + today.getMinutes()).slice(-2);
     }
 }
-
-var callback;
-function dialog(prop, call) {
-    callback = call;
-    $('#dialog_title').text(prop.title);
-    $('#dialog_text').text(prop.text);
-    $('#dialog_check_label').text(prop.checkLabel);
-    
-    if(prop.check) $('#dialog_checkbox').removeClass('is-hidden');
-    else $('#dialog_checkbox').addClass('is-hidden');
-
-    $('#dialog').removeClass('is-hidden');
-}
-
-$('#dialog_cancel').click(function() {
-    $('#dialog').addClass('is-hidden');
-});
-
-$('#dialog_ok').click(function() {
-    $('#dialog').addClass('is-hidden');
-    callback();
-});
