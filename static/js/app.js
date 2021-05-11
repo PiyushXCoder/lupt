@@ -98,12 +98,12 @@ socket.onmessage = function(event) {
         case 'connected':
             vayakti[j.kunjika] = j.name;
             if(!$('#vayakti_model').hasClass('.is-hidden')) refreshVayaktiList();
-            Messages.pushStatus('Vyakti '+j.name+' connected as '+j.kunjika.substr(0,8)+' at '+Messages.currentTime());
+            Messages.pushStatus('Vyakti '+j.name+' connected as '+j.kunjika+' at '+Messages.currentTime());
             break;
         case 'disconnected':
             delete vayakti[j.kunjika];
             if(!$('#vayakti_model').hasClass('.is-hidden')) refreshVayaktiList();
-            Messages.pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika.substr(0,8)+' at '+Messages.currentTime());
+            Messages.pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika+' at '+Messages.currentTime());
             break;
         case 'left':
             myinfo.kunjika = '';

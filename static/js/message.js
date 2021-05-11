@@ -52,7 +52,7 @@ let Messages = class {
         typing.forEach(function(val) {
             var name = vayakti[val];
             if(name == undefined) name = "";
-            text += name+'('+val.substr(0,8)+')'+ ','
+            text += name+'('+val+')'+ ','
         })
         text = text.substr(0, text.length-1);
         text += ' is typing...'
@@ -68,7 +68,7 @@ let Messages = class {
         var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
         if(!no_name_message) {
             elm.append($('<div>', {class: 'message-sub', name: 'by'})
-            .append($('<span>').text(vayakti[sender]+'('+sender.substr(0, 8)+')'))
+            .append($('<span>').text(vayakti[sender]+'('+sender+')'))
             .append($('<span>', {class: 'pull-right'}).text(Messages.currentTime())));
         } 
         if(reply != null && reply.length > 0) {
@@ -93,7 +93,7 @@ let Messages = class {
         var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
         if(!no_name_message) {
             elm.append($('<div>', {class: 'message-sub', name: 'by'})
-            .append($('<span>').text(vayakti[sender]+'('+sender.substr(0, 8)+')'))
+            .append($('<span>').text(vayakti[sender]+'('+sender+')'))
             .append($('<span>', {class: 'pull-right'}).text(Messages.currentTime())));
         } 
         elm.append($('<img>', {src: src, width: 300}));
@@ -132,7 +132,7 @@ let Messages = class {
         var el = $('#reply_clip');
         el.removeClass('is-hidden');
         el.attr('msg', text);
-        $('#reply_clip > span').text(text.substr(0, 20)+ '...');
+        $('#reply_clip > span').text(text+ '...');
         Messages.unselectAll();
     }
     

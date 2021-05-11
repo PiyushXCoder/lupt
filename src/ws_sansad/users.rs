@@ -19,11 +19,11 @@ impl WsSansad {
                 return;
             }
         };
-        // kunjika to hash
+        // kunjika to hash and base64
         let mut m = sha1::Sha1::new();
         m.update(format!("{}{}",kunjika,
             std::env::var("SALT").unwrap_or("".to_owned())).as_bytes());
-        let kunjika = m.digest().to_string();
+        let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
 
         let name  = match val.get("name") {
             Some(val ) => val.as_str().unwrap().to_owned(),
@@ -136,11 +136,11 @@ impl WsSansad {
                 return;
             }
         };
-        // kunjika to hash
+        // kunjika to hash and base64
         let mut m = sha1::Sha1::new();
         m.update(format!("{}{}",kunjika,
             std::env::var("SALT").unwrap_or("".to_owned())).as_bytes());
-        let kunjika = m.digest().to_string();
+        let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
 
         let name  = match val.get("name") {
             Some(val ) => val.as_str().unwrap().to_owned(),

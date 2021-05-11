@@ -1081,6 +1081,7 @@ dependencies = [
  "actix-files",
  "actix-web",
  "actix-web-actors",
+ "base64",
  "clap",
  "env_logger",
  "futures",
