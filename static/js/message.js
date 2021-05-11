@@ -67,8 +67,8 @@ let Messages = class {
         var area = $('#message_area');
         var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
         if(!no_name_message) {
-            elm.append($('<div>', {class: 'message-sub'})
-            .append(vayakti[sender]+'('+sender.substr(0, 8)+')')
+            elm.append($('<div>', {class: 'message-sub', name: 'by'})
+            .append($('<span>').text(vayakti[sender]+'('+sender.substr(0, 8)+')'))
             .append($('<span>', {class: 'pull-right'}).text(Messages.currentTime())));
         } 
         if(reply != null && reply.length > 0) {
@@ -92,7 +92,9 @@ let Messages = class {
         var area = $('#message_area');
         var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
         if(!no_name_message) {
-            elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
+            elm.append($('<div>', {class: 'message-sub', name: 'by'})
+            .append($('<span>').text(vayakti[sender]+'('+sender.substr(0, 8)+')'))
+            .append($('<span>', {class: 'pull-right'}).text(Messages.currentTime())));
         } 
         elm.append($('<img>', {src: src, width: 300}));
         elm.click(function() {
@@ -116,17 +118,17 @@ let Messages = class {
     }
 
     static selectedMessageToText() {
-        var text = "";
-        $('.message.active').each(function() {
-            text += $(this).find('.message-by').text() + ' : ';
-            text += $(this).find('pre').last().text() + '\n';
-        });
+        
     
         return text.trim();
     }
     
     static prepareReply() {
-        var text = Messages.selectedMessageToText();
+        var text = "";
+        $('.message.active').each(function() {
+            text += $(this).find('[name=by]').find('span:not(.pull-right)').text() + ' : ';
+            text += $(this).find('pre').last().text() + '\n';
+        });
         var el = $('#reply_clip');
         el.removeClass('is-hidden');
         el.attr('msg', text);
@@ -135,9 +137,23 @@ let Messages = class {
     }
     
     static copyMessagesToClipboard() {
+        var text = "";
+        $('.message.active').each(function() {
+            text += $(this).find('[name=by]').find('span:not(.pull-right)').text() + ' : ';
+            var pr = $(this).find('pre');
+            if (pr.length > 1) text += '\n';
+            for(var i = 0; i < pr.length-1; i++) {
+                $(pr[i]).text().split('\n').forEach(function (t) {
+                    if(t.trim().length <= 0) return;
+                    text += '    ' + t + '\n';
+                });
+            }
+            text += pr.last().text();
+        });
+
         var $temp = $("<textarea>");
         $("body").append($temp);
-        $temp.val(Messages.selectedMessageToText()).select();
+        $temp.val(text).select();
         document.execCommand("copy");
         $temp.remove();
         Messages.unselectAll();
@@ -203,7 +219,7 @@ let Messages = class {
             }
             msg.find('[name=bar_msg]').append($('<span>', {name: 'edited'}).text('edited'));
         }
-        $('[msgid='+msgid+']').find('pre').text(text);
+        $('[msgid='+msgid+']').find('pre').last().text(text);
     }
 
     static currentTime() {
