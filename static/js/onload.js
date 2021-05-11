@@ -46,8 +46,4 @@ $(document).ready(function() {
     });
 
     Camera.setupCamera();
-
-    $(document).bind("contextmenu",function(e){
-        return false;
-    });
 });
