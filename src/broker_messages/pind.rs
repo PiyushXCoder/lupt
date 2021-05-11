@@ -70,6 +70,16 @@ pub struct DeleteMsg {
     pub msg_id: Vec<String>
 }
 
+// Request to delete messages
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct EditMsg {
+    pub kaksh_kunjika: String,
+    pub kunjika: String,
+    pub text: String,
+    pub msg_id: String
+}
+
 // Request to send list of users
 #[derive(Clone, Message)]
 #[rtype(result = "String")]

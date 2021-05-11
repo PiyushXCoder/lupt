@@ -25,7 +25,11 @@ let Camera = class {
                         Camera.compressImage(file, 0.7, 'image/jpeg');
                         return;
                     } else if(base64data.length > 63488 && mime == 'image/jpeg') {
-                        window.alert('file is too large!');
+                        var prop = {
+                            title: 'Warning',
+                            text: 'file is too large!',
+                            check: false
+                        }; dialog(prop, function() {});
                         return;
                     }
                     

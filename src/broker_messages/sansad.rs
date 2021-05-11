@@ -44,6 +44,15 @@ pub struct WsDeleteMsg {
     pub sender_kunjika: String
 }
 
+// Request to delete messages
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsEditMsg {
+    pub text: String,
+    pub sender_kunjika: String,
+    pub msg_id: String
+}
+
 // Request to send transfer text
 #[derive(Clone, Message)]
 #[rtype(result = "()")]

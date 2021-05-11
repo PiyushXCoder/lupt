@@ -67,15 +67,17 @@ let Messages = class {
         var area = $('#message_area');
         var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
         if(!no_name_message) {
-            elm.append($('<div>', {class: 'message-by'}).append(vayakti[sender]+'('+sender.substr(0, 8)+')'))
+            elm.append($('<div>', {class: 'message-sub'})
+            .append(vayakti[sender]+'('+sender.substr(0, 8)+')')
+            .append($('<span>', {class: 'pull-right'}).text(Messages.currentTime())));
         } 
         if(reply != null && reply.length > 0) {
             elm.append(
                 $('<div>', {class: 'message message-reply'})
-                .append($('<pre>').append(reply))
+                .append($('<pre>').text(reply))
             );
         }
-        elm.append($('<pre>').append(text));
+        elm.append($('<pre>').text(text));
         elm.click(function() {
             Messages.pick(this);
         });
@@ -128,7 +130,7 @@ let Messages = class {
         var el = $('#reply_clip');
         el.removeClass('is-hidden');
         el.attr('msg', text);
-        $('#reply_clip > span').text(text.substr(0, 15)+ '...');
+        $('#reply_clip > span').text(text.substr(0, 20)+ '...');
         Messages.unselectAll();
     }
     
@@ -139,6 +141,46 @@ let Messages = class {
         document.execCommand("copy");
         $temp.remove();
         Messages.unselectAll();
+    }
+
+
+    static prepareEditMessages() {
+        var msgs = $('.message.active');
+        if(msgs.length > 1) {
+            var prop = {
+                title: 'Warning',
+                text: 'Select only one Message!',
+                check: false
+            }; dialog(prop, function() {});
+            return;
+        }
+
+        var msg = $(msgs[0]);
+        if(msg.find('pre').length == 0 || !msg.hasClass('message-me')) {
+            var prop = {
+                title: 'Warning',
+                text: 'Can\'t edit this Message!',
+                check: false
+            }; dialog(prop, function() {});
+            return;
+        }
+
+        var prop = {
+            title: 'Edit Messages',
+            text: 'Do you really want to edit?',
+            check: false
+        }
+
+        dialog(prop, function() {
+            var msg = $($('.message.active')[0]);
+            $('#reply_clip > span').text(msg.find('pre').text().substr(0, 20)+ '...');
+            $('#reply_clip').attr('msg', msg.attr('msgid'));
+            Messages.unselectAll();
+            $('#replyicon').removeClass('is-hidden');
+            $('#reply_clip').removeClass('is-hidden');
+        });
+
+        $('#selected_clip').addClass('is-hidden');
     }
     
     static cleanMessage() {
@@ -151,6 +193,17 @@ let Messages = class {
         msgid.forEach(function(id) {
             $('[msgid='+id+']').remove();
         });
+    }
+
+    static editMessages(msgid, text) {
+        var msg = $('[msgid='+msgid+']');
+        if(msg.find('[name=edited]').length == 0) {
+            if(msg.find('[name=bar_msg]').length == 0) {
+                msg.append($('<div>', {class: 'message-sub', name: 'bar_msg'}));
+            }
+            msg.find('[name=bar_msg]').append($('<span>', {name: 'edited'}).text('edited'));
+        }
+        $('[msgid='+msgid+']').find('pre').text(text);
     }
 
     static currentTime() {

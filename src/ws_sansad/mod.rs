@@ -109,6 +109,7 @@ impl WsSansad {
                 "img" => { self.send_image(val).await },
                 "status" => { self.send_status(val).await },
                 "del" => { self.delete_msg(val).await },
+                "edit" => { self.edit_msg(val).await },
                 "list" => { self.list().await },
                 "leave" => { self.leave_kaksh().await },
                 _ => ()

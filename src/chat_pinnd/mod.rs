@@ -49,6 +49,7 @@ impl Actor for ChatPinnd {
         self.subscribe_system_async::<ms::pind::SendText>(ctx);
         self.subscribe_system_async::<ms::pind::SendImage>(ctx);
         self.subscribe_system_async::<ms::pind::DeleteMsg>(ctx);
+        self.subscribe_system_async::<ms::pind::EditMsg>(ctx);
         self.subscribe_system_async::<ms::pind::SendStatus>(ctx);
         self.subscribe_system_async::<ms::pind::LeaveUser>(ctx);
     }

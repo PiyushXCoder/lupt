@@ -225,7 +225,7 @@ input {
     background-color: var(--msg-reply-bg-color);
 }
 
-.message .message-by {
+.message .message-sub {
     font-size: 1.3rem;
     font-style: italic;
     text-decoration: underline;

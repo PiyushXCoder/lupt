@@ -56,6 +56,20 @@ impl Handler<ms::sansad::WsDeleteMsg> for WsSansad {
     }
 }
 
+/// delete messages
+impl Handler<ms::sansad::WsEditMsg> for WsSansad {
+    type Result = ();
+    fn handle(&mut self, msg: ms::sansad::WsEditMsg, ctx: &mut Self::Context) -> Self::Result {
+        let json = json!({
+            "cmd": "edit",
+            "msg_id": msg.msg_id,
+            "text": msg.text,
+            "kunjika": msg.sender_kunjika // Sender's kunjuka
+        });
+        ctx.text(json.to_string());
+    }
+}
+
 /// List Vayakti
 impl Handler<ms::sansad::WsList> for WsSansad {
     type Result = ();

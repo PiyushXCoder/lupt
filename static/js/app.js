@@ -47,7 +47,7 @@ socket.onerror = function(event) {
 // Listen for messages
 socket.onmessage = function(event) {
     var j = JSON.parse(event.data);
-    console.log(j);
+    // console.log(j);
     switch(j.cmd) {
         case 'resp':
             if(j.result == 'Err') {
@@ -91,6 +91,9 @@ socket.onmessage = function(event) {
             break;
         case 'del':
             Messages.deleteMessages(j.msg_id);
+            break;
+        case 'edit':
+            Messages.editMessages(j.msg_id, j.text);
             break;
         case 'connected':
             vayakti[j.kunjika] = j.name;
@@ -191,11 +194,21 @@ function sendTypingEnd() {
 function send() {
     var text = $('#send_box').val().trim();
     if(text.length == 0) return;
-    socket.send(JSON.stringify({
-        cmd: "text",
-        text: text,
-        reply: $('#reply_clip').attr('msg')
-    }));
+
+    if($('#replyicon').hasClass('is-hidden')) {
+        socket.send(JSON.stringify({
+            cmd: "text",
+            text: text,
+            reply: $('#reply_clip').attr('msg')
+        }));
+    } else {
+        socket.send(JSON.stringify({
+            cmd: "edit",
+            text: text,
+            msg_id: $('#reply_clip').attr('msg')
+        }));
+        $('#replyicon').addClass('is-hidden');
+    }
     $('#send_box').val('');
     $('#reply_clip').attr('msg', '');
     $('#reply_clip').addClass('is-hidden');

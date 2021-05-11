@@ -145,9 +145,10 @@
 
     <!-- Reply Clip -->
     <div  id="reply_clip" class="clip-win reply-clip is-hidden">
+        <img id="replyicon" src="img/edit.svg" class="svg-filter is-hidden" style="height: 1.6rem;">
         <span></span>
         <a onclick="$('#reply_clip > span').text(''); $('#reply_clip').attr('msg', '');
-            $('#reply_clip').addClass('is-hidden');" style="float: right; padding: 3px 6px;">
+            $('#reply_clip').addClass('is-hidden'); $('#replyicon').addClass('is-hidden');" style="float: right; padding: 3px 6px;">
             <img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer;">
         </a>
     </div>
@@ -158,7 +159,7 @@
             <button onclick="deleteMessages()" class="button outline primary" style="padding: 1rem 1rem;">
                 <img src="img/delete.svg" style="height: 1.6rem;">
             </button>
-            <button onclick="Messages.copyMessagesToClipboard()" class="button outline primary" style="padding: 1rem 1rem;">
+            <button onclick="Messages.prepareEditMessages()" class="button outline primary" style="padding: 1rem 1rem;">
                 <img src="img/edit.svg" class="svg-filter" style="height: 1.6rem;">
             </button>
             <button onclick="Messages.copyMessagesToClipboard()" class="button outline primary" style="padding: 1rem 1rem;">
