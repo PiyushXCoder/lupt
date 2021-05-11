@@ -3,32 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/siimple.min.css">
     <link rel="stylesheet" href="css/style.css">
     <title>Lupt Chat</title>
+    <style>
+        strong {
+            color: #4aa8f0;
+        }
+        body {
+            padding-top: 30px;
+        }
+    </style>
 </head>
 <body>
     <!-- Connect Screen -->
-    <div id="connect_panel" class="siimple-content siimple-content--medium">
-        <div class="siimple-content siimple-content--fluid">
-            <div class="siimple-jumbotron siimple--text-center siimple--py-4">
-                <div class="siimple-jumbotron-title"><img src="img/label.svg" alt="Lupt Chat" style="width: 100%; max-width: 500px; height: auto;"></div>
-                <div class="siimple-jumbotron-detail">Chat in group or to strangers</div>
-                <div class="siimple-jumbotron-title">Terms of service</div>
+    <div class="container">
+        <div>
+            <div class="text-center">
+                <img src="img/label.png" alt="Lupt Chat">
+                <br>
+                <small>Chat in group or to strangers</small>
+                <br>
+                <h1>Terms of service</h1>
             </div>
             <pre>
 This Terms of Service Agreement (hereinafter "Agreement") sets forth the terms and conditions by which I provide the lupt Application Services to site visitors, users. By visiting our site, using any of the tools and services provided via our site, you thereby agree to be bound by each of the terms and conditions of this Agreement.
 
 I may automatically amend this Agreement at any time by informing you of the amended terms. For user to lupt  it is their responsibility to read this Terms of Service each time they access any portion of our site. Any usage of this site by you, including merely viewing our home page or any page published on our site, as an unregistered lupt's user, means that you agree to be bound by each and every one of the terms and conditions of this Terms of Service Agreement.
 
-<b>1. General</b>
+<strong>1. General</strong>
 lupt is always striving to improve the Service and bring you additional functionality that you will find engaging and useful. This means I may add new product features or enhancements from time to time as well as remove some features, and if these actions do not materially affect your rights or obligations, I may not provide you with notice before taking them.
 
-<b>2. Privacy vs Violations</b>
+<strong>2. Privacy vs Violations</strong>
 No third parties can access the content you share in the app.
 Despite the fact that this space is anonymous and secure, users are obliged to follow the rules. I will never support terrorism, pedophilia, violence, underaged users, pornography, bullying or other restrictive behavior.
 
-<b>3. Community Rules.</b>
+<strong>3. Community Rules.</strong>
 By using the Service, you agree that you will not:
 
 use the Service for any purpose that is illegal or prohibited by this Agreement.
@@ -42,11 +51,15 @@ post any Content that is hate speech, threatening, sexually explicit or pornogra
 post any Content that promotes racism, bigotry, hatred or physical harm of any kind against any group or individual.
             </pre>
         </div>
-        <div class="siimple-footer" align="center">
-            Made with ❤️️ by <a href="https://gitlab.com/PiyushXCoder" class="siimple-link">Piyush Mishra</a>
+        <div class="text-center"  style="padding: 60px;">
+            Made with ❤️️ by <a href="https://gitlab.com/PiyushXCoder">Piyush Mishra</a>
         </div>
     </div>
-
     <script src="js/jquery-3.5.1.min.js"></script>
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            $('body').toggleClass('dark');
+        }
+    </script>
 </body>
 </html>

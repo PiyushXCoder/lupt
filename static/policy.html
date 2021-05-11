@@ -3,40 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/siimple.min.css">
     <link rel="stylesheet" href="css/style.css">
     <title>Lupt Chat</title>
+    <style>
+        strong {
+            color: #4aa8f0;
+        }
+        body {
+            padding-top: 30px;
+        }
+    </style>
 </head>
 <body>
     <!-- Connect Screen -->
-    <div id="connect_panel" class="siimple-content siimple-content--medium">
-        <div class="siimple-content siimple-content--fluid">
-            <div class="siimple-jumbotron siimple--text-center siimple--py-4">
-                <div class="siimple-jumbotron-title"><img src="img/label.svg" alt="Lupt Chat" style="width: 100%; max-width: 500px; height: auto;"></div>
-                <div class="siimple-jumbotron-detail">Chat in group or to strangers</div>
-                <div class="siimple-jumbotron-title">Privacy Policy</div>
+    <div class="container">
+        <div>
+            <div class="text-center">
+                <img src="img/label.png" alt="Lupt Chat">
+                <br>
+                <small>Chat in group or to strangers</small>
+                <br>
+                <h1>Privacy Policy</h1>
             </div>
             <pre>
 
-<b>Who am I?</b>
+<strong>Who am I?</strong>
 lupt is operated by a hobbist 
 
-<b>INTRODUCTION</b>
+<strong>Introduction</strong>
 I strongly believe in protecting the privacy of individuals who visit our website and use our products and services (collectively, the “Terms of Service”). This Policy explains how I collect, use, disclose, and protect information that applies to our Service, and your choices about the collection and use of your personal and other information.
 For purposes of this Policy, personal information means information relating to an identified or identifiable natural person. An identifiable person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, and online identifier or to one or more factors specific to his/her physical, physiological, genetic, mental, economic, cultural or social identity.
 
-<b>1. Shares your data</b>
+<strong>1. Shares your data</strong>
 lupt never shares you data with third parties.
 
-<b>2. Storing data</b>
+<strong>2. Storing data</strong>
 lupt stores only the data it needs to function properly.
 No personal information is stored on our servers.
 All the messages are self-destructing.
 
-<b>3. Not intended for use by children</b>
+<strong>3. Not intended for use by children</strong>
 lupt is not directed at children who are under thirteen (13) years of age and I do not knowingly collect personal or other information from such children. If you are younger than thirteen (13) years of age, you should not use Our application and if you are between the ages of thirteen (13) and eighteen (18) you must have parental consent and you should not provide any personal identifiable information while using lupt without said parental consent.
 
-<b>3. Cookies policy</b>
+<strong>3. Cookies policy</strong>
 I collect information by placing cookies on your computer or mobile. A cookie is a piece of text stored on your computer or mobile by your web browser. They are basically a tool that stores information about website visits, and ensures site functionality and enables us to provide the services our members request.
 When you visit the publicly available sections of lupt, a session ID cookie is placed on your computer that only lasts while you're visiting.
 You may set your browser and your mobile settings to block cookies and local storage devices.
@@ -44,17 +53,21 @@ lupt's use of cookies and local storage devices basically falls into the followi
 •	cookies related to the performance of lupt's site, such as analytics that help us determine how our site is performing and ensuring a smooth and trouble free experience for our members and visitors;
 •	application-related data such as current opponent id which is removed right after conversation is over.
 
-<b>4. Changes to our Policy</b>
+<strong>4. Changes to our Policy</strong>
 I may modify or update this Privacy Policy from time to time to reflect the changes in our business and practices, and so you should review this page periodically. When I change the Policy in a material manner I will update the last modified date at the bottom of this page. Your continued use of the Service constitutes your agreement to be bound by such changes to this Policy. Your only remedy, if you do not accept the terms of this Policy, is to discontinue use of the Service.
 
-This privacy policy was last modified on (शुक्ल पक्ष, नवमी, २०७७ विक्रम सम्वत्) Sukla paskha, navmi, 2077 as per <a class="siimple-link" href="https://bharatdiscovery.org/india/%E0%A4%B5%E0%A4%BF%E0%A4%95%E0%A5%8D%E0%A4%B0%E0%A4%AE_%E0%A4%B8%E0%A4%82%E0%A4%B5%E0%A4%A4">Vikram Samvat</a>
+This privacy policy was last modified on (शुक्ल पक्ष, नवमी, २०७७ विक्रम सम्वत्) Sukla paskha, navmi, 2077 as per <a href="https://bharatdiscovery.org/india/%E0%A4%B5%E0%A4%BF%E0%A4%95%E0%A5%8D%E0%A4%B0%E0%A4%AE_%E0%A4%B8%E0%A4%82%E0%A4%B5%E0%A4%A4">Vikram Samvat</a>
             </pre>
         </div>
-        <div class="siimple-footer" align="center">
-            Made with ❤️️ by <a href="https://gitlab.com/PiyushXCoder" class="siimple-link">Piyush Mishra</a>
+        <div class="text-center"  style="padding: 60px;">
+            Made with ❤️️ by <a href="https://gitlab.com/PiyushXCoder">Piyush Mishra</a>
         </div>
     </div>
-
     <script src="js/jquery-3.5.1.min.js"></script>
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            $('body').toggleClass('dark');
+        }
+    </script>
 </body>
 </html>
