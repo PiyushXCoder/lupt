@@ -48,6 +48,7 @@ impl Actor for ChatPinnd {
         // for actix broker 
         self.subscribe_system_async::<ms::pind::SendText>(ctx);
         self.subscribe_system_async::<ms::pind::SendImage>(ctx);
+        self.subscribe_system_async::<ms::pind::SendReaction>(ctx);
         self.subscribe_system_async::<ms::pind::DeleteMsg>(ctx);
         self.subscribe_system_async::<ms::pind::EditMsg>(ctx);
         self.subscribe_system_async::<ms::pind::SendStatus>(ctx);

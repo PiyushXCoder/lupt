@@ -107,6 +107,7 @@ impl WsSansad {
                 "randnext" => { self.join_random_next().await },
                 "text" => { self.send_text(val).await },
                 "img" => { self.send_image(val).await },
+                "react" => { self.send_reaction(val).await },
                 "status" => { self.send_status(val).await },
                 "del" => { self.delete_msg(val).await },
                 "edit" => { self.edit_msg(val).await },

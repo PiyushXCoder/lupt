@@ -47,7 +47,7 @@ socket.onerror = function(event) {
 // Listen for messages
 socket.onmessage = function(event) {
     var j = JSON.parse(event.data);
-    // console.log(j);
+    console.log(j);
     switch(j.cmd) {
         case 'resp':
             if(j.result == 'Err') {
@@ -84,10 +84,13 @@ socket.onmessage = function(event) {
             }
             break;
         case 'text':
-            Messages.pushMessage(j.kunjika, j.text, j.reply, j.msg_id);
+            Messages.pushText(j.kunjika, j.text, j.reply, j.msg_id);
             break;
         case 'img':
             Messages.pushImage(j.kunjika, j.src,  j.msg_id);
+            break;
+        case 'react':
+            Messages.addReaction(j.kunjika, j.emoji,  j.msg_id);
             break;
         case 'del':
             Messages.deleteMessages(j.msg_id);
@@ -102,6 +105,11 @@ socket.onmessage = function(event) {
             break;
         case 'disconnected':
             delete vayakti[j.kunjika];
+            const index = typing.indexOf(j.kunjika);
+            if (index > -1) {
+                typing.splice(index, 1);
+            }
+            Messages.pushTypingStatus();
             if(!$('#vayakti_model').hasClass('.is-hidden')) refreshVayaktiList();
             Messages.pushStatus('Vyakti '+j.name+' disconnected as '+j.kunjika+' at '+Messages.currentTime());
             break;
@@ -214,6 +222,16 @@ function send() {
     $('#reply_clip').addClass('is-hidden');
     $('#reply_clip > span').text('');
     autosize($('#send_box')[0]);
+}
+
+
+function sendReaction(emoji, msg_id) {
+    socket.send(JSON.stringify({
+        cmd: "react",
+        msg_id: msg_id,
+        emoji: emoji
+    }));
+    $('#react_bar').remove();
 }
 
 function deleteMessages() {

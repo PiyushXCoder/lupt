@@ -51,6 +51,15 @@ pub struct SendImage {
     pub kunjika: String,
     pub src: String
 }
+/// Request to reaction
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct SendReaction {
+    pub kaksh_kunjika: String,
+    pub kunjika: String,
+    pub emoji: String,
+    pub msg_id: String
+}
 
 // Request to send status
 #[derive(Clone, Message)]

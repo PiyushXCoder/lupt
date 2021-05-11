@@ -27,6 +27,15 @@ pub struct WsImage {
     pub sender_kunjika: String,
     pub msg_id: u128
 }
+// Request to send REaction
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsReaction {
+    pub emoji: String,
+    pub sender_kunjika: String,
+    pub msg_id: String
+}
+
 
 // Request to send transfer status
 #[derive(Clone, Message)]

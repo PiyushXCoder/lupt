@@ -62,48 +62,82 @@ let Messages = class {
         scroll.scrollTop(scroll[0].scrollHeight);
     }
 
-    static pushMessage(sender, text, reply = null, msg_id) {
+    static pushMessage(sender, appendElm, msg_id) {
         var isMe = myinfo.kunjika == sender;
         var area = $('#message_area');
+        var parent = $('<div>');
         var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
-        if(!no_name_message) {
-            elm.append($('<div>', {class: 'message-sub', name: 'by'})
+        elm.append($('<div>', {class: 'message-sub', name: 'by'})
             .append($('<span>').text(vayakti[sender]+'('+sender+')'))
             .append($('<span>', {class: 'pull-right'}).text(Messages.currentTime())));
-        } 
-        if(reply != null && reply.length > 0) {
-            elm.append(
-                $('<div>', {class: 'message message-reply'})
-                .append($('<pre>').text(reply))
-            );
-        }
-        elm.append($('<pre>').text(text));
+        appendElm.forEach(function(app) {
+            elm.append(app);
+        });
         elm.click(function() {
             Messages.pick(this);
         });
-        area.append(elm);
+        elm.on('taphold', { delay: 700 },function () {
+            if(parent.find('#react_bar').length > 0) {
+                $('#react_bar').remove();
+                return
+            } else if($('#react_bar').length > 0) $('#react_bar').remove();
+            var ee = $('<div>', {id: 'react_bar'});
+            ['like', 'heart', 'laugh', 'sad'].forEach(function(i) {
+                ee.append($('<button>', {class: 'button', style: 'padding: 1rem'})
+                .append($('<img>', {src: 'img/'+i+'.svg', height: '18'}))
+                .click(function(evt) {
+                    sendReaction(i,msg_id);
+                }));
+            })
+            ee.append($('<button>', {class: 'button', style: 'padding: 1rem'})
+                .append($('<img>', {src: 'img/close.svg', height: '18'}))
+                .click(function(evt) {
+                    $('#react_bar').remove();
+                }));
+            parent.append(ee);
+        });
+        parent.append(elm);
+        area.append(parent);
 
         var scroll = $("#message_area_scroll");
         scroll.scrollTop(scroll[0].scrollHeight);
     }
 
-    static pushImage(sender, src, msg_id) {
-        var isMe = myinfo.kunjika == sender;
-        var area = $('#message_area');
-        var elm = $('<div>', {class: 'message '+(isMe?'message-me':'message-other'), msgid: msg_id});
-        if(!no_name_message) {
-            elm.append($('<div>', {class: 'message-sub', name: 'by'})
-            .append($('<span>').text(vayakti[sender]+'('+sender+')'))
-            .append($('<span>', {class: 'pull-right'}).text(Messages.currentTime())));
-        } 
-        elm.append($('<img>', {src: src, width: 300}));
-        elm.click(function() {
-            Messages.pick(this);
-        });
-        area.append(elm);
+    static pushText(sender, text, reply = null, msg_id) {
+        var app = [];
+        if(reply != null && reply.length > 0) {
+            app.push(
+                $('<div>', {class: 'message message-reply'})
+                .append($('<pre>').text(reply))
+            );
+        }
+        app.push($('<pre>').text(text));
+        Messages.pushMessage(sender,app,msg_id);
+    }
 
-        var scroll = $("#message_area_scroll");
-        scroll.scrollTop(scroll[0].scrollHeight);
+    static pushImage(sender, src, msg_id) {
+        Messages.pushMessage(sender,[$('<img>', {src: src, width: 300})],msg_id);
+    }
+
+    static addReaction(sender, emoji, msg_id) {
+        var msg = $('[msgid='+msg_id+']');
+        console.log('msg', msg, msg_id);
+        if(msg.find('[name=bar_msg]').length == 0) {
+            msg.append($('<div>', {class: 'message-sub', name: 'bar_msg'}));
+            console.log('inside');
+        }
+        var bar = msg.find('[name=bar_msg]');
+        console.log('bar', bar);
+        var elm = bar.find('[name="r_'+sender+'"]');
+        if(elm.length > 0) {
+            elm.find('img').attr('src', 'img/'+emoji+'.svg');
+            elm.find('span').text(vayakti[sender]+'('+sender+')');
+        } else {
+            var elm = $('<span>', {name: 'r_'+sender, style: 'padding: 0px 4px; display: inline-flex'});
+            elm.append($('<img>', {style: 'height: 1.4rem', src: 'img/'+emoji+'.svg'}));
+            elm.append($('<span>').text(vayakti[sender]+'('+sender+')'));
+            bar.append(elm);
+        }
     }
 
     // in message area 
@@ -115,12 +149,6 @@ let Messages = class {
 
         var scroll = $("#message_area_scroll");
         scroll.scrollTop(scroll[0].scrollHeight);
-    }
-
-    static selectedMessageToText() {
-        
-    
-        return text.trim();
     }
     
     static prepareReply() {
@@ -214,10 +242,7 @@ let Messages = class {
     static editMessages(msgid, text) {
         var msg = $('[msgid='+msgid+']');
         if(msg.find('[name=edited]').length == 0) {
-            if(msg.find('[name=bar_msg]').length == 0) {
-                msg.append($('<div>', {class: 'message-sub', name: 'bar_msg'}));
-            }
-            msg.find('[name=bar_msg]').append($('<span>', {name: 'edited'}).text('edited'));
+            msg.find('[name=by]').append($('<span>', {name: 'edited', class: 'text-grey bd-light', style: 'margin-left: 4px; padding: 0px 3px'}).text('edited'));
         }
         $('[msgid='+msgid+']').find('pre').last().text(text);
     }
