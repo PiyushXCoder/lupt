@@ -208,6 +208,11 @@ input {
     padding: 0px 8px 3px 8px;
     margin: 2px;
     word-wrap: break-word;;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
 }
 
 .message-other {

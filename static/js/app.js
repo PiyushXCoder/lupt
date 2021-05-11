@@ -167,7 +167,7 @@ function connect_next() {
         vayakti = [];
         typing = [];
         State.hideProgress();
-        Messages.pushStatus('Connectedas '+data.name+' at '+Messages.currentTime());
+        Messages.pushStatus('Connected as '+myinfo.name+' at '+Messages.currentTime());
         socket.send(JSON.stringify({cmd: 'list'}));
     });
     socket.send(JSON.stringify({ cmd: 'randnext' }));
