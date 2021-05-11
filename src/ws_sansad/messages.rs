@@ -87,7 +87,7 @@ impl WsSansad {
         });
     }
 
-    /// send text to vayakti in kaksh
+    /// send image to vayakti in kaksh
     pub async fn send_image(&mut self, val: Value) {
         // check if vayakti exist
         if let Isthiti::None = self.isthiti {
@@ -124,6 +124,53 @@ impl WsSansad {
             kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
             src
+        });
+    }
+
+    /// delete text to vayakti in kaksh
+    pub async fn delete_msg(&mut self, val: Value) {
+        // check if vayakti exist
+        if let Isthiti::None = self.isthiti {
+            self.send_err_response("Not in any Kaksh");
+            return;
+        }
+
+        // check if connected to any kaksh
+        match self.isthiti {
+            Isthiti::Kaksh(_) => (),
+            _ => {
+                self.send_err_response("Kaksh not connected");
+                return;
+            }
+        }
+
+        // image src
+        let mut msg_id = vec![];
+
+        let ids = match val.get("msg_id") {
+            Some(val) => val,
+            None => {
+                self.send_err_response("Invalid request");
+                return;
+            }
+        }.as_array().unwrap();
+        
+        for id in ids {
+            msg_id.push(id.as_str().unwrap().parse::<u128>().unwrap());
+        }
+        drop(ids);
+
+        let kaksh_kunjika = match &self.isthiti {
+            Isthiti::Kaksh(kaksh_kunjika) => {
+                kaksh_kunjika.to_owned()
+            }, _ => {
+                return;
+            }
+        };
+        Broker::<SystemBroker>::issue_async(ms::pind::DeleteMsg {
+            kaksh_kunjika,
+            kunjika: self.kunjika.to_owned(),
+            msg_id
         });
     }
 }

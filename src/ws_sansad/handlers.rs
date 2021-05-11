@@ -16,7 +16,7 @@ impl Handler<ms::sansad::WsText> for WsSansad {
     }
 }
 
-/// send text message
+/// send image message
 impl Handler<ms::sansad::WsImage> for WsSansad {
     type Result = ();
     fn handle(&mut self, msg: ms::sansad::WsImage, ctx: &mut Self::Context) -> Self::Result {
@@ -30,7 +30,6 @@ impl Handler<ms::sansad::WsImage> for WsSansad {
     }
 }
 
-
 /// send text status
 impl Handler<ms::sansad::WsStatus> for WsSansad {
     type Result = ();
@@ -38,6 +37,19 @@ impl Handler<ms::sansad::WsStatus> for WsSansad {
         let json = json!({
             "cmd": "status",
             "status": msg.status,
+            "kunjika": msg.sender_kunjika // Sender's kunjuka
+        });
+        ctx.text(json.to_string());
+    }
+}
+
+/// delete messages
+impl Handler<ms::sansad::WsDeleteMsg> for WsSansad {
+    type Result = ();
+    fn handle(&mut self, msg: ms::sansad::WsDeleteMsg, ctx: &mut Self::Context) -> Self::Result {
+        let json = json!({
+            "cmd": "del",
+            "msg_id": msg.msg_id,
             "kunjika": msg.sender_kunjika // Sender's kunjuka
         });
         ctx.text(json.to_string());

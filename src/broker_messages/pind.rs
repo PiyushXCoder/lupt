@@ -52,7 +52,7 @@ pub struct SendImage {
     pub src: String
 }
 
-// Request to send text t
+// Request to send status
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct SendStatus {
@@ -61,7 +61,16 @@ pub struct SendStatus {
     pub status: String
 }
 
-// Request to send text t
+// Request to delete messages
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct DeleteMsg {
+    pub kaksh_kunjika: String,
+    pub kunjika: String,
+    pub msg_id: Vec<u128>
+}
+
+// Request to send list of users
 #[derive(Clone, Message)]
 #[rtype(result = "String")]
 pub struct List {

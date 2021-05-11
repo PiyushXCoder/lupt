@@ -19,7 +19,7 @@ pub struct WsText {
     pub msg_id: u128
 }
 
-// Request to send transfer text
+// Request to send transfer Image
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsImage {
@@ -28,11 +28,19 @@ pub struct WsImage {
     pub msg_id: u128
 }
 
-// Request to send transfer text
+// Request to send transfer status
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsStatus {
     pub status: String,
+    pub sender_kunjika: String
+}
+
+// Request to delete messages
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsDeleteMsg {
+    pub msg_id: Vec<u128>,
     pub sender_kunjika: String
 }
 

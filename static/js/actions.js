@@ -1,6 +1,8 @@
 
 class Actions {
-    actions = []; // [[id, func]]
+    constructor() {
+        this.actions = []; // [[id, func]]    
+    }
 
     execute() {
         if(this.actions.length <= 0) return;

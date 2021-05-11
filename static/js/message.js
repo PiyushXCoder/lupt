@@ -124,7 +124,7 @@ let Messages = class {
     }
     
     static prepareReply() {
-        var text = this.selectedMessageToText();
+        var text = Messages.selectedMessageToText();
         var el = $('#reply_clip');
         el.removeClass('is-hidden');
         el.attr('msg', text);
@@ -135,7 +135,7 @@ let Messages = class {
     static copyMessagesToClipboard() {
         var $temp = $("<textarea>");
         $("body").append($temp);
-        $temp.val(this.selectedMessageToText()).select();
+        $temp.val(Messages.selectedMessageToText()).select();
         document.execCommand("copy");
         $temp.remove();
         Messages.unselectAll();
@@ -157,7 +157,11 @@ let Messages = class {
 
         dialog(prop, function() {
             if($('#dialog_check').prop('checked')) {
-
+                var msg_id = [];
+                $('.message.active').each(function() {
+                    msg_id.push($(this).attr('msgid'));
+                });
+                console.log(msg_id)
             } else $('.message.active').remove();
         });
 
