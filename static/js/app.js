@@ -150,6 +150,15 @@ function connect(frm) {
         State.chat();
         State.hideProgress();
         Messages.pushStatus('Connected as '+data.name+' at '+Messages.currentTime());
+
+        //push url
+        var frm = $('form[name=kaksh_sec]');
+        var url = '/?' + frm.find('[name=kaksh_kunjika]').val() + '&' +
+        frm.find('[name=kunjika]').val() + '&' +
+        frm.find('[name=name]').val();
+        console.log('here')
+        history.pushState({}, 'Lupt Chat', url);
+
         socket.send(JSON.stringify({cmd: 'list'}));
     })
 
