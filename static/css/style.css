@@ -292,20 +292,20 @@ input {
 .clip-win.gif-clip {
     width: calc(100% - 2*8px - 3*5px);
     max-width: 720px;
-    /* max-height: 70%; */
+    padding-bottom: 3px;
 }
 
 .gif-clip .button {
     max-width: 120px;
     padding: 0.5rem;
-    margin: 0.5rem;
+    margin: 0.4rem;
     display: inline-flex;
 }
 
 .gif-clip > #gif_area {
     overflow-y: auto;
     max-height: 350px;
-    padding: 1rem;
+    width: 100%;
 }
 
 #dialog {
