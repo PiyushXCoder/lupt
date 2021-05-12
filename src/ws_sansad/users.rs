@@ -22,7 +22,7 @@ impl WsSansad {
         // kunjika to hash and base64
         let mut m = sha1::Sha1::new();
         m.update(format!("{}{}",kunjika,
-            std::env::var("SALT").unwrap_or("".to_owned())).as_bytes());
+            crate::SALT.to_owned()).as_bytes());
         let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
 
         let name  = match val.get("name") {
@@ -139,7 +139,7 @@ impl WsSansad {
         // kunjika to hash and base64
         let mut m = sha1::Sha1::new();
         m.update(format!("{}{}",kunjika,
-            std::env::var("SALT").unwrap_or("".to_owned())).as_bytes());
+            crate::SALT.to_owned()).as_bytes());
         let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
 
         let name  = match val.get("name") {

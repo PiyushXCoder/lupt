@@ -8,6 +8,10 @@
 //!           |--> ws_sansad3 <---- /
 //!           |--> ws_sansad4 <----/
 //!
+
+#[macro_use]
+extern crate lazy_static;
+
 use actix_web::{
     App, Error, HttpRequest, HttpResponse, HttpServer, middleware::Logger, web,
     client::{Client, Connector}
@@ -24,8 +28,15 @@ mod broker_messages;
 mod ws_sansad;
 mod chat_pinnd;
 mod validator;
+
+lazy_static! {
+    pub static ref SALT: String = std::env::var("SALT").unwrap();
+    pub static ref TENOR_API_KEY: String = std::env::var("TENOR_API_KEY").unwrap();
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv::dotenv().ok();
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
     let store = MemoryStore::new();
@@ -63,7 +74,7 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         .finish();
 
     
-    let url = format!("https://g.tenor.com/v1/search?q={}&key=LIVDSRZULELA&limit=20&media_filter=tinygif", name);
+    let url = format!("https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif", name, TENOR_API_KEY.to_owned());
     let response = client.get(url)
         .header("User-Agent", "actix-web/3.0")
         .send()     
