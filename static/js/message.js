@@ -3,7 +3,7 @@ let Messages = class {
     static pick(elm) {
         var elm = $(elm);
         elm.toggleClass('active');
-
+        autosize($('#send_box')[0]);
         if($('.message.active').length == 0)
             $('#selected_clip').addClass('is-hidden');
         else
