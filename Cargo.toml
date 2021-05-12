@@ -4,6 +4,10 @@ version = "0.2.0"
 description = "Chat app for lupt(लुप्त) users!"
 authors = ["Piyush Raj <piyush.raj.kit@gmail.com>"]
 edition = "2018"
+license = "GPL 3.0"
+readme = "README.md"
+repository = "https://github.com/PiyushXCoder/lupt"
+keywords = ["chat","Chatting","Talk","Stranger"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
