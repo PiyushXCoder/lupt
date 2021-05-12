@@ -156,7 +156,6 @@ function connect(frm) {
         var url = '/?' + frm.find('[name=kaksh_kunjika]').val() + '&' +
         frm.find('[name=kunjika]').val() + '&' +
         frm.find('[name=name]').val();
-        console.log('here')
         history.pushState({}, 'Lupt Chat', url);
 
         socket.send(JSON.stringify({cmd: 'list'}));

@@ -33,7 +33,7 @@ let Messages = class {
             },2000);
         });
         $('#send_box').keypress(function(e) {
-            if(e.originalEvent.charCode == 13 && !e.shiftKey) {
+            if(e.key === 'Enter' && !e.shiftKey) {
                 send();
                 e.preventDefault();
                 clearTimeout(timeout);
