@@ -197,7 +197,12 @@
 
     <!-- Gif Clip -->
     <div id="gif_clip" class="clip-win gif-clip is-hidden">
-        <input type="text" id="gif_search" placeholder="Search">
+        <div>
+            <input type="text" id="gif_search" placeholder="Search" style="width: calc(100% - 4rem); display: inline-flex;">
+            <a onclick="$('#gif_clip').addClass('is-hidden');" style="float: right; padding: 6px 6px;">
+                <img src="img/close.svg" alt="X" style="height: 1.8rem; width: auto; cursor: pointer; display:inline-flexbox;">
+            </a>
+        </div>
         <div id="gif_area"></div>
     </div>
 
@@ -254,7 +259,7 @@
     <script src="js/actions.js"></script>
     <script src="js/state.js"></script>
     <script src="js/message.js"></script>
-    <script src="js/camera.js"></script>
+    <script src="js/images.js"></script>
     <script src="js/app.js"></script>
     <script src="js/onload.js"></script>
 </body>

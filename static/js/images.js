@@ -1,11 +1,11 @@
-let Camera = class {
-    static setupCamera() {
+let Images = class {
+    static setupImages() {
         $('#file-input')[0].addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) {
                 return;
             }
-            Camera.compressImage(file, 0.1, 'image/webp');
+            Images.compressImage(file, 0.1, 'image/webp');
         });
     }    
 
@@ -22,7 +22,7 @@ let Camera = class {
                     if(base64data.length > 63488 && mime != 'image/jpeg') {
                         base64data = null;
                         result = null;
-                        Camera.compressImage(file, 0.7, 'image/jpeg');
+                        Images.compressImage(file, 0.7, 'image/jpeg');
                         return;
                     } else if(base64data.length > 63488 && mime == 'image/jpeg') {
                         var prop = {

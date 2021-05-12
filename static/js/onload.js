@@ -45,5 +45,5 @@ $(document).ready(function() {
         send();
     });
 
-    Camera.setupCamera();
+    Images.setupImages();
 });
