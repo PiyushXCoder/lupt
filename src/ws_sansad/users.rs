@@ -63,10 +63,10 @@ impl WsSansad {
         };
 
         // Validate
-        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag], &kunjika, "Kunjika") {
+        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag, vl::NoAndOrQuestion], &kunjika, "Kunjika") {
             self.send_err_response(&val);
             return;
-        } else if let Some(val ) = validate(vec![vl::NonEmpty], &name, "Name") {
+        } else if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoAndOrQuestion], &name, "Name") {
             self.send_err_response(&val);
             return;
         }
@@ -183,13 +183,13 @@ impl WsSansad {
 
 
         // Validate
-        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoGupt, vl::NoSpace], &kaksh_kunjika, "Kaksh Kunjika") {
+        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoGupt, vl::NoSpace, vl::NoAndOrQuestion], &kaksh_kunjika, "Kaksh Kunjika") {
             self.send_err_response(&val);
             return;
-        } else if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag], &kunjika, "Kunjika") {
+        } else if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag, vl::NoAndOrQuestion], &kunjika, "Kunjika") {
             self.send_err_response(&val);
             return;
-        } else if let Some(val ) = validate(vec![vl::NonEmpty], &name, "Name") {
+        } else if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoAndOrQuestion], &name, "Name") {
             self.send_err_response(&val);
             return;
         }

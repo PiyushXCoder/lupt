@@ -19,6 +19,7 @@ pub enum Validation {
     NoGupt,
     NoSpace,
     NoHashtag,
+    NoAndOrQuestion,
 }
 
 pub fn validate(val: Vec<Validation>, dat: &str, entry_name: &str) -> Option<String> {
@@ -27,7 +28,8 @@ pub fn validate(val: Vec<Validation>, dat: &str, entry_name: &str) -> Option<Str
             Validation::NonEmpty => non_empty(dat, entry_name),
             Validation::NoGupt => is_gupt(dat),
             Validation::NoSpace => no_space(dat, entry_name),
-            Validation::NoHashtag => no_hashtag(dat, entry_name)
+            Validation::NoHashtag => no_hashtag(dat, entry_name),
+            Validation::NoAndOrQuestion => no_and_or_question(dat, entry_name),
         };
 
         if out != None {
@@ -64,6 +66,17 @@ fn no_space(dat: &str, entry_name: &str) -> Option<String> {
 fn no_hashtag(dat: &str, entry_name: &str) -> Option<String> {
     if dat.contains("#") {
         Some(format!("{} shounld not have Hashtag(#)", entry_name))
+    } else {
+        None
+    }
+}
+
+
+fn no_and_or_question(dat: &str, entry_name: &str) -> Option<String> {
+    if dat.contains("&") {
+        Some(format!("{} shounld not have &", entry_name))
+    } else if dat.contains("?") {
+        Some(format!("{} shounld not have ?", entry_name))
     } else {
         None
     }

@@ -153,9 +153,9 @@ function connect(frm) {
 
         //push url
         var frm = $('form[name=kaksh_sec]');
-        var url = '/?' + frm.find('[name=kaksh_kunjika]').val() + '&' +
-        frm.find('[name=kunjika]').val() + '&' +
-        frm.find('[name=name]').val();
+        var url = '/?' + encodeURI(frm.find('[name=kaksh_kunjika]').val()) + '&' +
+        encodeURI(frm.find('[name=kunjika]').val()) + '&' +
+        encodeURI(frm.find('[name=name]').val());
         history.pushState({}, 'Lupt Chat', url);
 
         socket.send(JSON.stringify({cmd: 'list'}));
