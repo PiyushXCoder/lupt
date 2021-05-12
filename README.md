@@ -29,4 +29,4 @@ This will produce the required project binary `lupt` in `target/release/lupt`
 
 ## License
 
-This project is under (GPL License)(LICENSE)
+This project is under [GPLv3](LICENSE)
