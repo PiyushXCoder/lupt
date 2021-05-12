@@ -334,7 +334,7 @@ function loadGif() {
                 area.append($('<button>', {class: 'button', onclick: 'sendGif("'+encodeURI(gif)+'"); $("#gif_clip").addClass("is-hidden");'})
                     .append($('<img>', {src: gif})));
             });
-            if(querygif != '') area.append($('<button>', {name: 'more', onclick: 'loadGif()', style: 'display: block'}).text('show more'));
+            if(querygif != '') area.append($('<button>', {name: 'more', onclick: 'loadGif()', class: 'button', style: 'display: block'}).text('show more'));
         }
     });
 }
