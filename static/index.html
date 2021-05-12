@@ -178,10 +178,15 @@
     <div id="action_clip" class="clip-win action-clip is-hidden">
         <div style="padding-bottom: 10px;">
             <button class="button" onclick="$('#file-input').click()">
-                <img src="img/image.svg" alt="Image" width="50" max-size="3072" class="siimple--py-2 siimple--px-2">
+                <img src="img/image.svg" alt="Image" width="50" max-size="3072">
                 <div>send image</div>
             </button>
             <input id="file-input" class="is-hidden" type="file" accept="image/png, image/jpeg"/>
+
+            <button class="button" onclick="$('#action_clip').addClass('is-hidden'); $('#gif_clip').removeClass('is-hidden'); loadGif('')">
+                <img src="img/gif.svg" alt="Image" width="50" max-size="3072">
+                <div>send Gif</div>
+            </button>
         </div>
         <div>
             <button onclick="changeColor()" class="button"><img src="img/color.svg" alt="C" height="16"></button>
@@ -190,11 +195,10 @@
         </div>
     </div>
 
-    <!-- Camera Clip -->
-    <div id="camera_clip" class="clip-win camera-clip is-hidden">
-        <video autoplay="true" id="videoElement" width="300"></video>
-        <button class="button is-full-width">Send</button>
-        
+    <!-- Gif Clip -->
+    <div id="gif_clip" class="clip-win gif-clip is-hidden">
+        <input type="text" id="gif_search" placeholder="Search">
+        <div id="gif_area"></div>
     </div>
 
     <!-- vayakti -->

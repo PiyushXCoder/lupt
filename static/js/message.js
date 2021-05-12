@@ -121,13 +121,10 @@ let Messages = class {
 
     static addReaction(sender, emoji, msg_id) {
         var msg = $('[msgid='+msg_id+']');
-        console.log('msg', msg, msg_id);
         if(msg.find('[name=bar_msg]').length == 0) {
             msg.append($('<div>', {class: 'message-sub', name: 'bar_msg'}));
-            console.log('inside');
         }
         var bar = msg.find('[name=bar_msg]');
-        console.log('bar', bar);
         var elm = bar.find('[name="r_'+sender+'"]');
         if(elm.length > 0) {
             elm.find('img').attr('src', 'img/'+emoji+'.svg');

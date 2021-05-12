@@ -3,6 +3,7 @@ let State = class {
         $('#connect_panel').removeClass('is-hidden');
         $('#chat_panel').addClass('is-hidden');
         $('#reply_clip').addClass('is-hidden');
+        $('#gif_clip').addClass('is-hidden');
         $('#selected_clip').addClass('is-hidden');
         $('#action_clip').addClass('is-hidden');
         $('#vayakti_model').addClass('is-hidden');
@@ -13,6 +14,7 @@ let State = class {
         $('#chat_panel').removeClass('is-hidden');
         $('#connect_panel').addClass('is-hidden');
         $('#reply_clip').addClass('is-hidden');
+        $('#gif_clip').addClass('is-hidden');
         $('#selected_clip').addClass('is-hidden');
         $('#action_clip').addClass('is-hidden');
         $('#vayakti_model').addClass('is-hidden');

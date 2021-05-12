@@ -17,7 +17,7 @@ var no_name_message = false;
 
 // check if support ws
 if(!('WebSocket' in window || 'MozWebSocket' in window)) {
-    $('initerror').text('Warning: Web Browser dosen\'t support websocket! Upgrade');
+    $('#initerror').text('Warning: Web Browser dosen\'t support websocket! Upgrade');
 }
 
 // Connection opened
@@ -40,14 +40,13 @@ socket.onopen = function(event) {
 
 // Connection fail
 socket.onerror = function(event) {
-    $('initerror').text('Warning: Failed to connect websocket! Refresh the '+
+    $('#initerror').text('Warning: Failed to connect websocket! Refresh the '+
         'page and if still don\'t work upgrade Web Browser');
 }
 
 // Listen for messages
 socket.onmessage = function(event) {
     var j = JSON.parse(event.data);
-    console.log(j);
     switch(j.cmd) {
         case 'resp':
             if(j.result == 'Err') {
@@ -288,7 +287,7 @@ function autosize(el){
     },0);    
 }
 
-
+// Dialog
 var dialogCallback;
 function dialog(prop, call) {
     dialogCallback = call;
@@ -310,3 +309,32 @@ $('#dialog_ok').click(function() {
     $('#dialog').addClass('is-hidden');
     dialogCallback();
 });
+
+// Gif
+$("#gif_search").keyup(function(event){
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        loadGif(this.value);
+    }
+});
+
+function loadGif(query) {
+    var area = $('#gif_area');
+    area.empty();
+    $.get("/gif/"+query, function(data, status){
+        if(status == 'success') {
+            data.results.forEach(function(result) {
+                var gif = result.media[0].tinygif.url;
+                area.append($('<button>', {class: 'button', onclick: 'sendGif("'+gif+'"); $("#gif_clip").addClass("is-hidden");'})
+                    .append($('<img>', {src: gif})));
+            });
+        }
+    });
+}
+
+function sendGif(gif) {
+    socket.send(JSON.stringify({
+        cmd: "img",
+        src: gif
+    }));
+}

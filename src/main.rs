@@ -8,11 +8,14 @@
 //!           |--> ws_sansad3 <---- /
 //!           |--> ws_sansad4 <----/
 //!
-
-use actix_web::{App, Error, HttpRequest, HttpResponse, HttpServer, middleware::Logger, web};
+use actix_web::{
+    App, Error, HttpRequest, HttpResponse, HttpServer, middleware::Logger, web,
+    client::{Client, Connector}
+};
 use actix_files as fs;
 use actix_web_actors::ws;
 use actix_ratelimit::{RateLimiter, MemoryStore, MemoryStoreActor};
+use openssl::ssl::{SslConnector, SslMethod};
 use ws_sansad::WsSansad;
 
 mod config;
@@ -38,6 +41,8 @@ async fn main() -> std::io::Result<()> {
         )
         .wrap(Logger::new("%t [%{x-forwarded-for}i] %s %{User-Agent}i %r"))
         .service(web::resource("/ws/").route(web::get().to(ws_index)))
+        .service(web::resource("/gif/").route(web::get().to(gif)))
+        .service(web::resource("/gif/{query}").route(web::get().to(gif)))
         .service(fs::Files::new("/", &static_path).index_file("index.html"))
     })
     .bind(config.bind_address)?
@@ -47,4 +52,24 @@ async fn main() -> std::io::Result<()> {
 
 async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
     ws::start(WsSansad::new(), &req, stream)
+}
+
+async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
+    let name = req.match_info().get("query").unwrap_or("");
+    let builder = SslConnector::builder(SslMethod::tls()).unwrap();
+
+    let client = Client::builder()
+        .connector(Connector::new().ssl(builder.build()).finish())
+        .finish();
+
+    
+    let url = format!("https://g.tenor.com/v1/search?q={}&key=LIVDSRZULELA&limit=20&media_filter=tinygif", name);
+    let response = client.get(url)
+        .header("User-Agent", "actix-web/3.0")
+        .send()     
+        .await?
+        .body()
+        .await?;
+
+    Ok(HttpResponse::Ok().content_type("application/json").body(response))
 }
