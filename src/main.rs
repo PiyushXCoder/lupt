@@ -74,7 +74,7 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         .finish();
 
     
-    let url = format!("https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif", name, TENOR_API_KEY.to_owned());
+    let url = format!("https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif", name.replace(" ", "+"), TENOR_API_KEY.to_owned());
     let response = client.get(url)
         .header("User-Agent", "actix-web/3.0")
         .send()     

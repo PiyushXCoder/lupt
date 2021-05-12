@@ -325,7 +325,7 @@ function loadGif(query) {
         if(status == 'success') {
             data.results.forEach(function(result) {
                 var gif = result.media[0].tinygif.url;
-                area.append($('<button>', {class: 'button', onclick: 'sendGif("'+gif+'"); $("#gif_clip").addClass("is-hidden");'})
+                area.append($('<button>', {class: 'button', onclick: 'sendGif("'+encodeURI(gif)+'"); $("#gif_clip").addClass("is-hidden");'})
                     .append($('<img>', {src: gif})));
             });
         }
