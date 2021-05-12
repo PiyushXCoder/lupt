@@ -157,7 +157,7 @@ let Messages = class {
         var el = $('#reply_clip');
         el.removeClass('is-hidden');
         el.attr('msg', text);
-        $('#reply_clip > span').text(text+ '...');
+        $('#reply_clip > span').text(text.substr(0,28)+ '...');
         Messages.unselectAll();
     }
     
