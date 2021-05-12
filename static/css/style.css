@@ -126,6 +126,10 @@ input {
     background-size: 30px;
 }
 
+.tabs > a {
+    cursor: pointer;
+}
+
 .chatpanel-top {
     width: 100%; 
     height: 50px; 
