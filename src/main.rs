@@ -52,8 +52,8 @@ async fn main() -> std::io::Result<()> {
         )
         .wrap(Logger::new("%t [%{x-forwarded-for}i] %s %{User-Agent}i %r"))
         .service(web::resource("/ws/").route(web::get().to(ws_index)))
-        .service(web::resource("/gif/").route(web::get().to(gif)))
-        .service(web::resource("/gif/{query}").route(web::get().to(gif)))
+        .service(web::resource("/gif/{pos}/").route(web::get().to(gif)))
+        .service(web::resource("/gif/{pos}/{query}").route(web::get().to(gif)))
         .service(fs::Files::new("/", &static_path).index_file("index.html"))
     })
     .bind(config.bind_address)?
@@ -67,6 +67,8 @@ async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse
 
 async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
     let name = req.match_info().get("query").unwrap_or("");
+    let mut pos = req.match_info().get("pos").unwrap_or("");
+    if pos == "_" { pos = "" }
     let builder = SslConnector::builder(SslMethod::tls()).unwrap();
 
     let client = Client::builder()
@@ -74,7 +76,7 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         .finish();
 
     
-    let url = format!("https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif", name.replace(" ", "+"), TENOR_API_KEY.to_owned());
+    let url = format!("https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif&pos={}", name.replace(" ", "+"), TENOR_API_KEY.to_owned(), pos);
     let response = client.get(url)
         .header("User-Agent", "actix-web/3.0")
         .send()     

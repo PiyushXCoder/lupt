@@ -314,20 +314,27 @@ $('#dialog_ok').click(function() {
 $("#gif_search").keyup(function(event){
     if (event.key === 'Enter') {
         event.preventDefault();
-        loadGif(this.value);
+        $('#gif_area').empty();
+        positiongif = '_';
+        querygif = this.value;
+        loadGif();
     }
 });
 
-function loadGif(query) {
+var positiongif = '_';
+var querygif = '';
+function loadGif() {
     var area = $('#gif_area');
-    area.empty();
-    $.get("/gif/"+query, function(data, status){
+    $.get('/gif/'+positiongif+'/'+querygif, function(data, status){
         if(status == 'success') {
+            area.find('[name=more]').remove();
+            positiongif = data.next;
             data.results.forEach(function(result) {
                 var gif = result.media[0].tinygif.url;
                 area.append($('<button>', {class: 'button', onclick: 'sendGif("'+encodeURI(gif)+'"); $("#gif_clip").addClass("is-hidden");'})
                     .append($('<img>', {src: gif})));
             });
+            if(querygif != '') area.append($('<button>', {name: 'more', onclick: 'loadGif()', style: 'display: block'}).text('show more'));
         }
     });
 }
