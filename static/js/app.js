@@ -162,7 +162,6 @@ function connect(frm) {
     })
 
     data = Object.assign({cmd: frm.attr('cmd')}, data);
-    console.log(data);
     socket.send(JSON.stringify(data));
 }
 
