@@ -273,6 +273,8 @@ function vayaktiList() {
 
 function changeColor() {
     $('body').toggleClass('dark')
+    if($('body').hasClass('dark')) setCookie('theme', 'dark', 30);
+    else setCookie('theme', 'light', 30);
     $('#action_clip').addClass('is-hidden');
 }
 
