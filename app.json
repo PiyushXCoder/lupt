@@ -1,11 +1,11 @@
 {
     "name": "Lupt",
     "description": "Chat app to talk in group or to strangers",
-    "repository": "https://gitlab.com/PiyushXCoder/lupt",
+    "repository": "https://github.com/PiyushXCoder/lupt",
     "success_url": "/",
     "keywords": ["rust", "actix"],
-    "website": "https://gitlab.com/PiyushXCoder/lupt",
+    "website": "https://github.com/PiyushXCoder/lupt",
     "env": {
-      "BUILDPACK_URL": "https://gitlab.com/PiyushXCoder/lupt.git"
+      "BUILDPACK_URL": "https://github.com/PiyushXCoder/lupt"
     }
   }

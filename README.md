@@ -1,4 +1,4 @@
-![1](static/img/label.svg)
+![1](static/img/label.png)
 
 # Lupt Chat
 Chat app to talk in group or to strangers
