@@ -152,7 +152,7 @@ impl Handler<ms::pind::JoinRandom> for ChatPinnd {
     }
 }
 
-/// Next Random user
+/// Next Random next vayakti
 impl Handler<ms::pind::JoinRandomNext> for ChatPinnd {
     type Result = Resp;
     fn handle(&mut self, msg: ms::pind::JoinRandomNext, _: &mut Self::Context) -> Self::Result {
@@ -258,7 +258,7 @@ impl Handler<ms::pind::JoinRandomNext> for ChatPinnd {
     }
 }
 
-/// send list of users
+/// send list of vayakti
 impl Handler<ms::pind::List> for ChatPinnd {
     type Result = String;
 
@@ -275,11 +275,11 @@ impl Handler<ms::pind::List> for ChatPinnd {
     }
 }
 
-/// Notifiy a user disconnected and trim kaksh
-impl Handler<ms::pind::LeaveUser> for ChatPinnd {
+/// Notifiy a vayakti disconnected and trim kaksh
+impl Handler<ms::pind::LeaveVayakti> for ChatPinnd {
     type Result = ();
 
-    fn handle(&mut self, msg: ms::pind::LeaveUser, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: ms::pind::LeaveVayakti, _: &mut Self::Context) -> Self::Result {
         if let Some(kaksh_kunjika) = &msg.kaksh_kunjika {
             if let Some(kaksh) = self.kaksh.get_mut(kaksh_kunjika) {
                 let name = if let Some(i) = kaksh.loog.iter().position(|x| x.addr == msg.addr) {

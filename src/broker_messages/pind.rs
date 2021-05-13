@@ -42,12 +42,28 @@ pub struct JoinRandom {
     pub name: String,
     pub tags: Vec<String>,
 }
-/// Request to connect Random vayakti
+/// Request to connect Random Next vayakti
 #[derive(Clone, Message)]
 #[rtype(result = "Resp")]
 pub struct JoinRandomNext {
     pub kaksh_kunjika: String,
     pub kunjika: String
+}
+
+// Request to send list of users
+#[derive(Clone, Message)]
+#[rtype(result = "String")]
+pub struct List {
+    pub kaksh_kunjika: String
+}
+
+/// Request to leave kaksh
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct  LeaveVayakti {
+    pub kaksh_kunjika: Option<String>,
+    pub kunjika: String,
+    pub addr: Addr<WsSansad>
 }
 
 /// Request to send text 
@@ -96,7 +112,7 @@ pub struct DeleteMsg {
     pub msg_id: Vec<String>
 }
 
-// Request to delete messages
+// Request to edit messages
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct EditMsg {
@@ -104,20 +120,4 @@ pub struct EditMsg {
     pub kunjika: String,
     pub text: String,
     pub msg_id: String
-}
-
-// Request to send list of users
-#[derive(Clone, Message)]
-#[rtype(result = "String")]
-pub struct List {
-    pub kaksh_kunjika: String
-}
-
-/// Request to leave kaksh
-#[derive(Clone, Message)]
-#[rtype(result = "()")]
-pub struct  LeaveUser {
-    pub kaksh_kunjika: Option<String>,
-    pub kunjika: String,
-    pub addr: Addr<WsSansad>
 }

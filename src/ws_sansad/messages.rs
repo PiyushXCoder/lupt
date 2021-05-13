@@ -65,44 +65,6 @@ impl WsSansad {
         });
     }
 
-    /// send status to vayakti in kaksh
-    pub async fn send_status(&mut self, val: Value) {
-        // check if vayakti exist
-        if let Isthiti::None = self.isthiti {
-            self.send_err_response("Not in any Kaksh");
-            return;
-        }
-
-        // check if connected to any kaksh
-        match self.isthiti {
-            Isthiti::Kaksh(_) => (),
-            _ => {
-                self.send_err_response("Kaksh not connected");
-                return;
-            }
-        }
-
-        // sent status
-        let status = match val.get("status") {
-            Some(val) => val,
-            None => {
-                self.send_err_response("Invalid request");
-                return;
-            }
-        }.as_str().unwrap().to_owned();
-        let kaksh_kunjika = match &self.isthiti {
-            Isthiti::Kaksh(kaksh_kunjika) => {
-                kaksh_kunjika.to_owned()
-            }, _ => {
-                return;
-            }
-        };
-        Broker::<SystemBroker>::issue_async(ms::pind::SendStatus {
-            kaksh_kunjika,
-            kunjika: self.kunjika.to_owned(),
-            status
-        });
-    }
 
     /// send image to vayakti in kaksh
     pub async fn send_image(&mut self, val: Value) {
@@ -143,6 +105,7 @@ impl WsSansad {
             src
         });
     }
+
 
     /// send reaction to vayakti in kaksh
     pub async fn send_reaction(&mut self, val: Value) {
@@ -194,6 +157,45 @@ impl WsSansad {
         });
     }
 
+    /// send status to vayakti in kaksh
+    pub async fn send_status(&mut self, val: Value) {
+        // check if vayakti exist
+        if let Isthiti::None = self.isthiti {
+            self.send_err_response("Not in any Kaksh");
+            return;
+        }
+
+        // check if connected to any kaksh
+        match self.isthiti {
+            Isthiti::Kaksh(_) => (),
+            _ => {
+                self.send_err_response("Kaksh not connected");
+                return;
+            }
+        }
+
+        // sent status
+        let status = match val.get("status") {
+            Some(val) => val,
+            None => {
+                self.send_err_response("Invalid request");
+                return;
+            }
+        }.as_str().unwrap().to_owned();
+        let kaksh_kunjika = match &self.isthiti {
+            Isthiti::Kaksh(kaksh_kunjika) => {
+                kaksh_kunjika.to_owned()
+            }, _ => {
+                return;
+            }
+        };
+        Broker::<SystemBroker>::issue_async(ms::pind::SendStatus {
+            kaksh_kunjika,
+            kunjika: self.kunjika.to_owned(),
+            status
+        });
+    }
+
     /// delete text to vayakti in kaksh
     pub async fn delete_msg(&mut self, val: Value) {
         // check if vayakti exist
@@ -242,7 +244,7 @@ impl WsSansad {
         });
     }
 
-    /// send text to vayakti in kaksh
+    /// edit text to vayakti in kaksh
     pub async fn edit_msg(&mut self, val: Value) {
         // check if vayakti exist
         if let Isthiti::None = self.isthiti {

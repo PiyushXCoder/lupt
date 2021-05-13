@@ -109,7 +109,7 @@ impl Handler<ms::pind::DeleteMsg> for ChatPinnd {
 }
 
 
-/// send delete messages for everyone
+/// send edit messages for everyone
 impl Handler<ms::pind::EditMsg> for ChatPinnd {
     type Result = ();
 

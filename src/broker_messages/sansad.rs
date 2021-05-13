@@ -19,12 +19,48 @@ use super::*;
 
 //################################################## For WsSansad ##################################################
 // Request to send own kunjika hash
+
+// Notify Someone connected
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsConnected {
+    pub name: String,
+    pub kunjika: String
+}
+
+// Got connected to random vayakti
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsConnectedRandom {
+    pub name: String,
+    pub kunjika: String,
+    pub kaksh_kunjika: String
+}
+
+// Request to send hash calculated of kunjika
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsKunjikaHash {
     pub kunjika: String
 }
-// Request to send transfer text
+
+// Request to send list
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsList {
+    pub json: String
+}
+
+// Notify someone disconnected
+#[derive(Clone, Message)]
+#[rtype(result = "()")]
+pub struct WsDisconnected {
+    pub kunjika: String,
+    pub name: String
+}
+
+
+// Request to send Text
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsText {
@@ -34,7 +70,7 @@ pub struct WsText {
     pub msg_id: u128
 }
 
-// Request to send transfer Image
+// Request to send Image
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsImage {
@@ -42,7 +78,7 @@ pub struct WsImage {
     pub sender_kunjika: String,
     pub msg_id: u128
 }
-// Request to send REaction
+// Request to send Reaction
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsReaction {
@@ -52,7 +88,7 @@ pub struct WsReaction {
 }
 
 
-// Request to send transfer status
+// Request to send Status
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsStatus {
@@ -68,7 +104,7 @@ pub struct WsDeleteMsg {
     pub sender_kunjika: String
 }
 
-// Request to delete messages
+// Request to edit messages
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsEditMsg {
@@ -77,42 +113,10 @@ pub struct WsEditMsg {
     pub msg_id: String
 }
 
-// Request to send transfer text
-#[derive(Clone, Message)]
-#[rtype(result = "()")]
-pub struct WsList {
-    pub json: String
-}
-
-// Notify Someone connected
-#[derive(Clone, Message)]
-#[rtype(result = "()")]
-pub struct WsConnected {
-    pub name: String,
-    pub kunjika: String
-}
-
-// Notify someone disconnected
-#[derive(Clone, Message)]
-#[rtype(result = "()")]
-pub struct WsDisconnected {
-    pub kunjika: String,
-    pub name: String
-}
-
 // Give response message
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsResponse {
     pub result: String,
     pub message: String
-}
-
-// Got connected to random vayakti
-#[derive(Clone, Message)]
-#[rtype(result = "()")]
-pub struct WsConnectedRandom {
-    pub name: String,
-    pub kunjika: String,
-    pub kaksh_kunjika: String
 }

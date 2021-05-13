@@ -40,7 +40,7 @@ pub fn validate(val: Vec<Validation>, dat: &str, entry_name: &str) -> Option<Str
 }
 
 fn non_empty(dat: &str, entry_name: &str) -> Option<String> {
-    if dat.len() > 0 {
+    if dat.len() > 0 || dat != "" {
         None
     } else {
         Some(format!("{} is Required", entry_name))
