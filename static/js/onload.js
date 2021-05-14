@@ -1,4 +1,4 @@
-if (getCookie('theme') == 'dark' || window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)  {
+if (getCookie('theme') == 'dark' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && getCookie('theme') != 'light')) {
     $('body').toggleClass('dark');
 }
 
