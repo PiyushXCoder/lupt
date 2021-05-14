@@ -44,6 +44,15 @@ socket.onerror = function(event) {
         'page and if still don\'t work upgrade Web Browser');
 }
 
+socket.onclose = function (e) {
+    if(actions.has_key('leave')) return;
+    actions.clear();
+    myinfo.kunjika = '';
+    myinfo.name = '';
+    State.login();
+    State.hideProgress();
+}
+
 // Listen for messages
 socket.onmessage = function(event) {
     var j = JSON.parse(event.data);

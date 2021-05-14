@@ -66,7 +66,7 @@ async fn main() -> std::io::Result<()> {
     let mut redirect = None;
     let port_x = config.port_x.clone();
     let port = config.port.clone();
-    if ssl_builder.is_some() {
+    if ssl_builder.is_some() && config.port_x != "" {
         redirect = Some(HttpServer::new(move || {
             App::new()
             .wrap(
@@ -99,16 +99,13 @@ async fn main() -> std::io::Result<()> {
         .service(fs::Files::new("/", &static_path).index_file("index.html"))
     });
     
-    match ssl_builder {
-        Some(b) => {
-            let srv = server.bind_openssl(format!("{}:{}", config.bind_address, config.port), b)?.run();
-            tokio::try_join!(redirect.unwrap(),  srv)?;
-        },
-        None => {
-            server.bind(format!("{}:{}", config.bind_address, config.port))?.run().await?;
-        }
+    if ssl_builder.is_some() && config.port_x != "" { 
+        let srv = server.bind_openssl(format!("{}:{}", config.bind_address, config.port), ssl_builder.unwrap())?.run();
+        tokio::try_join!(redirect.unwrap(),  srv)?;
+    } else {
+        server.bind(format!("{}:{}", config.bind_address, config.port))?.run().await?;
     }
-
+    
     Ok(())
 }
 
