@@ -5,7 +5,6 @@ description = "Chat app for lupt(लुप्त) users!"
 authors = ["Piyush Raj <piyush.raj.kit@gmail.com>"]
 edition = "2018"
 license = "GPL 3.0"
-license-file = "LICENSE"
 readme = "README.md"
 repository = "https://github.com/PiyushXCoder/lupt"
 homepage = "luptchat.in"
@@ -21,6 +20,7 @@ actix-web-actors = "3"
 actix-broker = "0.3.1"
 actix-files = "0.5.0"
 actix-ratelimit = "0.3.1"
+actix-web-middleware-redirect-https = "3.0.1"
 env_logger = "0.8.3"
 openssl = "0.10.28"
 
@@ -30,7 +30,7 @@ lazy_static = "1.4.0"
 serde = "1.0.123"
 serde_json = "1.0.62"
 rand = "0.8.3"
-tokio = { version = "1.5.0", features = ['rt', 'rt-multi-thread']}
+tokio = { version = "1.5.0", features = ['rt', 'rt-multi-thread', 'macros']}
 
 sha1 = "0.6.0"
 base64 = "0.13.0"

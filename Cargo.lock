@@ -359,6 +359,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-web-middleware-redirect-https"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3ce1464786203c29120f6d1e4dcdc9c3975506e70b89c3a56c5389f265256dc6"
+dependencies = [
+ "actix-service",
+ "actix-web",
+ "futures",
+]
+
+[[package]]
 name = "actix_derive"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1202,6 +1213,7 @@ dependencies = [
  "actix-ratelimit",
  "actix-web",
  "actix-web-actors",
+ "actix-web-middleware-redirect-https",
  "base64",
  "clap",
  "env_logger",
@@ -2060,6 +2072,18 @@ dependencies = [
  "autocfg",
  "num_cpus",
  "pin-project-lite 0.2.4",
+ "tokio-macros",
+]
+
+[[package]]
+name = "tokio-macros"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "caf7b11a536f46a809a8a9f0bb4237020f70ecbf115b842360afb127ea2fda57"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

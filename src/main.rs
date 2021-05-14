@@ -54,7 +54,6 @@ lazy_static! {
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
-    let store = MemoryStore::new();
     let config = config::Config::new();
 
     *SALT.write().unwrap() = config.config.salt;
@@ -63,11 +62,33 @@ async fn main() -> std::io::Result<()> {
     let ssl_builder = generate_ssl_builder(config.config.ssl_key, config.config.ssl_cert);
     let logger_pattern = config.config.logger_pattern;
     let static_path = config.static_path;
+
+    let mut redirect = None;
+    let port_x = config.port_x.clone();
+    let port = config.port.clone();
+    if ssl_builder.is_some() {
+        redirect = Some(HttpServer::new(move || {
+            App::new()
+            .wrap(
+                RateLimiter::new(
+                MemoryStoreActor::from(MemoryStore::new().clone()).start())
+                    .with_interval(std::time::Duration::from_secs(60))
+                    .with_max_requests(100)
+            )
+            .wrap(actix_web_middleware_redirect_https::RedirectHTTPS::with_replacements(&[(port_x.clone(), port.clone())]))
+            .route("/", web::get().to(|| HttpResponse::Ok()
+                                            .content_type("text/plain")
+                                            .body("Always HTTPS on non-default ports!")))
+        })
+        .bind(format!("{}:{}", config.bind_address, config.port_x))?
+        .run());
+    }
+
     let server = HttpServer::new(move || {
         App::new()
         .wrap(
             RateLimiter::new(
-            MemoryStoreActor::from(store.clone()).start())
+            MemoryStoreActor::from(MemoryStore::new().clone()).start())
                 .with_interval(std::time::Duration::from_secs(60))
                 .with_max_requests(200)
         )
@@ -79,10 +100,16 @@ async fn main() -> std::io::Result<()> {
     });
     
     match ssl_builder {
-        Some(b) => server.bind_openssl(config.bind_address, b),
-        None => server.bind(config.bind_address)
-    }?.run()
-    .await
+        Some(b) => {
+            let srv = server.bind_openssl(format!("{}:{}", config.bind_address, config.port), b)?.run();
+            tokio::try_join!(redirect.unwrap(),  srv)?;
+        },
+        None => {
+            server.bind(format!("{}:{}", config.bind_address, config.port))?.run().await?;
+        }
+    }
+
+    Ok(())
 }
 
 async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {

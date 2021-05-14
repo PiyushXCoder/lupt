@@ -1,2 +1,4 @@
 /target
 /config.json
+/localhost-key.pem
+/localhost.pem
