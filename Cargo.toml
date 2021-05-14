@@ -5,8 +5,11 @@ description = "Chat app for lupt(लुप्त) users!"
 authors = ["Piyush Raj <piyush.raj.kit@gmail.com>"]
 edition = "2018"
 license = "GPL 3.0"
+license-file = "LICENSE"
 readme = "README.md"
 repository = "https://github.com/PiyushXCoder/lupt"
+homepage = "luptchat.in"
+categories = ["chatting-app"]
 keywords = ["chat","Chatting","Talk","Stranger"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -21,14 +24,13 @@ actix-ratelimit = "0.3.1"
 env_logger = "0.8.3"
 openssl = "0.10.28"
 
-dotenv = "0.15.0"
 clap = "2.33.3"
 lazy_static = "1.4.0"
 
 serde = "1.0.123"
 serde_json = "1.0.62"
 rand = "0.8.3"
-futures = "0.3.12"
+tokio = { version = "1.5.0", features = ['rt', 'rt-multi-thread']}
 
 sha1 = "0.6.0"
 base64 = "0.13.0"

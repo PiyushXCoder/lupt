@@ -46,7 +46,7 @@ impl WsSansad {
         }
         let mut m = sha1::Sha1::new();
         m.update(format!("{}{}",kunjika,
-            crate::SALT.to_owned()).as_bytes());
+            crate::SALT.read().unwrap()).as_bytes());
         let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
 
         // Name
@@ -131,7 +131,7 @@ impl WsSansad {
         }
         let mut m = sha1::Sha1::new();
         m.update(format!("{}{}",kunjika,
-            crate::SALT.to_owned()).as_bytes());
+            crate::SALT.read().unwrap()).as_bytes());
         let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
 
         // Name

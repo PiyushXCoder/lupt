@@ -16,23 +16,25 @@
 */
 
 use clap::{App, Arg};
+use serde::{Deserialize, Serialize};
+
 pub struct Config {
     pub static_path: String,
-    pub bind_address: String
+    pub bind_address: String,
+    pub config: ConfigFile
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ConfigFile {
+    pub salt: String,
+    pub tenor_key: String,
+    pub ssl_cert: String,
+    pub ssl_key: String,
+    pub logger_pattern: String
 }
 
 impl Config {
     pub fn new() -> Self {
-        let bind_address = std::env::var("URL");
-        let static_path = std::env::var("STATIC_PATH");
-
-        if bind_address.is_ok() && static_path.is_ok() {
-            return Config {
-                static_path: static_path.unwrap(),
-                bind_address: bind_address.unwrap()
-            };
-        }
-
         let matches = App::new("Lupt (लुप्त)")
             .version(env!("CARGO_PKG_VERSION"))
             .author(env!("CARGO_PKG_AUTHORS"))
@@ -51,11 +53,34 @@ impl Config {
                 .help("Address to bind for server")
                 .required(true)
                 .takes_value(true))
+            .arg(Arg::with_name("config")
+                .short("c")
+                .long("config")
+                .value_name("FILE")
+                .help("Path to config file")
+                .required(true)
+                .takes_value(true))
             .get_matches();
+
+            let conf = matches.value_of("config").unwrap().to_owned();
+            let conf = std::fs::read_to_string(conf).expect("Failed to read config");
+            
+            let config = serde_json::from_str::<ConfigFile>(&conf).expect(r"
+Config File is corrupt.
+
+Config file must have following fields
+    - salt: Salt for hashing
+    - tenor_key: Key of tenor gif api
+    - ssl_cert: Path to certificate of ssl
+    - ssl_key: Path to private key of ssl
+    - logger_pattern: Pattern to make log according to Actix Logger
+");
+
 
         Config {
             static_path: matches.value_of("static_path").unwrap().to_owned(),
-            bind_address: matches.value_of("bind_address").unwrap().to_owned()
+            bind_address: matches.value_of("bind_address").unwrap().to_owned(),
+            config
         }
     }
 }

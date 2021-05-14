@@ -34,8 +34,9 @@ use actix_web::{
 use actix_files as fs;
 use actix_web_actors::ws;
 use actix_ratelimit::{RateLimiter, MemoryStore, MemoryStoreActor};
-use openssl::ssl::{SslConnector, SslMethod};
+use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslConnector, SslFiletype, SslMethod};
 use ws_sansad::WsSansad;
+use std::sync::RwLock;
 
 mod config;
 mod errors;
@@ -45,19 +46,24 @@ mod chat_pinnd;
 mod validator;
 
 lazy_static! {
-    pub static ref SALT: String = std::env::var("SALT").unwrap();
-    pub static ref TENOR_API_KEY: String = std::env::var("TENOR_API_KEY").unwrap();
+    pub static ref SALT: RwLock<String> = RwLock::new(String::new());
+    pub static ref TENOR_API_KEY: RwLock<String> = RwLock::new(String::new());
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenv::dotenv().ok();
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
     let store = MemoryStore::new();
     let config = config::Config::new();
+
+    *SALT.write().unwrap() = config.config.salt;
+    *TENOR_API_KEY.write().unwrap() = config.config.tenor_key;
+
+    let ssl_builder = generate_ssl_builder(config.config.ssl_key, config.config.ssl_cert);
+    let logger_pattern = config.config.logger_pattern;
     let static_path = config.static_path;
-    HttpServer::new(move || {
+    let server = HttpServer::new(move || {
         App::new()
         .wrap(
             RateLimiter::new(
@@ -65,14 +71,17 @@ async fn main() -> std::io::Result<()> {
                 .with_interval(std::time::Duration::from_secs(60))
                 .with_max_requests(200)
         )
-        .wrap(Logger::new("%t [%{x-forwarded-for}i] %s %{User-Agent}i %r"))
+        .wrap(Logger::new(&logger_pattern))
         .service(web::resource("/ws/").route(web::get().to(ws_index)))
         .service(web::resource("/gif/{pos}/").route(web::get().to(gif)))
         .service(web::resource("/gif/{pos}/{query}").route(web::get().to(gif)))
         .service(fs::Files::new("/", &static_path).index_file("index.html"))
-    })
-    .bind(config.bind_address)?
-    .run()
+    });
+    
+    match ssl_builder {
+        Some(b) => server.bind_openssl(config.bind_address, b),
+        None => server.bind(config.bind_address)
+    }?.run()
     .await
 }
 
@@ -91,7 +100,7 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         .finish();
 
     
-    let url = format!("https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif&pos={}", name.replace(" ", "+"), TENOR_API_KEY.to_owned(), pos);
+    let url = format!("https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif&pos={}", name.replace(" ", "+"), TENOR_API_KEY.read().unwrap(), pos);
     let response = client.get(url)
         .header("User-Agent", "actix-web/3.0")
         .send()     
@@ -100,4 +109,17 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         .await?;
 
     Ok(HttpResponse::Ok().content_type("application/json").body(response))
+}
+
+fn generate_ssl_builder(key: String, cert: String) -> Option<SslAcceptorBuilder> {
+    if key != "" && cert != "" {
+        let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+        builder
+            .set_private_key_file(key, SslFiletype::PEM)
+            .unwrap();
+        builder.set_certificate_chain_file(cert).unwrap();
+        Some(builder)
+    } else {
+        None
+    }
 }

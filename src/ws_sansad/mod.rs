@@ -58,7 +58,8 @@ impl Actor for WsSansad {
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        futures::executor::block_on(self.leave_kaksh()); // notify leaving
+        tokio::runtime::Runtime::new().unwrap()
+                    .block_on(self.leave_kaksh());// notify leaving
         Running::Stop
     }
 }
@@ -74,7 +75,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSansad {
             }, Ok(ws::Message::Pong(_)) => {
                 self.hb = Instant::now();
             }, Ok(ws::Message::Text(msg)) => {
-                futures::executor::block_on(self.parse_text_handle(msg));
+                tokio::runtime::Runtime::new().unwrap()
+                    .block_on(self.parse_text_handle(msg));
             }, Ok(ws::Message::Close(msg)) => {
                 ctx.close(msg);
                 ctx.stop();
@@ -105,7 +107,8 @@ impl WsSansad {
                 // heartbeat timed out
 
                 // stop actor
-                futures::executor::block_on(act.leave_kaksh()); // notify leaving
+                tokio::runtime::Runtime::new().unwrap()
+                    .block_on(act.leave_kaksh());
                 ctx.stop();                
                 // don't try to send a ping
                 return;
