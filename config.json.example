@@ -1,0 +1,7 @@
+{
+    "salt": "PUT SOME TEXT FOR SALT",
+    "tenor_key": "GET API KEY FROM https://tenor.com AND PASTE HERE",
+    "ssl_cert": "",
+    "ssl_key": "",
+    "logger_pattern": "%t [%a] %s %{User-Agent}i %r"
+}
