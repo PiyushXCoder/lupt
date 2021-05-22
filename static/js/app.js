@@ -42,15 +42,13 @@ socket.onopen = function(event) {
 socket.onerror = function(event) {
     $('#initerror').text('Warning: Failed to connect websocket! Refresh the '+
         'page and if still don\'t work upgrade Web Browser');
+    socket.close()
 }
 
 socket.onclose = function (e) {
-    if(actions.has_key('leave')) return;
-    actions.clear();
-    myinfo.kunjika = '';
-    myinfo.name = '';
-    State.login();
-    State.hideProgress();
+    Messages.pushStatus('Connection failed!\nRefresh page');
+    $('[name="error_msg"]').text('Connection failed! Refresh page');
+    $('[name="error_msg"]').removeClass('is-hidden');
 }
 
 // Listen for messages

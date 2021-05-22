@@ -35,9 +35,9 @@ const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(15);
 
 /// How often heartbeat pings are sent
-const SPECIAL_HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5 * 60);
+const SPECIAL_HEARTBEAT_INTERVAL: Duration = Duration::from_secs(3*60);
 /// How long before lack of client response causes a timeout
-const SPECIAL_CLIENT_TIMEOUT: Duration = Duration::from_secs(15 * 60);
+const SPECIAL_CLIENT_TIMEOUT: Duration = Duration::from_secs(15*60);
 
 pub struct WsSansad {
     kunjika: String,
@@ -66,7 +66,7 @@ impl Actor for WsSansad {
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
         tokio::runtime::Runtime::new().unwrap()
-                    .block_on(self.leave_kaksh());// notify leaving
+            .block_on(self.leave_kaksh());// notify leaving
         Running::Stop
     }
 }
@@ -143,6 +143,7 @@ impl WsSansad {
                 // don't try to send a ping
                 return;
             }
+            ctx.ping(b"");
         });
     }
 

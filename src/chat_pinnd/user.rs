@@ -282,19 +282,19 @@ impl Handler<ms::pind::LeaveVayakti> for ChatPinnd {
     fn handle(&mut self, msg: ms::pind::LeaveVayakti, _: &mut Self::Context) -> Self::Result {
         if let Some(kaksh_kunjika) = &msg.kaksh_kunjika {
             if let Some(kaksh) = self.kaksh.get_mut(kaksh_kunjika) {
-                let name = if let Some(i) = kaksh.loog.iter().position(|x| x.addr == msg.addr) {
-                    kaksh.loog.remove(i).name
-                } else { "".to_owned() };
-    
-                if kaksh.loog.len() == 0 {
-                    self.kaksh.remove(kaksh_kunjika);
-                } else {
+                if kaksh.loog.len() > 1 {
+                    let name = if let Some(i) = kaksh.loog.iter().position(|x| x.addr == msg.addr) {
+                        kaksh.loog.remove(i).name
+                    } else { "".to_owned() };
+
                     kaksh.loog.iter().for_each(|a| {
                         a.addr.do_send(ms::sansad::WsDisconnected {
                             kunjika: msg.kunjika.to_owned(),
                             name: name.to_owned()
                         })
                     });
+                } else {
+                    self.kaksh.remove(kaksh_kunjika);
                 }
             }
         }
