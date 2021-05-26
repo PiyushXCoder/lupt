@@ -12,19 +12,24 @@ let Images = class {
     }    
 
     static compressImage(file, qual, mime) {
-        new Compressor(file, {
+	var compressor = null;
+	var sendingTimeout = setTimeout(function() {
+                compressor.abort();
+            }, 5000);
+        compressor = new Compressor(file, {
             quality: qual,
             width: 320,
             mimeType: mime,
             success(result) {
+	        clearTimeout(sendingTimeout);
                 var reader = new FileReader();
                 reader.readAsDataURL(result); 
                 reader.onloadend = function() {
                     var base64data = reader.result;
-                    console.log('a')
                     if(base64data.length > 63488 && mime != 'image/jpeg') {
                         base64data = null;
                         result = null;
+                        compressor = null;
                         Images.compressImage(file, 0.7, 'image/jpeg');
                         return;
                     } else if(base64data.length > 63488 && mime == 'image/jpeg') {
@@ -42,6 +47,15 @@ let Images = class {
                     $('#progress_clip').addClass('is-hidden');
                 }
             },
+	    error(err) {
+	    	clearTimeout(sendingTimeout);
+		$('#progress_clip').addClass('is-hidden');
+		var prop = {
+		title: 'Warning',
+		text: "Failed to send image. Taking too long to compress.",
+		check: false
+		}; dialog(prop, function() {});
+	    },
         });
     }
 }
