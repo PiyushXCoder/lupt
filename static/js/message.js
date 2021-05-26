@@ -116,7 +116,13 @@ let Messages = class {
     }
 
     static pushImage(sender, src, msg_id) {
-        Messages.pushMessage(sender,[$('<img>', {src: src, width: 300})],msg_id);
+        var sp = $('<span>', {class: 'text-grey bd-light'}).append(' Loading Image... ');
+        var img = $('<img>', {src: src, width: 300});
+        img.on('load', function() {
+            sp.empty();
+            sp.append(img);
+        });
+        Messages.pushMessage(sender,[sp],msg_id);
     }
 
     static addReaction(sender, emoji, msg_id) {
