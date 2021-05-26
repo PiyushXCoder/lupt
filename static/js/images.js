@@ -5,6 +5,8 @@ let Images = class {
             if (!file) {
                 return;
             }
+            $('#progress_clip').removeClass('is-hidden');
+            $('#action_clip').addClass('is-hidden');
             Images.compressImage(file, 0.1, 'image/webp');
         });
     }    
@@ -19,6 +21,7 @@ let Images = class {
                 reader.readAsDataURL(result); 
                 reader.onloadend = function() {
                     var base64data = reader.result;
+                    console.log('a')
                     if(base64data.length > 63488 && mime != 'image/jpeg') {
                         base64data = null;
                         result = null;
@@ -32,12 +35,11 @@ let Images = class {
                         }; dialog(prop, function() {});
                         return;
                     }
-                    
                     socket.send(JSON.stringify({
                         cmd: "img",
                         src: base64data
                     }));
-                    $('#action_clip').addClass('is-hidden');
+                    $('#progress_clip').addClass('is-hidden');
                 }
             },
         });

@@ -261,6 +261,16 @@ input {
     background-color: var(--bg-secondary-color);
 }
 
+.clip-win.progress-clip {
+    width: 80px;
+    height: 80px;
+    border-radius:  10px;
+    bottom: unset;
+    top: 55px;
+    left: 50%;
+    margin-left: -40px;
+}
+
 .clip-win.reply-clip {
     width: calc(100% - 2*8px - 3*5px);
     max-width: 720px;

@@ -146,7 +146,10 @@
         </div>
     </div>
 
-    
+    <!-- Progress Clip -->
+    <div  id="progress_clip" class="clip-win progress-clip is-hidden">
+        <img src="img/loading.svg" class="svg-filter">
+    </div>
 
     <!-- Reply Clip -->
     <div  id="reply_clip" class="clip-win reply-clip is-hidden">
@@ -249,13 +252,13 @@
         </footer>
     </div>
     <script>
-        window.onerror = function(message, source, lineno, colno) {
+       /* window.onerror = function(message, source, lineno, colno) {
             var msg = 'Error: \n';
             msg += source + '\n';
             msg += lineno+':' + colno + '\n';
             msg += message + '\n';
             alert(msg);
-        }
+        } */
     </script>
     <script src="js/jquery-3.5.1.min.js"></script>
     <script src="js/taphold.js"></script>
