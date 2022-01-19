@@ -30,7 +30,7 @@ impl Handler<ms::pind::SendText> for ChatPinnd {
                     sender_kunjika: msg.kunjika.to_owned(),
                     text: msg.text.to_owned(),
                     reply: msg.reply.to_owned(),
-                    msg_id
+                    msg_id,
                 });
             });
         }
@@ -49,7 +49,7 @@ impl Handler<ms::pind::SendImage> for ChatPinnd {
                 c.addr.do_send(ms::sansad::WsImage {
                     sender_kunjika: msg.kunjika.to_owned(),
                     src: msg.src.to_owned(),
-                    msg_id
+                    msg_id,
                 });
             });
         }
@@ -66,7 +66,7 @@ impl Handler<ms::pind::SendReaction> for ChatPinnd {
                 c.addr.do_send(ms::sansad::WsReaction {
                     sender_kunjika: msg.kunjika.to_owned(),
                     emoji: msg.emoji.to_owned(),
-                    msg_id: msg.msg_id.to_owned()
+                    msg_id: msg.msg_id.to_owned(),
                 });
             });
         }
@@ -101,13 +101,12 @@ impl Handler<ms::pind::DeleteMsg> for ChatPinnd {
             kaksh.loog.iter().for_each(|c| {
                 c.addr.do_send(ms::sansad::WsDeleteMsg {
                     sender_kunjika: msg.kunjika.to_owned(),
-                    msg_id: msg.msg_id.clone()
+                    msg_id: msg.msg_id.clone(),
                 });
             });
         }
     }
 }
-
 
 /// send edit messages for everyone
 impl Handler<ms::pind::EditMsg> for ChatPinnd {
@@ -119,7 +118,7 @@ impl Handler<ms::pind::EditMsg> for ChatPinnd {
                 c.addr.do_send(ms::sansad::WsEditMsg {
                     sender_kunjika: msg.kunjika.to_owned(),
                     msg_id: msg.msg_id.to_owned(),
-                    text: msg.text.to_owned()
+                    text: msg.text.to_owned(),
                 });
             });
         }

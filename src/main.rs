@@ -15,7 +15,7 @@
 
 //! Lupt chat
 //! Chat Website to have group chat and stranger's chat both
-//! 
+//!
 //! Structure of how program work flow
 //!
 //!           |--> ws_sansad1 <----\
@@ -27,23 +27,24 @@
 #[macro_use]
 extern crate lazy_static;
 
-use actix_web::{
-    App, Error, HttpRequest, HttpResponse, HttpServer, middleware::Logger, web,
-    client::{Client, Connector}
-};
 use actix_files as fs;
+use actix_ratelimit::{MemoryStore, MemoryStoreActor, RateLimiter};
+use actix_web::{
+    client::{Client, Connector},
+    middleware::Logger,
+    web, App, Error, HttpRequest, HttpResponse, HttpServer,
+};
 use actix_web_actors::ws;
-use actix_ratelimit::{RateLimiter, MemoryStore, MemoryStoreActor};
 use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslConnector, SslFiletype, SslMethod};
-use ws_sansad::WsSansad;
 use std::sync::RwLock;
+use ws_sansad::WsSansad;
 
+mod broker_messages;
+mod chat_pinnd;
 mod config;
 mod errors;
-mod broker_messages;
-mod ws_sansad;
-mod chat_pinnd;
 mod validator;
+mod ws_sansad;
 
 lazy_static! {
     pub static ref SALT: RwLock<String> = RwLock::new(String::new());
@@ -67,45 +68,65 @@ async fn main() -> std::io::Result<()> {
     let port_x = config.port_x.clone();
     let port = config.port.clone();
     if ssl_builder.is_some() && config.port_x != "" {
-        redirect = Some(HttpServer::new(move || {
-            App::new()
-            .wrap(
-                RateLimiter::new(
-                MemoryStoreActor::from(MemoryStore::new().clone()).start())
-                    .with_interval(std::time::Duration::from_secs(60))
-                    .with_max_requests(100)
-            )
-            .wrap(actix_web_middleware_redirect_https::RedirectHTTPS::with_replacements(&[(port_x.clone(), port.clone())]))
-            .route("/", web::get().to(|| HttpResponse::Ok()
-                                            .content_type("text/plain")
-                                            .body("Always HTTPS on non-default ports!")))
-        })
-        .bind(format!("{}:{}", config.bind_address, config.port_x))?
-        .run());
+        redirect = Some(
+            HttpServer::new(move || {
+                App::new()
+                    .wrap(
+                        RateLimiter::new(
+                            MemoryStoreActor::from(MemoryStore::new().clone()).start(),
+                        )
+                        .with_interval(std::time::Duration::from_secs(60))
+                        .with_max_requests(100),
+                    )
+                    .wrap(
+                        actix_web_middleware_redirect_https::RedirectHTTPS::with_replacements(&[(
+                            port_x.clone(),
+                            port.clone(),
+                        )]),
+                    )
+                    .route(
+                        "/",
+                        web::get().to(|| {
+                            HttpResponse::Ok()
+                                .content_type("text/plain")
+                                .body("Always HTTPS on non-default ports!")
+                        }),
+                    )
+            })
+            .bind(format!("{}:{}", config.bind_address, config.port_x))?
+            .run(),
+        );
     }
 
     let server = HttpServer::new(move || {
         App::new()
-        .wrap(
-            RateLimiter::new(
-            MemoryStoreActor::from(MemoryStore::new().clone()).start())
-                .with_interval(std::time::Duration::from_secs(60))
-                .with_max_requests(200)
-        )
-        .wrap(Logger::new(&logger_pattern))
-        .service(web::resource("/ws/").route(web::get().to(ws_index)))
-        .service(web::resource("/gif/{pos}/").route(web::get().to(gif)))
-        .service(web::resource("/gif/{pos}/{query}").route(web::get().to(gif)))
-        .service(fs::Files::new("/", &static_path).index_file("index.html"))
+            .wrap(
+                RateLimiter::new(MemoryStoreActor::from(MemoryStore::new().clone()).start())
+                    .with_interval(std::time::Duration::from_secs(60))
+                    .with_max_requests(200),
+            )
+            .wrap(Logger::new(&logger_pattern))
+            .service(web::resource("/ws/").route(web::get().to(ws_index)))
+            .service(web::resource("/gif/{pos}/").route(web::get().to(gif)))
+            .service(web::resource("/gif/{pos}/{query}").route(web::get().to(gif)))
+            .service(fs::Files::new("/", &static_path).index_file("index.html"))
     });
-    
-    if ssl_builder.is_some() && config.port_x != "" { 
-        let srv = server.bind_openssl(format!("{}:{}", config.bind_address, config.port), ssl_builder.unwrap())?.run();
-        tokio::try_join!(redirect.unwrap(),  srv)?;
+
+    if ssl_builder.is_some() && config.port_x != "" {
+        let srv = server
+            .bind_openssl(
+                format!("{}:{}", config.bind_address, config.port),
+                ssl_builder.unwrap(),
+            )?
+            .run();
+        tokio::try_join!(redirect.unwrap(), srv)?;
     } else {
-        server.bind(format!("{}:{}", config.bind_address, config.port))?.run().await?;
+        server
+            .bind(format!("{}:{}", config.bind_address, config.port))?
+            .run()
+            .await?;
     }
-    
+
     Ok(())
 }
 
@@ -116,31 +137,38 @@ async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse
 async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
     let name = req.match_info().get("query").unwrap_or("");
     let mut pos = req.match_info().get("pos").unwrap_or("");
-    if pos == "_" { pos = "" }
+    if pos == "_" {
+        pos = ""
+    }
     let builder = SslConnector::builder(SslMethod::tls()).unwrap();
 
     let client = Client::builder()
         .connector(Connector::new().ssl(builder.build()).finish())
         .finish();
 
-    
-    let url = format!("https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif&pos={}", name.replace(" ", "+"), TENOR_API_KEY.read().unwrap(), pos);
-    let response = client.get(url)
+    let url = format!(
+        "https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif&pos={}",
+        name.replace(" ", "+"),
+        TENOR_API_KEY.read().unwrap(),
+        pos
+    );
+    let response = client
+        .get(url)
         .header("User-Agent", "actix-web/3.0")
-        .send()     
+        .send()
         .await?
         .body()
         .await?;
 
-    Ok(HttpResponse::Ok().content_type("application/json").body(response))
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(response))
 }
 
 fn generate_ssl_builder(key: String, cert: String) -> Option<SslAcceptorBuilder> {
     if key != "" && cert != "" {
         let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-        builder
-            .set_private_key_file(key, SslFiletype::PEM)
-            .unwrap();
+        builder.set_private_key_file(key, SslFiletype::PEM).unwrap();
         builder.set_certificate_chain_file(cert).unwrap();
         Some(builder)
     } else {

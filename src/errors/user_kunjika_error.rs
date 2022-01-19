@@ -15,8 +15,8 @@
     along with Lupt.  If not, see <https://www.gnu.org/licenses/>
 */
 
-use std::fmt;
 use std::error::Error;
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct AlreadyExistError;
@@ -27,6 +27,4 @@ impl fmt::Display for AlreadyExistError {
     }
 }
 
-impl Error for AlreadyExistError {
-    
-}
+impl Error for AlreadyExistError {}

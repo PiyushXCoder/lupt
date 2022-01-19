@@ -16,8 +16,8 @@
 */
 
 //! Messages to be sent between Actors
-use super::*;
 use super::util::Resp;
+use super::*;
 
 //################################################## For ChatPinnd ##################################################
 /// Request to change information of vayakti to list of vayakti im ChatPind
@@ -47,26 +47,26 @@ pub struct JoinRandom {
 #[rtype(result = "Resp")]
 pub struct JoinRandomNext {
     pub kaksh_kunjika: String,
-    pub kunjika: String
+    pub kunjika: String,
 }
 
 // Request to send list of users
 #[derive(Clone, Message)]
 #[rtype(result = "String")]
 pub struct List {
-    pub kaksh_kunjika: String
+    pub kaksh_kunjika: String,
 }
 
 /// Request to leave kaksh
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
-pub struct  LeaveVayakti {
+pub struct LeaveVayakti {
     pub kaksh_kunjika: Option<String>,
     pub kunjika: String,
-    pub addr: Addr<WsSansad>
+    pub addr: Addr<WsSansad>,
 }
 
-/// Request to send text 
+/// Request to send text
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct SendText {
@@ -76,13 +76,13 @@ pub struct SendText {
     pub reply: Option<String>,
 }
 
-/// Request to send image 
+/// Request to send image
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct SendImage {
     pub kaksh_kunjika: String,
     pub kunjika: String,
-    pub src: String
+    pub src: String,
 }
 /// Request to reaction
 #[derive(Clone, Message)]
@@ -91,7 +91,7 @@ pub struct SendReaction {
     pub kaksh_kunjika: String,
     pub kunjika: String,
     pub emoji: String,
-    pub msg_id: String
+    pub msg_id: String,
 }
 
 // Request to send status
@@ -100,7 +100,7 @@ pub struct SendReaction {
 pub struct SendStatus {
     pub kaksh_kunjika: String,
     pub kunjika: String,
-    pub status: String
+    pub status: String,
 }
 
 // Request to delete messages
@@ -109,7 +109,7 @@ pub struct SendStatus {
 pub struct DeleteMsg {
     pub kaksh_kunjika: String,
     pub kunjika: String,
-    pub msg_id: Vec<String>
+    pub msg_id: Vec<String>,
 }
 
 // Request to edit messages
@@ -119,5 +119,5 @@ pub struct EditMsg {
     pub kaksh_kunjika: String,
     pub kunjika: String,
     pub text: String,
-    pub msg_id: String
+    pub msg_id: String,
 }

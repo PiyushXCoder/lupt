@@ -15,9 +15,9 @@
     along with Lupt.  If not, see <https://www.gnu.org/licenses/>
 */
 
+use crate::ws_sansad::WsSansad;
 use actix::prelude::*;
 use dev::{MessageResponse, ResponseChannel};
-use crate::ws_sansad::WsSansad;
 
 pub mod pind;
 pub mod sansad;

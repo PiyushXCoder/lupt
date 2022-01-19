@@ -18,8 +18,8 @@
 //! Ws Sansad manage websocket of each client
 
 mod handlers;
-mod users;
 mod messages;
+mod users;
 
 use actix::prelude::*;
 use actix_broker::{Broker, SystemBroker};
@@ -27,7 +27,12 @@ use actix_web_actors::ws;
 use serde_json::{json, Value};
 use std::time::{Duration, Instant};
 
-use crate::{chat_pinnd::ChatPinnd, broker_messages as ms, broker_messages::util::Resp, validator::{Validation as vl, validate}};
+use crate::{
+    broker_messages as ms,
+    broker_messages::util::Resp,
+    chat_pinnd::ChatPinnd,
+    validator::{validate, Validation as vl},
+};
 
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
@@ -35,9 +40,9 @@ const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(15);
 
 /// How often heartbeat pings are sent
-const SPECIAL_HEARTBEAT_INTERVAL: Duration = Duration::from_secs(3*60);
+const SPECIAL_HEARTBEAT_INTERVAL: Duration = Duration::from_secs(3 * 60);
 /// How long before lack of client response causes a timeout
-const SPECIAL_CLIENT_TIMEOUT: Duration = Duration::from_secs(15*60);
+const SPECIAL_CLIENT_TIMEOUT: Duration = Duration::from_secs(15 * 60);
 
 pub struct WsSansad {
     kunjika: String,
@@ -51,13 +56,12 @@ pub struct WsSansad {
 enum Isthiti {
     None,
     Kaksh(String),
-    VraktigatWaitlist
+    VraktigatWaitlist,
 }
-
 
 impl Actor for WsSansad {
     type Context = ws::WebsocketContext<Self>;
-    
+
     fn started(&mut self, ctx: &mut Self::Context) {
         self.addr = Some(ctx.address().clone()); // own addr
         self.hb(ctx);
@@ -65,35 +69,38 @@ impl Actor for WsSansad {
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        tokio::runtime::Runtime::new().unwrap()
-            .block_on(self.leave_kaksh());// notify leaving
+        tokio::runtime::Runtime::new()
+            .unwrap()
+            .block_on(self.leave_kaksh()); // notify leaving
         Running::Stop
     }
 }
-
 
 /// manage stream
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSansad {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         match msg {
-            Ok(ws::Message::Ping(msg)) => { 
+            Ok(ws::Message::Ping(msg)) => {
                 ctx.ping(&msg);
                 self.hb = Instant::now();
-            }, Ok(ws::Message::Pong(_)) => {
+            }
+            Ok(ws::Message::Pong(_)) => {
                 self.hb = Instant::now();
-            }, Ok(ws::Message::Text(msg)) => {
+            }
+            Ok(ws::Message::Text(msg)) => {
                 self.special_hb = Instant::now();
-                tokio::runtime::Runtime::new().unwrap()
+                tokio::runtime::Runtime::new()
+                    .unwrap()
                     .block_on(self.parse_text_handle(msg));
-            }, Ok(ws::Message::Close(msg)) => {
+            }
+            Ok(ws::Message::Close(msg)) => {
                 ctx.close(msg);
                 ctx.stop();
             }
-            _ => ctx.stop()
+            _ => ctx.stop(),
         }
     }
 }
-
 
 impl WsSansad {
     pub fn new() -> Self {
@@ -102,7 +109,7 @@ impl WsSansad {
             isthiti: Isthiti::None,
             addr: None,
             hb: Instant::now(),
-            special_hb: Instant::now()
+            special_hb: Instant::now(),
         }
     }
 
@@ -116,9 +123,10 @@ impl WsSansad {
                 // heartbeat timed out
 
                 // stop actor
-                tokio::runtime::Runtime::new().unwrap()
+                tokio::runtime::Runtime::new()
+                    .unwrap()
                     .block_on(act.leave_kaksh());
-                ctx.stop();                
+                ctx.stop();
                 // don't try to send a ping
                 return;
             }
@@ -137,9 +145,10 @@ impl WsSansad {
                 // heartbeat timed out
 
                 // stop actor
-                tokio::runtime::Runtime::new().unwrap()
+                tokio::runtime::Runtime::new()
+                    .unwrap()
                     .block_on(act.leave_kaksh());
-                ctx.stop();                
+                ctx.stop();
                 // don't try to send a ping
                 return;
             }
@@ -151,18 +160,18 @@ impl WsSansad {
     async fn parse_text_handle(&mut self, msg: String) {
         if let Ok(val) = serde_json::from_str::<Value>(&msg) {
             match val.get("cmd").unwrap().as_str().unwrap() {
-                "join" => { self.join_kaksh(val).await },
-                "rand" => { self.join_random(val).await },
-                "randnext" => { self.join_random_next().await },
-                "text" => { self.send_text(val).await },
-                "img" => { self.send_image(val).await },
-                "react" => { self.send_reaction(val).await },
-                "status" => { self.send_status(val).await },
-                "del" => { self.delete_msg(val).await },
-                "edit" => { self.edit_msg(val).await },
-                "list" => { self.list().await },
-                "leave" => { self.leave_kaksh().await },
-                _ => ()
+                "join" => self.join_kaksh(val).await,
+                "rand" => self.join_random(val).await,
+                "randnext" => self.join_random_next().await,
+                "text" => self.send_text(val).await,
+                "img" => self.send_image(val).await,
+                "react" => self.send_reaction(val).await,
+                "status" => self.send_status(val).await,
+                "del" => self.delete_msg(val).await,
+                "edit" => self.edit_msg(val).await,
+                "list" => self.list().await,
+                "leave" => self.leave_kaksh().await,
+                _ => (),
             }
         }
     }
@@ -171,7 +180,7 @@ impl WsSansad {
     fn send_ok_response(&self, text: &str) {
         self.addr.clone().unwrap().do_send(ms::sansad::WsResponse {
             result: "Ok".to_owned(),
-            message: text.to_owned()
+            message: text.to_owned(),
         });
     }
 
@@ -179,7 +188,7 @@ impl WsSansad {
     fn send_err_response(&self, text: &str) {
         self.addr.clone().unwrap().do_send(ms::sansad::WsResponse {
             result: "Err".to_owned(),
-            message: text.to_owned()
+            message: text.to_owned(),
         });
     }
 }

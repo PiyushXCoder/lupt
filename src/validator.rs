@@ -71,7 +71,6 @@ fn no_hashtag(dat: &str, entry_name: &str) -> Option<String> {
     }
 }
 
-
 fn no_and_or_question(dat: &str, entry_name: &str) -> Option<String> {
     if dat.contains("&") {
         Some(format!("{} shounld not have &", entry_name))

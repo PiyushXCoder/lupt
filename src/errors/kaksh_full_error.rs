@@ -24,4 +24,3 @@ impl fmt::Display for KakshFullError {
         write!(f, "No space left for more user!")
     }
 }
-

@@ -23,7 +23,7 @@ impl WsSansad {
         // Check is already joined
         match self.isthiti {
             Isthiti::None => (),
-            _ => return
+            _ => return,
         }
 
         // is vayakti in watch list
@@ -33,76 +33,95 @@ impl WsSansad {
         }
 
         // Kunjika
-        let kunjika  = match val.get("kunjika") {
-            Some(val ) => val.as_str().unwrap().to_owned(),
+        let kunjika = match val.get("kunjika") {
+            Some(val) => val.as_str().unwrap().to_owned(),
             None => {
                 self.send_err_response("Invalid request");
                 return;
             }
         };
-        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag, vl::NoAndOrQuestion], &kunjika, "Kunjika") {
+        if let Some(val) = validate(
+            vec![
+                vl::NonEmpty,
+                vl::NoSpace,
+                vl::NoHashtag,
+                vl::NoAndOrQuestion,
+            ],
+            &kunjika,
+            "Kunjika",
+        ) {
             self.send_err_response(&val);
             return;
         }
         let mut m = sha1::Sha1::new();
-        m.update(format!("{}{}",kunjika,
-            crate::SALT.read().unwrap()).as_bytes());
+        m.update(format!("{}{}", kunjika, crate::SALT.read().unwrap()).as_bytes());
         let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
 
         // Name
-        let name  = match val.get("name") {
-            Some(val ) => val.as_str().unwrap().to_owned(),
+        let name = match val.get("name") {
+            Some(val) => val.as_str().unwrap().to_owned(),
             None => {
                 self.send_err_response("Invalid request");
                 return;
             }
         };
-        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoAndOrQuestion], &name, "Name") {
+        if let Some(val) = validate(vec![vl::NonEmpty, vl::NoAndOrQuestion], &name, "Name") {
             self.send_err_response(&val);
             return;
         }
 
         // Kaksh Kunjika
         let kaksh_kunjika = match val.get("kaksh_kunjika") {
-            Some(val ) => val.as_str().unwrap().to_owned(),
+            Some(val) => val.as_str().unwrap().to_owned(),
             None => {
                 self.send_err_response("Invalid request");
                 return;
             }
         };
-        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoGupt, vl::NoSpace, vl::NoAndOrQuestion], &kaksh_kunjika, "Kaksh Kunjika") {
+        if let Some(val) = validate(
+            vec![vl::NonEmpty, vl::NoGupt, vl::NoSpace, vl::NoAndOrQuestion],
+            &kaksh_kunjika,
+            "Kaksh Kunjika",
+        ) {
             self.send_err_response(&val);
             return;
-        } 
+        }
 
         // Length
         let length: Option<usize> = match val.get("length") {
-            Some(val) => match val.as_i64(){
-                    Some(val) => Some(val as usize),
-                    None => None
-                },
-            None => None
+            Some(val) => match val.as_i64() {
+                Some(val) => Some(val as usize),
+                None => None,
+            },
+            None => None,
         };
-       
-        // request
-        let result: Resp = ChatPinnd::from_registry().send(ms::pind::JoinKaksh {
-            kaksh_kunjika: kaksh_kunjika.to_owned(),
-            length,
-            addr: self.addr.clone().unwrap(),
-            kunjika: kunjika.to_owned(),
-            name
-        }).await.unwrap();
 
+        // request
+        let result: Resp = ChatPinnd::from_registry()
+            .send(ms::pind::JoinKaksh {
+                kaksh_kunjika: kaksh_kunjika.to_owned(),
+                length,
+                addr: self.addr.clone().unwrap(),
+                kunjika: kunjika.to_owned(),
+                name,
+            })
+            .await
+            .unwrap();
 
         match result {
-            Resp::Err(err) => self.send_err_response(&err), 
+            Resp::Err(err) => self.send_err_response(&err),
             Resp::Ok => {
                 self.isthiti = Isthiti::Kaksh(kaksh_kunjika);
-                self.addr.clone().unwrap().do_send(ms::sansad::WsKunjikaHash{ kunjika: kunjika.clone() });
+                self.addr
+                    .clone()
+                    .unwrap()
+                    .do_send(ms::sansad::WsKunjikaHash {
+                        kunjika: kunjika.clone(),
+                    });
                 self.kunjika = kunjika;
                 self.send_ok_response("joined")
             }
-            _ => ()
+            _ => (),
         }
     }
 
@@ -114,74 +133,94 @@ impl WsSansad {
             Isthiti::VraktigatWaitlist => {
                 self.send_ok_response("watchlist");
                 return;
-            }, Isthiti::Kaksh(_) => return
+            }
+            Isthiti::Kaksh(_) => return,
         }
 
         // Kunjika
-        let kunjika  = match val.get("kunjika") {
-            Some(val ) => val.as_str().unwrap().to_owned(),
+        let kunjika = match val.get("kunjika") {
+            Some(val) => val.as_str().unwrap().to_owned(),
             None => {
                 self.send_err_response("Invalid request");
                 return;
             }
         };
-        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoSpace, vl::NoHashtag, vl::NoAndOrQuestion], &kunjika, "Kunjika") {
+        if let Some(val) = validate(
+            vec![
+                vl::NonEmpty,
+                vl::NoSpace,
+                vl::NoHashtag,
+                vl::NoAndOrQuestion,
+            ],
+            &kunjika,
+            "Kunjika",
+        ) {
             self.send_err_response(&val);
             return;
         }
         let mut m = sha1::Sha1::new();
-        m.update(format!("{}{}",kunjika,
-            crate::SALT.read().unwrap()).as_bytes());
+        m.update(format!("{}{}", kunjika, crate::SALT.read().unwrap()).as_bytes());
         let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
 
         // Name
-        let name  = match val.get("name") {
-            Some(val ) => val.as_str().unwrap().to_owned(),
+        let name = match val.get("name") {
+            Some(val) => val.as_str().unwrap().to_owned(),
             None => {
                 self.send_err_response("Invalid request");
                 return;
             }
         };
-        if let Some(val ) = validate(vec![vl::NonEmpty, vl::NoAndOrQuestion], &name, "Name") {
+        if let Some(val) = validate(vec![vl::NonEmpty, vl::NoAndOrQuestion], &name, "Name") {
             self.send_err_response(&val);
             return;
         }
 
         // Tags
-        let tags  = match val.get("tags") {
-            Some(val ) => {
+        let tags = match val.get("tags") {
+            Some(val) => {
                 let mut v = Vec::new();
                 for x in val.as_str().unwrap().split_ascii_whitespace() {
                     v.push(x.to_owned());
                 }
                 v
-            },
-            None => {
-                Vec::new()
             }
+            None => Vec::new(),
         };
 
         // request
-        let result: Resp = ChatPinnd::from_registry().send(ms::pind::JoinRandom{
-            addr: self.addr.clone().unwrap(),
-            kunjika: kunjika.to_owned(),
-            name,
-            tags
-        }).await.unwrap();
+        let result: Resp = ChatPinnd::from_registry()
+            .send(ms::pind::JoinRandom {
+                addr: self.addr.clone().unwrap(),
+                kunjika: kunjika.to_owned(),
+                name,
+                tags,
+            })
+            .await
+            .unwrap();
 
         match result {
-            Resp::Err(err) => self.send_err_response(&err), 
-            Resp::Ok =>  {
-                self.addr.clone().unwrap().do_send(ms::sansad::WsKunjikaHash{ kunjika: kunjika.clone() });
+            Resp::Err(err) => self.send_err_response(&err),
+            Resp::Ok => {
+                self.addr
+                    .clone()
+                    .unwrap()
+                    .do_send(ms::sansad::WsKunjikaHash {
+                        kunjika: kunjika.clone(),
+                    });
                 self.kunjika = kunjika;
-            },
+            }
             Resp::None => {
-                self.addr.clone().unwrap().do_send(ms::sansad::WsResponse{
-                    result: "watch".to_owned() ,
-                    message: "Watchlist".to_owned()
-                 });
+                self.addr.clone().unwrap().do_send(ms::sansad::WsResponse {
+                    result: "watch".to_owned(),
+                    message: "Watchlist".to_owned(),
+                });
                 self.isthiti = Isthiti::VraktigatWaitlist;
-                self.addr.clone().unwrap().do_send(ms::sansad::WsKunjikaHash{ kunjika: kunjika.clone() });
+                self.addr
+                    .clone()
+                    .unwrap()
+                    .do_send(ms::sansad::WsKunjikaHash {
+                        kunjika: kunjika.clone(),
+                    });
                 self.kunjika = kunjika
             }
         }
@@ -194,7 +233,7 @@ impl WsSansad {
             Isthiti::VraktigatWaitlist => {
                 self.send_ok_response("watchlist");
                 return;
-            },
+            }
             Isthiti::Kaksh(kaksh_kunjika) => kaksh_kunjika,
             Isthiti::None => {
                 self.send_ok_response("Not allowed");
@@ -203,22 +242,25 @@ impl WsSansad {
         };
 
         // request
-        let result: Resp = ChatPinnd::from_registry().send(ms::pind::JoinRandomNext {
-            kunjika: self.kunjika.to_owned(),
-            kaksh_kunjika: kaksh_kunjika.to_owned(),
-        }).await.unwrap();
+        let result: Resp = ChatPinnd::from_registry()
+            .send(ms::pind::JoinRandomNext {
+                kunjika: self.kunjika.to_owned(),
+                kaksh_kunjika: kaksh_kunjika.to_owned(),
+            })
+            .await
+            .unwrap();
 
         match result {
-            Resp::Err(err) => self.send_err_response(&err), 
+            Resp::Err(err) => self.send_err_response(&err),
             Resp::None => {
-                self.addr.clone().unwrap().do_send(ms::sansad::WsResponse{
-                   result: "watch".to_owned() ,
-                   message: "Watchlist".to_owned()
+                self.addr.clone().unwrap().do_send(ms::sansad::WsResponse {
+                    result: "watch".to_owned(),
+                    message: "Watchlist".to_owned(),
                 });
                 self.isthiti = Isthiti::VraktigatWaitlist;
                 self.kunjika = self.kunjika.to_owned()
             }
-            _ => ()
+            _ => (),
         }
     }
 
@@ -233,14 +275,18 @@ impl WsSansad {
         // check if connected to any kaksh
         match &self.isthiti {
             Isthiti::Kaksh(kunjika) => {
-                let json: String = ChatPinnd::from_registry().send(ms::pind::List {
-                    kaksh_kunjika: kunjika.to_owned()
-                }).await.unwrap();
+                let json: String = ChatPinnd::from_registry()
+                    .send(ms::pind::List {
+                        kaksh_kunjika: kunjika.to_owned(),
+                    })
+                    .await
+                    .unwrap();
 
-                self.addr.clone().unwrap().do_send(ms::sansad::WsList {
-                    json
-                })
-            },
+                self.addr
+                    .clone()
+                    .unwrap()
+                    .do_send(ms::sansad::WsList { json })
+            }
             _ => {
                 self.send_err_response("Kaksh not connected");
                 return;
@@ -252,16 +298,16 @@ impl WsSansad {
     pub async fn leave_kaksh(&mut self) {
         let kaksh_kunjika = match &self.isthiti {
             Isthiti::Kaksh(val) => Some(val.to_owned()),
-            _ => None
+            _ => None,
         };
-        
+
         Broker::<SystemBroker>::issue_async(ms::pind::LeaveVayakti {
             kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
-            addr: self.addr.clone().unwrap()
+            addr: self.addr.clone().unwrap(),
         });
-    
-        self.isthiti = Isthiti::None;        
+
+        self.isthiti = Isthiti::None;
         self.send_ok_response("left");
     }
 }

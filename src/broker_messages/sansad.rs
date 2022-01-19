@@ -25,7 +25,7 @@ use super::*;
 #[rtype(result = "()")]
 pub struct WsConnected {
     pub name: String,
-    pub kunjika: String
+    pub kunjika: String,
 }
 
 // Got connected to random vayakti
@@ -34,21 +34,21 @@ pub struct WsConnected {
 pub struct WsConnectedRandom {
     pub name: String,
     pub kunjika: String,
-    pub kaksh_kunjika: String
+    pub kaksh_kunjika: String,
 }
 
 // Request to send hash calculated of kunjika
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsKunjikaHash {
-    pub kunjika: String
+    pub kunjika: String,
 }
 
 // Request to send list
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsList {
-    pub json: String
+    pub json: String,
 }
 
 // Notify someone disconnected
@@ -56,9 +56,8 @@ pub struct WsList {
 #[rtype(result = "()")]
 pub struct WsDisconnected {
     pub kunjika: String,
-    pub name: String
+    pub name: String,
 }
-
 
 // Request to send Text
 #[derive(Clone, Message)]
@@ -67,7 +66,7 @@ pub struct WsText {
     pub text: String,
     pub reply: Option<String>,
     pub sender_kunjika: String,
-    pub msg_id: u128
+    pub msg_id: u128,
 }
 
 // Request to send Image
@@ -76,7 +75,7 @@ pub struct WsText {
 pub struct WsImage {
     pub src: String,
     pub sender_kunjika: String,
-    pub msg_id: u128
+    pub msg_id: u128,
 }
 // Request to send Reaction
 #[derive(Clone, Message)]
@@ -84,16 +83,15 @@ pub struct WsImage {
 pub struct WsReaction {
     pub emoji: String,
     pub sender_kunjika: String,
-    pub msg_id: String
+    pub msg_id: String,
 }
-
 
 // Request to send Status
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct WsStatus {
     pub status: String,
-    pub sender_kunjika: String
+    pub sender_kunjika: String,
 }
 
 // Request to delete messages
@@ -101,7 +99,7 @@ pub struct WsStatus {
 #[rtype(result = "()")]
 pub struct WsDeleteMsg {
     pub msg_id: Vec<String>,
-    pub sender_kunjika: String
+    pub sender_kunjika: String,
 }
 
 // Request to edit messages
@@ -110,7 +108,7 @@ pub struct WsDeleteMsg {
 pub struct WsEditMsg {
     pub text: String,
     pub sender_kunjika: String,
-    pub msg_id: String
+    pub msg_id: String,
 }
 
 // Give response message
@@ -118,5 +116,5 @@ pub struct WsEditMsg {
 #[rtype(result = "()")]
 pub struct WsResponse {
     pub result: String,
-    pub message: String
+    pub message: String,
 }

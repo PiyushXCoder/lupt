@@ -18,7 +18,6 @@
 use super::*;
 
 impl WsSansad {
-
     /// send text to vayakti in kaksh
     pub async fn send_text(&mut self, val: Value) {
         // check if vayakti exist
@@ -43,17 +42,19 @@ impl WsSansad {
                 self.send_err_response("Invalid request");
                 return;
             }
-        }.as_str().unwrap().to_owned();
+        }
+        .as_str()
+        .unwrap()
+        .to_owned();
 
         let reply: Option<String> = match val.get("reply") {
             Some(val) => Some(val.as_str().unwrap().to_owned()),
-            None => None
+            None => None,
         };
 
         let kaksh_kunjika = match &self.isthiti {
-            Isthiti::Kaksh(kaksh_kunjika) => {
-                kaksh_kunjika.to_owned()
-            }, _ => {
+            Isthiti::Kaksh(kaksh_kunjika) => kaksh_kunjika.to_owned(),
+            _ => {
                 return;
             }
         };
@@ -61,10 +62,9 @@ impl WsSansad {
             kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
             text,
-            reply
+            reply,
         });
     }
-
 
     /// send image to vayakti in kaksh
     pub async fn send_image(&mut self, val: Value) {
@@ -90,22 +90,23 @@ impl WsSansad {
                 self.send_err_response("Invalid request");
                 return;
             }
-        }.as_str().unwrap().to_owned();
+        }
+        .as_str()
+        .unwrap()
+        .to_owned();
 
         let kaksh_kunjika = match &self.isthiti {
-            Isthiti::Kaksh(kaksh_kunjika) => {
-                kaksh_kunjika.to_owned()
-            }, _ => {
+            Isthiti::Kaksh(kaksh_kunjika) => kaksh_kunjika.to_owned(),
+            _ => {
                 return;
             }
         };
         Broker::<SystemBroker>::issue_async(ms::pind::SendImage {
             kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
-            src
+            src,
         });
     }
-
 
     /// send reaction to vayakti in kaksh
     pub async fn send_reaction(&mut self, val: Value) {
@@ -131,7 +132,10 @@ impl WsSansad {
                 self.send_err_response("Invalid request");
                 return;
             }
-        }.as_str().unwrap().to_owned();
+        }
+        .as_str()
+        .unwrap()
+        .to_owned();
 
         // sent emoji
         let msg_id = match val.get("msg_id") {
@@ -140,12 +144,14 @@ impl WsSansad {
                 self.send_err_response("Invalid request");
                 return;
             }
-        }.as_str().unwrap().to_owned();
+        }
+        .as_str()
+        .unwrap()
+        .to_owned();
 
         let kaksh_kunjika = match &self.isthiti {
-            Isthiti::Kaksh(kaksh_kunjika) => {
-                kaksh_kunjika.to_owned()
-            }, _ => {
+            Isthiti::Kaksh(kaksh_kunjika) => kaksh_kunjika.to_owned(),
+            _ => {
                 return;
             }
         };
@@ -153,7 +159,7 @@ impl WsSansad {
             kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
             emoji,
-            msg_id
+            msg_id,
         });
     }
 
@@ -181,18 +187,20 @@ impl WsSansad {
                 self.send_err_response("Invalid request");
                 return;
             }
-        }.as_str().unwrap().to_owned();
+        }
+        .as_str()
+        .unwrap()
+        .to_owned();
         let kaksh_kunjika = match &self.isthiti {
-            Isthiti::Kaksh(kaksh_kunjika) => {
-                kaksh_kunjika.to_owned()
-            }, _ => {
+            Isthiti::Kaksh(kaksh_kunjika) => kaksh_kunjika.to_owned(),
+            _ => {
                 return;
             }
         };
         Broker::<SystemBroker>::issue_async(ms::pind::SendStatus {
             kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
-            status
+            status,
         });
     }
 
@@ -222,17 +230,18 @@ impl WsSansad {
                 self.send_err_response("Invalid request");
                 return;
             }
-        }.as_array().unwrap();
-        
+        }
+        .as_array()
+        .unwrap();
+
         for id in ids {
             msg_id.push(id.as_str().unwrap().to_owned());
         }
         drop(ids);
 
         let kaksh_kunjika = match &self.isthiti {
-            Isthiti::Kaksh(kaksh_kunjika) => {
-                kaksh_kunjika.to_owned()
-            }, _ => {
+            Isthiti::Kaksh(kaksh_kunjika) => kaksh_kunjika.to_owned(),
+            _ => {
                 return;
             }
         };
@@ -240,7 +249,7 @@ impl WsSansad {
         Broker::<SystemBroker>::issue_async(ms::pind::DeleteMsg {
             kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
-            msg_id
+            msg_id,
         });
     }
 
@@ -268,7 +277,10 @@ impl WsSansad {
                 self.send_err_response("Invalid request");
                 return;
             }
-        }.as_str().unwrap().to_owned();
+        }
+        .as_str()
+        .unwrap()
+        .to_owned();
 
         // msg_id
         let msg_id = match val.get("msg_id") {
@@ -277,12 +289,14 @@ impl WsSansad {
                 self.send_err_response("Invalid request");
                 return;
             }
-        }.as_str().unwrap().to_owned();
+        }
+        .as_str()
+        .unwrap()
+        .to_owned();
 
         let kaksh_kunjika = match &self.isthiti {
-            Isthiti::Kaksh(kaksh_kunjika) => {
-                kaksh_kunjika.to_owned()
-            }, _ => {
+            Isthiti::Kaksh(kaksh_kunjika) => kaksh_kunjika.to_owned(),
+            _ => {
                 return;
             }
         };
@@ -290,7 +304,7 @@ impl WsSansad {
             kaksh_kunjika,
             kunjika: self.kunjika.to_owned(),
             text,
-            msg_id
+            msg_id,
         });
     }
 }

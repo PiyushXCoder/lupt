@@ -23,7 +23,7 @@ pub struct Config {
     pub bind_address: String,
     pub port: String,
     pub port_x: String,
-    pub config: ConfigFile
+    pub config: ConfigFile,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -32,7 +32,7 @@ pub struct ConfigFile {
     pub tenor_key: String,
     pub ssl_cert: String,
     pub ssl_key: String,
-    pub logger_pattern: String
+    pub logger_pattern: String,
 }
 
 impl Config {
@@ -41,47 +41,58 @@ impl Config {
             .version(env!("CARGO_PKG_VERSION"))
             .author(env!("CARGO_PKG_AUTHORS"))
             .about(env!("CARGO_PKG_DESCRIPTION"))
-            .arg(Arg::with_name("bind_address")
-                .short("a")
-                .long("bind_address")
-                .value_name("ADDRESS")
-                .help("Address to bind for server")
-                .required(true)
-                .takes_value(true))
-            .arg(Arg::with_name("port")
-                .short("p")
-                .long("port")
-                .value_name("PORT")
-                .help("Port to bind for server")
-                .required(true)
-                .takes_value(true))
-            .arg(Arg::with_name("port_x")
-                .short("x")
-                .long("port_x")
-                .value_name("PORT")
-                .help("Port to bind for http if ssl is enabled to redirect to https")
-                .required(false)
-                .takes_value(true))
-            .arg(Arg::with_name("static_path")
-                .short("s")
-                .long("static_path")
-                .value_name("DIR")
-                .help("Path of directory with index.html")
-                .required(true)
-                .takes_value(true))
-            .arg(Arg::with_name("config")
-                .short("c")
-                .long("config")
-                .value_name("FILE")
-                .help("Path to config file")
-                .required(true)
-                .takes_value(true))
+            .arg(
+                Arg::with_name("bind_address")
+                    .short("a")
+                    .long("bind_address")
+                    .value_name("ADDRESS")
+                    .help("Address to bind for server")
+                    .required(true)
+                    .takes_value(true),
+            )
+            .arg(
+                Arg::with_name("port")
+                    .short("p")
+                    .long("port")
+                    .value_name("PORT")
+                    .help("Port to bind for server")
+                    .required(true)
+                    .takes_value(true),
+            )
+            .arg(
+                Arg::with_name("port_x")
+                    .short("x")
+                    .long("port_x")
+                    .value_name("PORT")
+                    .help("Port to bind for http if ssl is enabled to redirect to https")
+                    .required(false)
+                    .takes_value(true),
+            )
+            .arg(
+                Arg::with_name("static_path")
+                    .short("s")
+                    .long("static_path")
+                    .value_name("DIR")
+                    .help("Path of directory with index.html")
+                    .required(true)
+                    .takes_value(true),
+            )
+            .arg(
+                Arg::with_name("config")
+                    .short("c")
+                    .long("config")
+                    .value_name("FILE")
+                    .help("Path to config file")
+                    .required(true)
+                    .takes_value(true),
+            )
             .get_matches();
 
-            let conf = matches.value_of("config").unwrap().to_owned();
-            let conf = std::fs::read_to_string(conf).expect("Failed to read config");
-            
-            let config = serde_json::from_str::<ConfigFile>(&conf).expect(r"
+        let conf = matches.value_of("config").unwrap().to_owned();
+        let conf = std::fs::read_to_string(conf).expect("Failed to read config");
+
+        let config = serde_json::from_str::<ConfigFile>(&conf).expect(
+            r"
 Config File is corrupt.
 
 Config file must have following fields
@@ -90,15 +101,15 @@ Config file must have following fields
     - ssl_cert: Path to certificate of ssl
     - ssl_key: Path to private key of ssl
     - logger_pattern: Pattern to make log according to Actix Logger
-");
-
+",
+        );
 
         Config {
             static_path: matches.value_of("static_path").unwrap().to_owned(),
             bind_address: matches.value_of("bind_address").unwrap().to_owned(),
             port: matches.value_of("port").unwrap().to_owned(),
             port_x: matches.value_of("port_x").unwrap_or("").to_owned(),
-            config
+            config,
         }
     }
 }

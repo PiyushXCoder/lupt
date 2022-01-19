@@ -21,8 +21,8 @@ use super::*;
 #[derive(Debug)]
 pub enum Resp {
     Ok,
-    Err(String), 
-    None
+    Err(String),
+    None,
 }
 
 impl<A, M> MessageResponse<A, M> for Resp

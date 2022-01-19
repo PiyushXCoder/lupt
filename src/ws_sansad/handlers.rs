@@ -17,7 +17,6 @@
 
 use super::*;
 
-
 /// notify someone got connected
 impl Handler<ms::sansad::WsConnected> for WsSansad {
     type Result = ();
@@ -34,7 +33,11 @@ impl Handler<ms::sansad::WsConnected> for WsSansad {
 /// notify got connected as random person
 impl Handler<ms::sansad::WsConnectedRandom> for WsSansad {
     type Result = ();
-    fn handle(&mut self, msg: ms::sansad::WsConnectedRandom, ctx: &mut Self::Context) -> Self::Result {
+    fn handle(
+        &mut self,
+        msg: ms::sansad::WsConnectedRandom,
+        ctx: &mut Self::Context,
+    ) -> Self::Result {
         self.isthiti = Isthiti::Kaksh(msg.kaksh_kunjika);
         let json = json!({
             "cmd": "random",
@@ -177,4 +180,3 @@ impl Handler<ms::sansad::WsResponse> for WsSansad {
         ctx.text(json.to_string());
     }
 }
-
