@@ -47,8 +47,8 @@ mod validator;
 mod ws_sansad;
 
 lazy_static! {
-    pub static ref SALT: RwLock<String> = RwLock::new(String::new());
-    pub static ref TENOR_API_KEY: RwLock<String> = RwLock::new(String::new());
+    pub static ref SALT: RwLock<String> = RwLock::new("".to_owned());
+    pub static ref TENOR_API_KEY: RwLock<Option<String>> = RwLock::new(None);
 }
 
 #[actix_web::main]
@@ -58,14 +58,22 @@ async fn main() -> std::io::Result<()> {
     let (config, config_file) = config::generate();
 
     *SALT.write().unwrap() = config_file.salt;
-    *TENOR_API_KEY.write().unwrap() = config_file.tenor_key;
 
-    let ssl_builder = generate_ssl_builder(config_file.ssl_key, config_file.ssl_cert);
+    if let Some(key) = config_file.tenor_key {
+        *TENOR_API_KEY.write().unwrap() = Some(key);
+    }
+
+    let ssl_builder = if config_file.ssl_key.is_some() && config_file.ssl_cert.is_some() {
+        generate_ssl_builder(config_file.ssl_key.unwrap(), config_file.ssl_cert.unwrap())
+    } else {
+        None
+    };
+
     let logger_pattern = config_file.logger_pattern;
     let static_path = config.static_path;
 
     let server = HttpServer::new(move || {
-        App::new()
+        let app = App::new()
             .wrap(
                 RateLimiter::new(MemoryStoreActor::from(MemoryStore::new().clone()).start())
                     .with_interval(std::time::Duration::from_secs(60))
@@ -73,12 +81,22 @@ async fn main() -> std::io::Result<()> {
             )
             .wrap(Logger::new(&logger_pattern))
             .service(web::resource("/ws/").route(web::get().to(ws_index)))
-            .service(web::resource("/gif/{pos}/").route(web::get().to(gif)))
-            .service(web::resource("/gif/{pos}/{query}").route(web::get().to(gif)))
-            .service(fs::Files::new("/", &static_path).index_file("index.html"))
+            .service(fs::Files::new("/", &static_path).index_file("index.html"));
+
+        if TENOR_API_KEY.read().unwrap().is_some() {
+            let app = app
+                .service(web::resource("/gif/{pos}/").route(web::get().to(gif)))
+                .service(web::resource("/gif/{pos}/{query}").route(web::get().to(gif)));
+
+            return app;
+        }
+
+        app
     });
 
+    println!("{} {}", ssl_builder.is_some(), config.port_ssl.is_some());
     if ssl_builder.is_some() && config.port_ssl.is_some() {
+        println!("got in here");
         let port = config.port.clone();
         let port_ssl = config.port_ssl.clone().unwrap();
         let redirect_server = HttpServer::new(move || {
@@ -139,10 +157,16 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         .connector(Connector::new().ssl(builder.build()).finish())
         .finish();
 
+    let tenor_key = TENOR_API_KEY.read().unwrap();
+    let key = match &*tenor_key {
+        Some(a) => a.as_str(),
+        None => "",
+    };
+
     let url = format!(
         "https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif&pos={}",
         name.replace(" ", "+"),
-        TENOR_API_KEY.read().unwrap(),
+        key,
         pos
     );
     let response = client

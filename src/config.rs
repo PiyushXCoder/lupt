@@ -51,9 +51,9 @@ pub(crate) struct Config {
 #[derive(Serialize, Deserialize)]
 pub(crate) struct ConfigFile {
     pub(crate) salt: String,
-    pub(crate) tenor_key: String,
-    pub(crate) ssl_cert: String,
-    pub(crate) ssl_key: String,
+    pub(crate) tenor_key: Option<String>,
+    pub(crate) ssl_cert: Option<String>,
+    pub(crate) ssl_key: Option<String>,
     pub(crate) logger_pattern: String,
 }
 
