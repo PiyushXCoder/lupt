@@ -16,6 +16,7 @@
 */
 
 use super::*;
+use sha2::{Digest, Sha224};
 
 impl WsSansad {
     /// Request to join to kaksh
@@ -53,9 +54,9 @@ impl WsSansad {
             self.send_err_response(&val);
             return;
         }
-        let mut m = sha1::Sha1::new();
-        m.update(format!("{}{}", kunjika, crate::SALT.read().unwrap()).as_bytes());
-        let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
+        let mut hasher = Sha224::new();
+        hasher.update(format!("{}{}", kunjika, crate::SALT.read().unwrap()).as_bytes());
+        let kunjika = base64::encode(hasher.finalize())[..8].to_owned();
 
         // Name
         let name = match val.get("name") {
@@ -158,9 +159,9 @@ impl WsSansad {
             self.send_err_response(&val);
             return;
         }
-        let mut m = sha1::Sha1::new();
-        m.update(format!("{}{}", kunjika, crate::SALT.read().unwrap()).as_bytes());
-        let kunjika = base64::encode(m.digest().bytes())[..8].to_owned();
+        let mut hasher = Sha224::new();
+        hasher.update(format!("{}{}", kunjika, crate::SALT.read().unwrap()).as_bytes());
+        let kunjika = base64::encode(hasher.finalize())[..8].to_owned();
 
         // Name
         let name = match val.get("name") {

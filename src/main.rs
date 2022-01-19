@@ -55,48 +55,14 @@ lazy_static! {
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
-    let config = config::Config::new();
+    let (config, config_file) = config::generate();
 
-    *SALT.write().unwrap() = config.config.salt;
-    *TENOR_API_KEY.write().unwrap() = config.config.tenor_key;
+    *SALT.write().unwrap() = config_file.salt;
+    *TENOR_API_KEY.write().unwrap() = config_file.tenor_key;
 
-    let ssl_builder = generate_ssl_builder(config.config.ssl_key, config.config.ssl_cert);
-    let logger_pattern = config.config.logger_pattern;
+    let ssl_builder = generate_ssl_builder(config_file.ssl_key, config_file.ssl_cert);
+    let logger_pattern = config_file.logger_pattern;
     let static_path = config.static_path;
-
-    let mut redirect = None;
-    let port_x = config.port_x.clone();
-    let port = config.port.clone();
-    if ssl_builder.is_some() && config.port_x != "" {
-        redirect = Some(
-            HttpServer::new(move || {
-                App::new()
-                    .wrap(
-                        RateLimiter::new(
-                            MemoryStoreActor::from(MemoryStore::new().clone()).start(),
-                        )
-                        .with_interval(std::time::Duration::from_secs(60))
-                        .with_max_requests(100),
-                    )
-                    .wrap(
-                        actix_web_middleware_redirect_https::RedirectHTTPS::with_replacements(&[(
-                            port_x.clone(),
-                            port.clone(),
-                        )]),
-                    )
-                    .route(
-                        "/",
-                        web::get().to(|| {
-                            HttpResponse::Ok()
-                                .content_type("text/plain")
-                                .body("Always HTTPS on non-default ports!")
-                        }),
-                    )
-            })
-            .bind(format!("{}:{}", config.bind_address, config.port_x))?
-            .run(),
-        );
-    }
 
     let server = HttpServer::new(move || {
         App::new()
@@ -112,21 +78,48 @@ async fn main() -> std::io::Result<()> {
             .service(fs::Files::new("/", &static_path).index_file("index.html"))
     });
 
-    if ssl_builder.is_some() && config.port_x != "" {
-        let srv = server
+    if ssl_builder.is_some() && config.port_ssl.is_some() {
+        let port = config.port.clone();
+        let port_ssl = config.port_ssl.clone().unwrap();
+        let redirect_server = HttpServer::new(move || {
+            App::new()
+                .wrap(
+                    RateLimiter::new(MemoryStoreActor::from(MemoryStore::new().clone()).start())
+                        .with_interval(std::time::Duration::from_secs(60))
+                        .with_max_requests(100),
+                )
+                .wrap(
+                    actix_web_middleware_redirect_https::RedirectHTTPS::with_replacements(&[(
+                        port.clone(),
+                        port_ssl.clone(),
+                    )]),
+                )
+                .route(
+                    "/",
+                    web::get().to(|| {
+                        HttpResponse::Ok()
+                            .content_type("text/plain")
+                            .body("Always HTTPS on non-default ports!")
+                    }),
+                )
+        })
+        .bind(format!("{}:{}", config.bind_address, config.port))?
+        .run();
+
+        let server = server
             .bind_openssl(
-                format!("{}:{}", config.bind_address, config.port),
+                format!("{}:{}", config.bind_address, config.port_ssl.unwrap()),
                 ssl_builder.unwrap(),
             )?
             .run();
-        tokio::try_join!(redirect.unwrap(), srv)?;
+
+        tokio::try_join!(redirect_server, server)?;
     } else {
         server
             .bind(format!("{}:{}", config.bind_address, config.port))?
             .run()
             .await?;
     }
-
     Ok(())
 }
 
