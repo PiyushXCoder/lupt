@@ -94,9 +94,7 @@ async fn main() -> std::io::Result<()> {
         app
     });
 
-    println!("{} {}", ssl_builder.is_some(), config.port_ssl.is_some());
     if ssl_builder.is_some() && config.port_ssl.is_some() {
-        println!("got in here");
         let port = config.port.clone();
         let port_ssl = config.port_ssl.clone().unwrap();
         let redirect_server = HttpServer::new(move || {
