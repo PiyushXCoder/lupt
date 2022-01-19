@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+  lupt:
+    container_name: lupt-server
+    build: .
+    ports:
+      - "8080:8080"
