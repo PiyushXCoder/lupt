@@ -73,24 +73,22 @@ async fn main() -> std::io::Result<()> {
     let static_path = config.static_path;
 
     let server = HttpServer::new(move || {
-        let app = App::new()
+        let mut app = App::new()
             .wrap(
                 RateLimiter::new(MemoryStoreActor::from(MemoryStore::new().clone()).start())
                     .with_interval(std::time::Duration::from_secs(60))
                     .with_max_requests(200),
             )
             .wrap(Logger::new(&logger_pattern))
-            .service(web::resource("/ws/").route(web::get().to(ws_index)))
-            .service(fs::Files::new("/", &static_path).index_file("index.html"));
+            .service(web::resource("/ws/").route(web::get().to(ws_index)));
 
         if TENOR_API_KEY.read().unwrap().is_some() {
-            let app = app
+            app = app
                 .service(web::resource("/gif/{pos}/").route(web::get().to(gif)))
                 .service(web::resource("/gif/{pos}/{query}").route(web::get().to(gif)));
-
-            return app;
         }
 
+        app = app.service(fs::Files::new("/", &static_path).index_file("index.html"));
         app
     });
 
