@@ -1,8 +1,12 @@
-version: '2'
 
+version: "3.2"
 services:
-  lupt:
-    container_name: lupt-server
+  web:
+    container_name: lupt-chat
     build: .
     ports:
-      - "8080:8080"
+      - "8080:8081"
+    volumes:
+      - type: bind
+        source: ./etc
+        target: /app/lupt/etc
