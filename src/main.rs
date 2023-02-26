@@ -156,15 +156,24 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
     let tenor_key = TENOR_API_KEY.read().unwrap();
     let key = match &*tenor_key {
         Some(a) => a.as_str(),
-        None => "",
+        None => panic!("No api key!"),
     };
 
-    let url = format!(
-        "https://g.tenor.com/v1/search?q={}&key={}&limit=20&media_filter=tinygif&pos={}",
+    let url = if name != "" {
+        format!(
+        "https://tenor.googleapis.com/v2/search?q={}&key={}&limit=20&media_filter=tinygif&pos={}",
         name.replace(" ", "+"),
         key,
         pos
-    );
+        )
+    } else {
+        format!(
+        "https://tenor.googleapis.com/v2/featured?key={}&limit=20&media_filter=tinygif&pos={}",
+        key,
+        pos
+        )
+    };
+
     let response = client
         .get(url)
         .header("User-Agent", "actix-web/3.0")

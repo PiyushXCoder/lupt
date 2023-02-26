@@ -24,7 +24,7 @@ if(!('WebSocket' in window || 'MozWebSocket' in window)) {
 socket.onopen = function(event) {
     var params = window.location.search;
     params = params.substr(1,params.length).split('&');
-    
+
     if(params.length < 3) {
         State.hideProgress();
         return;
@@ -187,7 +187,7 @@ function connect_next() {
     socket.send(JSON.stringify({ cmd: 'randnext' }));
 }
 
-function leave() {    
+function leave() {
     if(actions.has_key('leave')) return;
     actions.clear();
     actions.add('leave', function() {
@@ -294,14 +294,14 @@ function refreshVayaktiList() {
             .append($('<td>').append(key)));
     });
 }
-           
+
 function autosize(el){
     setTimeout(function(){
         el.style.cssText = 'height:auto; padding:0';
         el.style.cssText = 'height:' + el.scrollHeight + 'px';
         $('#reply_clip').css('bottom',  (el.scrollHeight + 20) + 'px');
         $('#selected_clip').css('bottom',  (el.scrollHeight + 30) + 'px');
-    },0);    
+    },0);
 }
 
 // Dialog
@@ -311,7 +311,7 @@ function dialog(prop, call) {
     $('#dialog_title').text(prop.title);
     $('#dialog_text').text(prop.text);
     $('#dialog_check_label').text(prop.checkLabel);
-    
+
     if(prop.check) $('#dialog_checkbox').removeClass('is-hidden');
     else $('#dialog_checkbox').addClass('is-hidden');
 
@@ -347,7 +347,7 @@ function loadGif() {
             area.find('[name=more]').remove();
             positiongif = data.next;
             data.results.forEach(function(result) {
-                var gif = result.media[0].tinygif.url;
+                var gif = result.media_formats.tinygif.url;
                 area.append($('<button>', {class: 'button', onclick: 'sendGif("'+encodeURI(gif)+'"); $("#gif_clip").addClass("is-hidden");'})
                     .append($('<img>', {src: gif})));
             });
