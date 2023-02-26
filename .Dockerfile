@@ -15,7 +15,7 @@ WORKDIR /app/${APP}
 COPY . .
 
 RUN cargo build --release && \
-    cp target/release/lupt . && \
+    cp target/release/${APP} . && \
     cargo clean && \
     rm -rf /usr/local/rustup/ /usr/local/cargo/ && \
     apk del gcc
