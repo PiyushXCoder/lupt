@@ -35,8 +35,10 @@ use actix_web::{
     web, App, Error, HttpRequest, HttpResponse, HttpServer,
 };
 use actix_web_actors::ws;
-use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslConnector, SslFiletype, SslMethod};
-use std::sync::RwLock;
+use log::error;
+// use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslConnector, SslFiletype, SslMethod};
+use rustls::{Certificate, NoClientAuth, PrivateKey, ServerConfig};
+use std::{fs::File, sync::RwLock};
 use ws_sansad::WsSansad;
 
 mod broker_messages;
@@ -53,18 +55,18 @@ lazy_static! {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "actix_web=info");
+    std::env::set_var("RUST_LOG", "info");
     env_logger::init();
     let (config, config_file) = config::generate();
-
+    error!("Hello");
     *SALT.write().unwrap() = config_file.salt;
 
     if let Some(key) = config_file.tenor_key {
         *TENOR_API_KEY.write().unwrap() = Some(key);
     }
 
-    let ssl_builder = if config_file.ssl_key.is_some() && config_file.ssl_cert.is_some() {
-        generate_ssl_builder(config_file.ssl_key.unwrap(), config_file.ssl_cert.unwrap())
+    let rustls_server_config = if config_file.ssl_key.is_some() && config_file.ssl_cert.is_some() {
+        gen_rustls_server_config(config_file.ssl_key.unwrap(), config_file.ssl_cert.unwrap())
     } else {
         None
     };
@@ -92,7 +94,7 @@ async fn main() -> std::io::Result<()> {
         app
     });
 
-    if ssl_builder.is_some() && config.port_ssl.is_some() {
+    if rustls_server_config.is_some() && config.port_ssl.is_some() {
         let port = config.port.clone();
         let port_ssl = config.port_ssl.clone().unwrap();
         let redirect_server = HttpServer::new(move || {
@@ -119,11 +121,11 @@ async fn main() -> std::io::Result<()> {
         })
         .bind(format!("{}:{}", config.bind_address, config.port))?
         .run();
-
+        let sc = rustls_server_config.unwrap();
         let server = server
-            .bind_openssl(
+            .bind_rustls(
                 format!("{}:{}", config.bind_address, config.port_ssl.unwrap()),
-                ssl_builder.unwrap(),
+                sc,
             )?
             .run();
 
@@ -147,10 +149,9 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
     if pos == "_" {
         pos = ""
     }
-    let builder = SslConnector::builder(SslMethod::tls()).unwrap();
 
     let client = Client::builder()
-        .connector(Connector::new().ssl(builder.build()).finish())
+        .connector(Connector::new().finish())
         .finish();
 
     let tenor_key = TENOR_API_KEY.read().unwrap();
@@ -168,9 +169,8 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         )
     } else {
         format!(
-        "https://tenor.googleapis.com/v2/featured?key={}&limit=20&media_filter=tinygif&pos={}",
-        key,
-        pos
+            "https://tenor.googleapis.com/v2/featured?key={}&limit=20&media_filter=tinygif&pos={}",
+            key, pos
         )
     };
 
@@ -187,12 +187,28 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         .body(response))
 }
 
-fn generate_ssl_builder(key: String, cert: String) -> Option<SslAcceptorBuilder> {
+fn gen_rustls_server_config(key: String, cert: String) -> Option<ServerConfig> {
     if key != "" && cert != "" {
-        let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-        builder.set_private_key_file(key, SslFiletype::PEM).unwrap();
-        builder.set_certificate_chain_file(cert).unwrap();
-        Some(builder)
+        let mut br = std::io::BufReader::new(File::open(cert).unwrap());
+        let certs = rustls_pemfile::certs(&mut br)
+            .unwrap()
+            .iter()
+            .map(|a| Certificate(a.to_owned()))
+            .collect::<Vec<Certificate>>();
+
+        let mut br = std::io::BufReader::new(File::open(key).unwrap());
+        let private_key = rustls_pemfile::ec_private_keys(&mut br).unwrap_or(
+            rustls_pemfile::rsa_private_keys(&mut br)
+                .unwrap_or(rustls_pemfile::pkcs8_private_keys(&mut br).unwrap()),
+        );
+
+        let private_key = private_key.get(0).unwrap();
+
+        let private_key = PrivateKey(private_key.to_owned());
+
+        let mut config = ServerConfig::new(NoClientAuth::new());
+        config.set_single_cert(certs, private_key).unwrap();
+        Some(config)
     } else {
         None
     }

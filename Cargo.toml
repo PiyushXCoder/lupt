@@ -14,7 +14,7 @@ keywords = ["chat", "Chatting", "Talk", "Stranger"]
 
 [dependencies]
 actix = "0.10"
-actix-web = { version = "3", features = ["openssl"] }
+actix-web = { version = "3", features = ["rustls"] }
 actix-web-actors = "3"
 actix-broker = "0.3"
 actix-files = "0.5"
@@ -33,3 +33,6 @@ tokio = { version = "1.5", features = ['rt', 'rt-multi-thread', 'macros'] }
 
 sha2 = "0.10"
 base64 = "0.13"
+log = "0.4.17"
+rustls = "0.18.0"
+rustls-pemfile = "1.0.2"
