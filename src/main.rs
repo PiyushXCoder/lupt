@@ -39,7 +39,7 @@ use actix_web::{
 };
 use actix_web_actors::ws;
 use config::CONFIG;
-use rustls::{Certificate, NoClientAuth, PrivateKey, ServerConfig};
+use rustls::{Certificate, PrivateKey, ServerConfig};
 use std::fs::File;
 use ws_sansad::WsSansad;
 
@@ -59,11 +59,6 @@ async fn main() -> std::io::Result<()> {
 
     let main_server = HttpServer::new(move || {
         let mut app = App::new()
-            .wrap(
-                RateLimiter::new(MemoryStoreActor::from(MemoryStore::new().clone()).start())
-                    .with_interval(std::time::Duration::from_secs(60))
-                    .with_max_requests(200),
-            )
             .wrap(Logger::new(&CONFIG.logger_pattern))
             .service(web::resource("/ws/").route(web::get().to(ws_index)));
 
@@ -114,8 +109,16 @@ fn gen_rustls_server_config(key: String, cert: String) -> ServerConfig {
 
     let private_key = PrivateKey(private_key.to_owned());
 
-    let mut config = ServerConfig::new(NoClientAuth::new());
-    config.set_single_cert(certs, private_key).unwrap();
+    let mut config = ServerConfig::builder()
+        .with_safe_default_cipher_suites()
+        .with_safe_default_kx_groups()
+        .with_safe_default_protocol_versions()
+        .map_err(|e| anyhow!(e))
+        .expect("Build TLS!")
+        .with_no_client_auth()
+        .with_single_cert(certs, private_key)
+        .map_err(|e| anyhow!(e))
+        .expect("Add TLS certificates!");
     config
 }
 
