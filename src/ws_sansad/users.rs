@@ -16,8 +16,8 @@
 */
 
 use super::*;
+use crate::config::CONFIG;
 use sha2::{Digest, Sha224};
-
 impl WsSansad {
     /// Request to join to kaksh
     pub async fn join_kaksh(&mut self, val: Value) {
@@ -55,7 +55,7 @@ impl WsSansad {
             return;
         }
         let mut hasher = Sha224::new();
-        hasher.update(format!("{}{}", kunjika, crate::SALT.read().unwrap()).as_bytes());
+        hasher.update(format!("{}{}", kunjika, CONFIG.salt).as_bytes());
         let kunjika = base64::encode(hasher.finalize())[..8].to_owned();
 
         // Name
@@ -160,7 +160,7 @@ impl WsSansad {
             return;
         }
         let mut hasher = Sha224::new();
-        hasher.update(format!("{}{}", kunjika, crate::SALT.read().unwrap()).as_bytes());
+        hasher.update(format!("{}{}", kunjika, &CONFIG.salt).as_bytes());
         let kunjika = base64::encode(hasher.finalize())[..8].to_owned();
 
         // Name
