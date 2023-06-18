@@ -105,7 +105,7 @@ fn gen_rustls_server_config(key: String, cert: String) -> ServerConfig {
 
     let private_key = PrivateKey(private_key.to_owned());
 
-    let mut config = ServerConfig::builder()
+    let config = ServerConfig::builder()
         .with_safe_default_cipher_suites()
         .with_safe_default_kx_groups()
         .with_safe_default_protocol_versions()
