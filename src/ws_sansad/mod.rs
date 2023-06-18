@@ -29,7 +29,7 @@ use std::time::{Duration, Instant};
 
 use crate::{
     broker_messages as ms,
-    broker_messages::util::Resp,
+    broker_messages::responses::ResultResponse,
     chat_pinnd::ChatPinnd,
     validator::{validate, Validation as vl},
 };

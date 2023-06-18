@@ -28,7 +28,7 @@ impl Handler<ms::pind::JoinKaksh> for ChatPinnd {
             .iter()
             .position(|vk| vk.kunjika == msg.kunjika)
         {
-            return MessageResult(Resp::Err("Kunjika already exist".to_owned()));
+            return MessageResult(ResultResponse::Err("Kunjika already exist".to_owned()));
         }
 
         if let Some(_) = self.kaksh.iter().position(|(_, g)| {
@@ -37,7 +37,7 @@ impl Handler<ms::pind::JoinKaksh> for ChatPinnd {
                 None => false,
             }
         }) {
-            return MessageResult(Resp::Err("Kunjika already exist".to_owned()));
+            return MessageResult(ResultResponse::Err("Kunjika already exist".to_owned()));
         }
 
         // check if kaksh exist and add user
@@ -47,7 +47,9 @@ impl Handler<ms::pind::JoinKaksh> for ChatPinnd {
                 // check if kaksh have no space left
                 if let Some(n) = kaksh.length {
                     if kaksh.loog.len() >= n {
-                        return MessageResult(Resp::Err("Kaksh have no space".to_owned()));
+                        return MessageResult(ResultResponse::Err(
+                            "Kaksh have no space".to_owned(),
+                        ));
                     }
                 }
 
@@ -80,7 +82,7 @@ impl Handler<ms::pind::JoinKaksh> for ChatPinnd {
             }
         }
 
-        MessageResult(Resp::Ok)
+        MessageResult(ResultResponse::Ok)
     }
 }
 
@@ -97,7 +99,7 @@ impl Handler<ms::pind::JoinRandom> for ChatPinnd {
             .iter()
             .position(|vk| vk.kunjika == msg.kunjika)
         {
-            return MessageResult(Resp::Err("Kunjika already exist".to_owned()));
+            return MessageResult(ResultResponse::Err("Kunjika already exist".to_owned()));
         }
 
         if let Some(_) = self.kaksh.iter().position(|(_, g)| {
@@ -106,7 +108,7 @@ impl Handler<ms::pind::JoinRandom> for ChatPinnd {
                 None => false,
             }
         }) {
-            return MessageResult(Resp::Err("Kunjika already exist".to_owned()));
+            return MessageResult(ResultResponse::Err("Kunjika already exist".to_owned()));
         }
 
         // Check if watch list is empty
@@ -117,7 +119,7 @@ impl Handler<ms::pind::JoinRandom> for ChatPinnd {
                 name: msg.name,
                 tags: msg.tags,
             });
-            return MessageResult(Resp::None);
+            return MessageResult(ResultResponse::None);
         }
 
         // connect person with tag
@@ -136,7 +138,7 @@ impl Handler<ms::pind::JoinRandom> for ChatPinnd {
                         name: msg.name,
                         tags: msg.tags,
                     });
-                    return MessageResult(Resp::None);
+                    return MessageResult(ResultResponse::None);
                 }
             }
         } else {
@@ -185,7 +187,7 @@ impl Handler<ms::pind::JoinRandom> for ChatPinnd {
                 kaksh_kunjika: group_kunjika,
             });
 
-        MessageResult(Resp::Ok)
+        MessageResult(ResultResponse::Ok)
     }
 }
 
@@ -195,12 +197,20 @@ impl Handler<ms::pind::JoinRandomNext> for ChatPinnd {
     fn handle(&mut self, msg: ms::pind::JoinRandomNext, _: &mut Self::Context) -> Self::Result {
         let kaksh = match self.kaksh.get_mut(&msg.kaksh_kunjika) {
             Some(v) => v,
-            None => return MessageResult(Resp::Err("Failed to join, check entries!".to_owned())),
+            None => {
+                return MessageResult(ResultResponse::Err(
+                    "Failed to join, check entries!".to_owned(),
+                ))
+            }
         };
 
         let loog_i = match kaksh.loog.iter().position(|a| a.kunjika == msg.kunjika) {
             Some(v) => v,
-            None => return MessageResult(Resp::Err("Failed to join, check entries!".to_owned())),
+            None => {
+                return MessageResult(ResultResponse::Err(
+                    "Failed to join, check entries!".to_owned(),
+                ))
+            }
         };
 
         let addr;
@@ -211,12 +221,16 @@ impl Handler<ms::pind::JoinRandomNext> for ChatPinnd {
             let loog = match kaksh.loog.get(loog_i) {
                 Some(v) => v,
                 None => {
-                    return MessageResult(Resp::Err("Failed to join, check entries!".to_owned()))
+                    return MessageResult(ResultResponse::Err(
+                        "Failed to join, check entries!".to_owned(),
+                    ))
                 }
             };
 
             if let None = loog.tags {
-                return MessageResult(Resp::Err("You are not a randome vyakti!".to_owned()));
+                return MessageResult(ResultResponse::Err(
+                    "You are not a randome vyakti!".to_owned(),
+                ));
             }
 
             addr = loog.addr.clone();
@@ -224,7 +238,9 @@ impl Handler<ms::pind::JoinRandomNext> for ChatPinnd {
             tags = match loog.tags.clone() {
                 Some(v) => v,
                 None => {
-                    return MessageResult(Resp::Err("Failed to join, check entries!".to_owned()))
+                    return MessageResult(ResultResponse::Err(
+                        "Failed to join, check entries!".to_owned(),
+                    ))
                 }
             };
         }
@@ -246,7 +262,7 @@ impl Handler<ms::pind::JoinRandomNext> for ChatPinnd {
                 name,
                 tags,
             });
-            return MessageResult(Resp::None);
+            return MessageResult(ResultResponse::None);
         }
         // connect person with tag or to zero
         let pos = if tags.len() > 0 {
@@ -264,7 +280,7 @@ impl Handler<ms::pind::JoinRandomNext> for ChatPinnd {
                         name,
                         tags,
                     });
-                    return MessageResult(Resp::None);
+                    return MessageResult(ResultResponse::None);
                 }
             }
         } else {
@@ -318,7 +334,7 @@ impl Handler<ms::pind::JoinRandomNext> for ChatPinnd {
                 kaksh_kunjika: group_kunjika,
             });
 
-        MessageResult(Resp::Ok)
+        MessageResult(ResultResponse::Ok)
     }
 }
 

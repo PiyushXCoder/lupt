@@ -25,7 +25,7 @@ use std::{collections::HashMap, vec};
 use actix::prelude::*;
 use actix_broker::BrokerSubscribe;
 
-use crate::{broker_messages as ms, broker_messages::util::Resp, ws_sansad};
+use crate::{broker_messages as ms, broker_messages::responses::ResultResponse, ws_sansad};
 
 #[allow(dead_code)]
 pub struct ChatPinnd {

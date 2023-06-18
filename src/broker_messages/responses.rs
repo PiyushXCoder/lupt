@@ -17,7 +17,7 @@
 
 // //################################################## Helper ##################################################
 #[derive(Debug)]
-pub enum Resp {
+pub enum ResultResponse {
     Ok,
     Err(String),
     None,
