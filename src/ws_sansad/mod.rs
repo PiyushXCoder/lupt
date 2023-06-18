@@ -39,11 +39,6 @@ const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 /// How long before lack of client response causes a timeout
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(15);
 
-/// How often heartbeat pings are sent
-const SPECIAL_HEARTBEAT_INTERVAL: Duration = Duration::from_secs(3 * 60);
-/// How long before lack of client response causes a timeout
-const SPECIAL_CLIENT_TIMEOUT: Duration = Duration::from_secs(15 * 60);
-
 pub struct WsSansad {
     kunjika: String,
     isthiti: Isthiti,
@@ -65,13 +60,11 @@ impl Actor for WsSansad {
     fn started(&mut self, ctx: &mut Self::Context) {
         self.addr = Some(ctx.address().clone()); // own addr
         self.hb(ctx);
-        self.special_hb(ctx);
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        tokio::runtime::Runtime::new()
-            .unwrap()
-            .block_on(self.leave_kaksh()); // notify leaving
+        futures::executor::block_on(self.leave_kaksh());
+
         Running::Stop
     }
 }
@@ -89,9 +82,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSansad {
             }
             Ok(ws::Message::Text(msg)) => {
                 self.special_hb = Instant::now();
-                tokio::runtime::Runtime::new()
-                    .unwrap()
-                    .block_on(self.parse_text_handle(msg));
+                // tokio::runtime::Runtime::new()
+                //     .unwrap()
+                //     .block_on(self.parse_text_handle(msg.to_string()));
+                futures::executor::block_on(self.parse_text_handle(msg.to_string()));
             }
             Ok(ws::Message::Close(msg)) => {
                 ctx.close(msg);
@@ -123,35 +117,12 @@ impl WsSansad {
                 // heartbeat timed out
 
                 // stop actor
-                tokio::runtime::Runtime::new()
-                    .unwrap()
-                    .block_on(act.leave_kaksh());
+                futures::executor::block_on(act.leave_kaksh());
                 ctx.stop();
                 // don't try to send a ping
                 return;
             }
 
-            ctx.ping(b"");
-        });
-    }
-
-    /// helper method that sends ping to client every second.
-    ///
-    /// also this method checks heartbeats from client
-    fn special_hb(&self, ctx: &mut <Self as Actor>::Context) {
-        ctx.run_interval(SPECIAL_HEARTBEAT_INTERVAL, |act, ctx| {
-            // check client heartbeats
-            if Instant::now().duration_since(act.special_hb) > SPECIAL_CLIENT_TIMEOUT {
-                // heartbeat timed out
-
-                // stop actor
-                tokio::runtime::Runtime::new()
-                    .unwrap()
-                    .block_on(act.leave_kaksh());
-                ctx.stop();
-                // don't try to send a ping
-                return;
-            }
             ctx.ping(b"");
         });
     }

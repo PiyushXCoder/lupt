@@ -31,13 +31,9 @@ extern crate lazy_static;
 extern crate anyhow;
 
 use actix_files as fs;
-use actix_ratelimit::{MemoryStore, MemoryStoreActor, RateLimiter};
-use actix_web::{
-    client::{Client, Connector},
-    middleware::Logger,
-    web, App, Error, HttpRequest, HttpResponse, HttpServer,
-};
+use actix_web::{middleware::Logger, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
+use awc::Client;
 use config::CONFIG;
 use rustls::{Certificate, PrivateKey, ServerConfig};
 use std::fs::File;
@@ -133,9 +129,7 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         pos = ""
     }
 
-    let client = Client::builder()
-        .connector(Connector::new().finish())
-        .finish();
+    let client = Client::default();
 
     let tenor_key = CONFIG.tenor_key.clone().unwrap();
 
@@ -155,11 +149,13 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
 
     let response = client
         .get(url)
-        .header("User-Agent", "actix-web/3.0")
+        .insert_header(("User-Agent", "actix-web/3.0"))
         .send()
-        .await?
+        .await
+        .unwrap()
         .body()
-        .await?;
+        .await
+        .unwrap(); // need handle errors
 
     Ok(HttpResponse::Ok()
         .content_type("application/json")

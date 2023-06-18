@@ -13,21 +13,21 @@ keywords = ["chat", "Chatting", "Talk", "Stranger"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix = "0.10"
+actix = "0.13"
 actix-web = { version = "4", features = ["rustls"] }
-actix-web-actors = "3"
-actix-broker = "0.3"
+actix-web-actors = "4"
+actix-broker = "0.4"
 actix-files = "0.6"
-env_logger = "0.9"
+awc = "3.1"
+env_logger = "0.10"
 openssl = "0.10"
 
 clap = { version = "4", features = ["derive"] }
 lazy_static = "1.4"
-
-serde = "1.0"
+serde = { version = "1.0", features = ["serde_derive"] }
 serde_json = "1.0"
 rand = "0.8"
-tokio = { version = "1.5", features = ['rt', 'rt-multi-thread', 'macros'] }
+futures = "0.3"
 
 sha2 = "0.10"
 base64 = "0.21"
