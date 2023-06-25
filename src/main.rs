@@ -31,15 +31,11 @@ extern crate lazy_static;
 extern crate anyhow;
 
 use actix_files as fs;
-use actix_ratelimit::{MemoryStore, MemoryStoreActor, RateLimiter};
-use actix_web::{
-    client::{Client, Connector},
-    middleware::Logger,
-    web, App, Error, HttpRequest, HttpResponse, HttpServer,
-};
+use actix_web::{middleware::Logger, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
+use awc::Client;
 use config::CONFIG;
-use rustls::{Certificate, NoClientAuth, PrivateKey, ServerConfig};
+use rustls::{Certificate, PrivateKey, ServerConfig};
 use std::fs::File;
 use ws_sansad::WsSansad;
 
@@ -59,11 +55,6 @@ async fn main() -> std::io::Result<()> {
 
     let main_server = HttpServer::new(move || {
         let mut app = App::new()
-            .wrap(
-                RateLimiter::new(MemoryStoreActor::from(MemoryStore::new().clone()).start())
-                    .with_interval(std::time::Duration::from_secs(60))
-                    .with_max_requests(200),
-            )
             .wrap(Logger::new(&CONFIG.logger_pattern))
             .service(web::resource("/ws/").route(web::get().to(ws_index)));
 
@@ -114,8 +105,16 @@ fn gen_rustls_server_config(key: String, cert: String) -> ServerConfig {
 
     let private_key = PrivateKey(private_key.to_owned());
 
-    let mut config = ServerConfig::new(NoClientAuth::new());
-    config.set_single_cert(certs, private_key).unwrap();
+    let config = ServerConfig::builder()
+        .with_safe_default_cipher_suites()
+        .with_safe_default_kx_groups()
+        .with_safe_default_protocol_versions()
+        .map_err(|e| anyhow!(e))
+        .expect("Build TLS!")
+        .with_no_client_auth()
+        .with_single_cert(certs, private_key)
+        .map_err(|e| anyhow!(e))
+        .expect("Add TLS certificates!");
     config
 }
 
@@ -130,9 +129,7 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
         pos = ""
     }
 
-    let client = Client::builder()
-        .connector(Connector::new().finish())
-        .finish();
+    let client = Client::default();
 
     let tenor_key = CONFIG.tenor_key.clone().unwrap();
 
@@ -152,11 +149,13 @@ async fn gif(req: HttpRequest) -> Result<HttpResponse, Error> {
 
     let response = client
         .get(url)
-        .header("User-Agent", "actix-web/3.0")
+        .insert_header(("User-Agent", "actix-web/3.0"))
         .send()
-        .await?
+        .await
+        .unwrap()
         .body()
-        .await?;
+        .await
+        .unwrap(); // need handle errors
 
     Ok(HttpResponse::Ok()
         .content_type("application/json")

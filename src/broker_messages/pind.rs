@@ -16,7 +16,7 @@
 */
 
 //! Messages to be sent between Actors
-use super::util::Resp;
+use super::responses::ResultResponse;
 use super::*;
 
 //################################################## For ChatPinnd ##################################################
@@ -24,7 +24,7 @@ use super::*;
 
 /// Request to Kaksh with its kunjika
 #[derive(Clone, Message)]
-#[rtype(result = "Resp")]
+#[rtype(result = "ResultResponse")]
 pub struct JoinKaksh {
     pub kaksh_kunjika: String,
     pub length: Option<usize>,
@@ -35,7 +35,7 @@ pub struct JoinKaksh {
 
 /// Request to connect Random vayakti
 #[derive(Clone, Message)]
-#[rtype(result = "Resp")]
+#[rtype(result = "ResultResponse")]
 pub struct JoinRandom {
     pub addr: Addr<WsSansad>,
     pub kunjika: String,
@@ -44,7 +44,7 @@ pub struct JoinRandom {
 }
 /// Request to connect Random Next vayakti
 #[derive(Clone, Message)]
-#[rtype(result = "Resp")]
+#[rtype(result = "ResultResponse")]
 pub struct JoinRandomNext {
     pub kaksh_kunjika: String,
     pub kunjika: String,

@@ -17,7 +17,9 @@
 
 use super::*;
 use crate::config::CONFIG;
+use base64::Engine;
 use sha2::{Digest, Sha224};
+
 impl WsSansad {
     /// Request to join to kaksh
     pub async fn join_kaksh(&mut self, val: Value) {
@@ -56,7 +58,9 @@ impl WsSansad {
         }
         let mut hasher = Sha224::new();
         hasher.update(format!("{}{}", kunjika, CONFIG.salt).as_bytes());
-        let kunjika = base64::encode(hasher.finalize())[..8].to_owned();
+        let kunjika = base64::engine::general_purpose::STANDARD_NO_PAD.encode(hasher.finalize())
+            [..8]
+            .to_owned();
 
         // Name
         let name = match val.get("name") {
@@ -98,7 +102,7 @@ impl WsSansad {
         };
 
         // request
-        let result: Resp = ChatPinnd::from_registry()
+        let result: ResultResponse = ChatPinnd::from_registry()
             .send(ms::pind::JoinKaksh {
                 kaksh_kunjika: kaksh_kunjika.to_owned(),
                 length,
@@ -110,8 +114,8 @@ impl WsSansad {
             .unwrap();
 
         match result {
-            Resp::Err(err) => self.send_err_response(&err),
-            Resp::Ok => {
+            ResultResponse::Err(err) => self.send_err_response(&err),
+            ResultResponse::Ok => {
                 self.isthiti = Isthiti::Kaksh(kaksh_kunjika);
                 self.addr
                     .clone()
@@ -161,7 +165,9 @@ impl WsSansad {
         }
         let mut hasher = Sha224::new();
         hasher.update(format!("{}{}", kunjika, &CONFIG.salt).as_bytes());
-        let kunjika = base64::encode(hasher.finalize())[..8].to_owned();
+        let kunjika = base64::engine::general_purpose::STANDARD_NO_PAD.encode(hasher.finalize())
+            [..8]
+            .to_owned();
 
         // Name
         let name = match val.get("name") {
@@ -189,7 +195,7 @@ impl WsSansad {
         };
 
         // request
-        let result: Resp = ChatPinnd::from_registry()
+        let result: ResultResponse = ChatPinnd::from_registry()
             .send(ms::pind::JoinRandom {
                 addr: self.addr.clone().unwrap(),
                 kunjika: kunjika.to_owned(),
@@ -200,8 +206,8 @@ impl WsSansad {
             .unwrap();
 
         match result {
-            Resp::Err(err) => self.send_err_response(&err),
-            Resp::Ok => {
+            ResultResponse::Err(err) => self.send_err_response(&err),
+            ResultResponse::Ok => {
                 self.addr
                     .clone()
                     .unwrap()
@@ -210,7 +216,7 @@ impl WsSansad {
                     });
                 self.kunjika = kunjika;
             }
-            Resp::None => {
+            ResultResponse::None => {
                 self.addr.clone().unwrap().do_send(ms::sansad::WsResponse {
                     result: "watch".to_owned(),
                     message: "Watchlist".to_owned(),
@@ -243,7 +249,7 @@ impl WsSansad {
         };
 
         // request
-        let result: Resp = ChatPinnd::from_registry()
+        let result: ResultResponse = ChatPinnd::from_registry()
             .send(ms::pind::JoinRandomNext {
                 kunjika: self.kunjika.to_owned(),
                 kaksh_kunjika: kaksh_kunjika.to_owned(),
@@ -252,8 +258,8 @@ impl WsSansad {
             .unwrap();
 
         match result {
-            Resp::Err(err) => self.send_err_response(&err),
-            Resp::None => {
+            ResultResponse::Err(err) => self.send_err_response(&err),
+            ResultResponse::None => {
                 self.addr.clone().unwrap().do_send(ms::sansad::WsResponse {
                     result: "watch".to_owned(),
                     message: "Watchlist".to_owned(),
