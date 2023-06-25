@@ -44,7 +44,6 @@ pub struct WsSansad {
     isthiti: Isthiti,
     addr: Option<Addr<Self>>,
     hb: Instant,
-    special_hb: Instant,
 }
 
 #[derive(Debug)]
@@ -81,10 +80,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSansad {
                 self.hb = Instant::now();
             }
             Ok(ws::Message::Text(msg)) => {
-                self.special_hb = Instant::now();
-                // tokio::runtime::Runtime::new()
-                //     .unwrap()
-                //     .block_on(self.parse_text_handle(msg.to_string()));
                 futures::executor::block_on(self.parse_text_handle(msg.to_string()));
             }
             Ok(ws::Message::Close(msg)) => {
@@ -103,7 +98,6 @@ impl WsSansad {
             isthiti: Isthiti::None,
             addr: None,
             hb: Instant::now(),
-            special_hb: Instant::now(),
         }
     }
 
