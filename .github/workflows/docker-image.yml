@@ -22,7 +22,7 @@ jobs:
           - name: 'Build Inventory Image'
             run: |
               docker buildx create --name builder1 --use --bootstrap
-              docker buildx build --load --platform linux/arm64 \
+              docker buildx build --load --platform linux/arm64/v8,linux/amd64 \
                 --build-arg="RUNNER_GROUP_ID=${{vars.RUNNER_GROUP_ID}}" \
                 --build-arg="RUNNER_USER_ID=${{vars.RUNNER_USER_ID}}" \
                 --build-arg="APP=${{vars.APP}}" --tag ghcr.io/${GITHUB_REPOSITORY,,}:main $(pwd)
