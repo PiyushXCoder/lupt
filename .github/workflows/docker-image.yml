@@ -4,7 +4,6 @@ on:
   push:
     branches: 
       - "main"
-      - "PiyushXCoder-workflow"
 
 jobs:
       push-store-image:
