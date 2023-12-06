@@ -2,9 +2,11 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - "main"
   pull_request:
-    branches: [ "main" ]
+    branches: 
+      - "main"
 
 jobs:
       push-store-image:
@@ -23,6 +25,6 @@ jobs:
 
           - name: 'Build Inventory Image'
             run: |
-              docker build . --tag ghcr.io/${{env.GITHUB_REPOSITORY}}:main
-              docker push ghcr.io/${{env.GITHUB_REPOSITORY}}:main
+              docker build . --tag ghcr.io/${{github.repository}}:main
+              docker push ghcr.io/${{github.repository}}:main
 
