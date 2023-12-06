@@ -1,0 +1,15 @@
+
+version: "3.2"
+services:
+  web:
+    build: 
+      context: .
+      args:
+        RUNNER_USER_ID: ${RUNNER_USER_ID} 
+        RUNNER_GROUP_ID: ${RUNNER_GROUP_ID}
+        APP: ${APP}
+
+    ports:
+      - ${PORT}:8080
+    volumes:
+      - ${CONFIG}:/app/config.json
