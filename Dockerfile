@@ -21,7 +21,7 @@ ENV RUNNER_USER_ID=${RUNNER_USER_ID}
 ARG APP=local
 ENV APP=${APP}
 
-RUN apk add --no-cache openssl 
+# RUN apk add --no-cache openssl 
 
 RUN addgroup -g ${RUNNER_GROUP_ID} runner && adduser -G runner -u ${RUNNER_USER_ID} runner -D
 USER runner
