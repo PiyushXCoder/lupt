@@ -23,6 +23,6 @@ jobs:
 
           - name: 'Build Inventory Image'
             run: |
-              docker build . --tag ghcr.io/${{GITHUB_REPOSITORY}}:main
-              docker push ghcr.io/${{GITHUB_REPOSITORY}}:main
+              docker build . --tag ghcr.io/${{env.GITHUB_REPOSITORY}}:main
+              docker push ghcr.io/${{env.GITHUB_REPOSITORY}}:main
 
