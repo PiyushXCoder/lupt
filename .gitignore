@@ -1,6 +1,4 @@
 /target
-/Dockerfile
 /etc/config.json
 /localhost-key.pem
 /localhost.pem
-/docker-compose.yml
