@@ -2,7 +2,7 @@
 version: "3.2"
 services:
   web:
-    image: "ghcr.io/piyushxcoder/lupt:master"
+    image: "ghcr.io/piyushxcoder/lupt:main"
     restart: always
     ports:
       - ${PORT}:8000
