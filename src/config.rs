@@ -29,17 +29,21 @@ pub(crate) struct Args {
 
 #[derive(Deserialize)]
 pub(crate) struct ConfigFile {
-    pub(crate) bind_address: String,
+    pub(crate) static_dir: PathBuf,
 
-    pub(crate) static_dir_path: PathBuf,
+    pub(crate) bind_address: String,
+    pub(crate) non_ssl_port: u16,
+
+    pub(crate) ssl_enabled: bool,
+    pub(crate) ssl_port: Option<u16>,
+    pub(crate) ssl_cert: Option<String>,
+    pub(crate) ssl_key: Option<String>,
+
     pub(crate) logger_pattern: String,
+    pub(crate) log_file: PathBuf,
 
     pub(crate) salt: String,
     pub(crate) tenor_key: Option<String>,
-
-    pub(crate) allow_ssl: Option<bool>,
-    pub(crate) ssl_cert: Option<String>,
-    pub(crate) ssl_key: Option<String>,
 }
 
 pub(crate) fn generate() -> ConfigFile {

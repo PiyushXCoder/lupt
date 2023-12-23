@@ -1,1 +1,3 @@
 /target
+/actix-web-middleware-redirect-https/
+/logs.txt

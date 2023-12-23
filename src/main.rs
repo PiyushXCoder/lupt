@@ -36,7 +36,10 @@ use actix_web_actors::ws;
 use awc::Client;
 use config::CONFIG;
 use rustls::{Certificate, PrivateKey, ServerConfig};
+use rustls_pemfile::{certs, pkcs8_private_keys};
+use simplelog::*;
 use std::fs::File;
+use std::io::BufReader;
 use ws_sansad::WsSansad;
 
 mod broker_messages;
@@ -48,12 +51,30 @@ mod ws_sansad;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "info");
-    env_logger::init();
-
     lazy_static::initialize(&CONFIG);
 
-    let main_server = HttpServer::new(move || {
+    CombinedLogger::init(vec![
+        TermLogger::new(
+            LevelFilter::Warn,
+            Config::default(),
+            TerminalMode::Mixed,
+            ColorChoice::Auto,
+        ),
+        WriteLogger::new(
+            LevelFilter::Info,
+            Config::default(),
+            File::options()
+                .write(true)
+                .open(&CONFIG.log_file)
+                .unwrap_or_else(|_| {
+                    println!("Creating new log file");
+                    File::create(&CONFIG.log_file).unwrap()
+                }),
+        ),
+    ])
+    .unwrap();
+
+    let server = HttpServer::new(move || {
         let mut app = App::new()
             .wrap(Logger::new(&CONFIG.logger_pattern))
             .service(web::resource("/ws/").route(web::get().to(ws_index)));
@@ -66,56 +87,84 @@ async fn main() -> std::io::Result<()> {
             }
         }
 
-        app = app.service(fs::Files::new("/", &CONFIG.static_dir_path).index_file("index.html"));
+        app = app.service(fs::Files::new("/", &CONFIG.static_dir).index_file("index.html"));
         app
     });
 
-    let main_server = if CONFIG.allow_ssl.unwrap_or(false) {
-        main_server
+    if CONFIG.ssl_enabled {
+        let server = server
             .bind_rustls(
-                &CONFIG.bind_address,
-                gen_rustls_server_config(
+                format!("{}:{}", CONFIG.bind_address, CONFIG.ssl_port.unwrap()),
+                load_rustls_config(
                     CONFIG.ssl_key.clone().unwrap(),
                     CONFIG.ssl_cert.clone().unwrap(),
                 ),
             )?
-            .run()
+            .run();
+        let redirect_server = create_redirect_server(
+            CONFIG.ssl_port.unwrap(),
+            CONFIG.non_ssl_port,
+            &CONFIG.bind_address,
+        );
+        let (r1, r2) = tokio::join!(server, redirect_server);
+        r1.unwrap();
+        r2.unwrap();
     } else {
-        main_server.bind(&CONFIG.bind_address)?.run()
-    };
+        server
+            .bind(format!("{}:{}", CONFIG.bind_address, CONFIG.non_ssl_port))?
+            .run()
+            .await?;
+    }
 
-    main_server.await
+    Ok(())
 }
 
-fn gen_rustls_server_config(key: String, cert: String) -> ServerConfig {
-    let mut br = std::io::BufReader::new(File::open(cert).unwrap());
-    let certs = rustls_pemfile::certs(&mut br)
+fn load_rustls_config(key: String, cert: String) -> rustls::ServerConfig {
+    // Load key files
+    let cert_file = &mut BufReader::new(File::open(cert).unwrap());
+    let key_file = &mut BufReader::new(File::open(key).unwrap());
+
+    // Parse the certificate and set it in the configuration
+    let cert_chain = certs(cert_file)
         .unwrap()
-        .iter()
-        .map(|a| Certificate(a.to_owned()))
+        .into_iter()
+        .map(|a: Vec<u8>| rustls::Certificate(a))
         .collect::<Vec<Certificate>>();
+    let key = pkcs8_private_keys(key_file)
+        .unwrap()
+        .into_iter()
+        .map(|a: Vec<u8>| rustls::PrivateKey(a))
+        .collect::<Vec<PrivateKey>>()
+        .first()
+        .unwrap()
+        .to_owned();
 
-    let mut br = std::io::BufReader::new(File::open(key).unwrap());
-    let private_key = rustls_pemfile::ec_private_keys(&mut br).unwrap_or(
-        rustls_pemfile::rsa_private_keys(&mut br)
-            .unwrap_or(rustls_pemfile::pkcs8_private_keys(&mut br).unwrap()),
-    );
-
-    let private_key = private_key.get(0).unwrap();
-
-    let private_key = PrivateKey(private_key.to_owned());
-
-    let config = ServerConfig::builder()
-        .with_safe_default_cipher_suites()
-        .with_safe_default_kx_groups()
-        .with_safe_default_protocol_versions()
-        .map_err(|e| anyhow!(e))
-        .expect("Build TLS!")
+    // Create configuration
+    ServerConfig::builder()
+        .with_safe_defaults()
         .with_no_client_auth()
-        .with_single_cert(certs, private_key)
-        .map_err(|e| anyhow!(e))
-        .expect("Add TLS certificates!");
-    config
+        .with_single_cert(cert_chain, key)
+        .unwrap()
+}
+
+async fn create_redirect_server(
+    ssl_port: u16,
+    non_ssl_port: u16,
+    bind_address: &str,
+) -> std::io::Result<()> {
+    HttpServer::new(move || {
+        App::new().wrap(
+            actix_web_middleware_redirect_https::RedirectHTTPS::with_replacements(&[(
+                non_ssl_port.to_string(),
+                ssl_port.to_string(),
+            )]),
+        )
+    })
+    .bind(format!("{}:{}", bind_address, non_ssl_port))?
+    .run()
+    .await
+    .unwrap();
+    Ok(())
 }
 
 async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {

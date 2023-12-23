@@ -237,7 +237,6 @@ impl WsSansad {
         for id in ids {
             msg_id.push(id.as_str().unwrap().to_owned());
         }
-        drop(ids);
 
         let kaksh_kunjika = match &self.isthiti {
             Isthiti::Kaksh(kaksh_kunjika) => kaksh_kunjika.to_owned(),

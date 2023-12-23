@@ -1,4 +1,5 @@
 /target
-/etc/config.json
 /localhost-key.pem
 /localhost.pem
+/actix-web-middleware-redirect-https/
+/logs.txt

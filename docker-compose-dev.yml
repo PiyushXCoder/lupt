@@ -2,8 +2,11 @@
 version: "3.2"
 services:
   web:
-    image: "ghcr.io/piyushxcoder/lupt:master"
-    restart: always
+    build:
+      context: .
+      args:
+        RUNNER_USER_ID: 1000
+        RUNNER_GROUP_ID: 1000
     ports:
       - ${PORT}:8000
     volumes:
@@ -11,3 +14,5 @@ services:
       - ${LOG}:/app/logs.txt:rw
     environment:
       - RUST_LOG=actix_web=info
+
+

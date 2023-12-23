@@ -1,0 +1,13 @@
+{
+    "static_dir": "./static/",
+    "bind_address": "0.0.0.0",
+    "non_ssl_port": 8000,
+    "ssl_enabled": false,
+    "ssl_port": null,
+    "ssl_cert": null,
+    "ssl_key": null,
+    "logger_pattern": "%t [%a] %s %{User-Agent}i %r",
+    "log_file": "logs.txt",
+    "salt": "PUT SOME TEXT FOR SALT",
+    "tenor_key": "GET API KEY FROM https://tenor.com AND PASTE HERE"
+}

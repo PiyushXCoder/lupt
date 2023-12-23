@@ -294,7 +294,6 @@ impl Handler<ms::pind::JoinRandomNext> for ChatPinnd {
         );
 
         let log_count = kaksh.loog.len();
-        drop(kaksh);
         if log_count == 0 {
             self.kaksh.remove(&msg.kaksh_kunjika);
         }
