@@ -1,5 +1,5 @@
 FROM rust:alpine3.18 AS build
-RUN cargo search --limit 0 && \
+RUN cargo search --limit 1 && \
   apk add --no-cache musl-dev pkgconfig openssl-dev 
 WORKDIR /app
 COPY . .
