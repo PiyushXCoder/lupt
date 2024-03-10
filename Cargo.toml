@@ -1,6 +1,6 @@
 [package]
 name = "lupt"
-version = "0.2.0"
+version = "0.2.1"
 description = "Chat app for lupt(लुप्त) users!"
 authors = ["Piyush Raj <piyush.raj.kit@gmail.com>"]
 edition = "2018"
@@ -19,7 +19,7 @@ actix-web-actors = "4"
 actix-web-middleware-redirect-https = { git = "https://github.com/PiyushXCoder/actix-web-middleware-redirect-https.git" }
 actix-broker = "0.4"
 actix-files = "0.6"
-awc = "3.1"
+awc = { version = "3.1", features = ["rustls"] }
 clap = { version = "4", features = ["derive"] }
 lazy_static = "1.4"
 serde = { version = "1.0", features = ["serde_derive"] }
