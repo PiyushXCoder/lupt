@@ -423,6 +423,7 @@ dependencies = [
  "percent-encoding",
  "pin-project-lite",
  "rand",
+ "rustls",
  "serde",
  "serde_json",
  "serde_urlencoded",
@@ -971,7 +972,7 @@ dependencies = [
 
 [[package]]
 name = "lupt"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "actix",
  "actix-broker",
