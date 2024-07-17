@@ -2,14 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://luptchat.in/</loc>
+        <priority>1.0</priority>
     </url>
     <url>
         <loc>https://luptchat.in/index.html</loc>
+        <priority>0.7</priority>
     </url>
     <url>
         <loc>https://luptchat.in/policy.html</loc>
+        <priority>0.7</priority>
     </url>
     <url>
         <loc>https://luptchat.in/terms.html</loc>
+        <priority>0.7</priority>
     </url>
 </urlset>
